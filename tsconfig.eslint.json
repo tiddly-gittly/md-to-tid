@@ -14,6 +14,7 @@
     "scripts/**/*.ts",
     "src/**/*.d.ts",
     "demo/**/*.d.ts",
+    "test/**/*.mjs",
     "./*.json",
     "./*.js"
   ],

@@ -3,6 +3,7 @@
     "MDAST",
     "NLCST",
     "Retid",
+    "tidast",
     "UNIST"
   ]
 }
