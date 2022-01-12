@@ -1,13 +1,39 @@
 import { u } from 'unist-builder';
-import { Heading as MdHeading } from 'mdast'
-import { toTidast } from '../dist/index.mjs';
+import { unified } from 'unified';
+import { toString } from '../dist/index.mjs';
 
-describe('Map from Mdast to Tidast', () => {
-  test('Map root to root', () => {
-    expect(toTidast(u('root', []))).toEqual(u('root', []));
+describe('retidStringify', () => {
+  test('* unordered list', () => {
+    expect(
+      toString({
+        type: 'list',
+        children: [
+          {
+            type: 'listItem',
+            children: [{ type: 'paragraph', children: [{ type: 'text', value: 'alpha' }] }],
+          },
+        ],
+      }),
+    ).toEqual('*   alpha\n');
   });
 
-  test('Map literal to literal', () => {
-    expect(toTidast(u('heading', []) as MdHeading)).toEqual(u('root', []));
+  test('# ordered list', () => {
+    expect(
+      toString({
+        type: 'list',
+        ordered: true,
+        children: [
+          {
+            type: 'listItem',
+            children: [
+              {
+                type: 'paragraph',
+                children: [{ type: 'text', value: 'item 1' }],
+              },
+            ],
+          },
+        ],
+      }),
+    ).toEqual('#   item 1\n');
   });
 });
