@@ -7,11 +7,11 @@
   "types": "dist/src/index.d.ts",
   "scripts": {
     "build": "npm run build:types && npm run build:js",
+    "test": "npm run build:js && NODE_OPTIONS=--experimental-vm-modules jest --config=jest.config.json",
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "rollup -c",
     "build:demo": "rollup -c rollup.config.demo.js && cp demo/index.html public-dist/index.html",
     "dev:demo": "mkdir -p public-dist/ && cp demo/index.html public-dist/index.html && rollup -c rollup.config.demo.development.js --watch",
-    "test": "npm run build:js && NODE_OPTIONS=--experimental-vm-modules jest --config=jest.config.json",
     "prepublishOnly": "npm run clean && npm run build",
     "clean": "rimraf dist public-dist",
     "installType": "typesync"
@@ -44,6 +44,7 @@
     "errio": "1.2.2",
     "lodash": "4.17.21",
     "mdast-util-from-markdown": "^1.0.4",
+    "mdast-util-to-markdown": "^1.2.6",
     "nlcst-to-string": "^3.1.0",
     "nlcst-types": "^1.2.4",
     "preval.macro": "^5.0.0",
@@ -57,7 +58,8 @@
     "use-query-string": "^2.3.0",
     "vfile": "^5.1.1",
     "vfile-location": "^4.0.1",
-    "vfile-reporter": "^7.0.2"
+    "vfile-reporter": "^7.0.2",
+    "zwitch": "^2.0.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.15.7",
