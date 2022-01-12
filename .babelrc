@@ -1,5 +1,14 @@
 {
-  "presets": ["@babel/env", "@babel/typescript", "@babel/react"],
+  "presets": [
+    [
+      "@babel/env",
+      {
+        "targets": "> 30%, not dead"
+      }
+    ],
+    "@babel/typescript",
+    "@babel/react"
+  ],
   "plugins": [
     "macros",
     "lodash",

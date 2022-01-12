@@ -1,9 +1,10 @@
 import { u } from 'unist-builder';
 import { unified } from 'unified';
-import { toString } from '../dist/index.mjs';
+import remarkParse from 'remark-parse';
+import { toString, md2tid } from '../dist/index.mjs';
 
-describe('retidStringify', () => {
-  test('* unordered list', () => {
+describe('unordered list', () => {
+  test('render 1 level 1 node ast', () => {
     expect(
       toString({
         type: 'list',
@@ -17,7 +18,13 @@ describe('retidStringify', () => {
     ).toEqual('*   alpha\n');
   });
 
-  test('# ordered list', () => {
+  test('- to *', async () => {
+    await expect(md2tid('- item 1')).resolves.toEqual('*   item 1\n');
+  });
+});
+
+describe('ordered list', () => {
+  test('render 1 level 1 node ast', () => {
     expect(
       toString({
         type: 'list',
@@ -35,5 +42,9 @@ describe('retidStringify', () => {
         ],
       }),
     ).toEqual('#   item 1\n');
+  });
+
+  test('1. to #', async () => {
+    await expect(md2tid('1. item 1')).resolves.toEqual('#   item 1\n');
   });
 });

@@ -6,7 +6,8 @@ type MdastNode = MdastRoot | MdastContent;
 
 export type IOptions = Omit<IToMarkdownOptions, 'extensions'>;
 
-export const retidStringify: Plugin<[IOptions], MdastRoot, string> = function (options: IOptions) {
+  // @ts-expect-error: bad type written by unified author.
+export const retidStringify: Plugin<[(IOptions | undefined)?] | void[], MdastRoot, string> = function (options) {
   const compiler: CompilerFunction<MdastNode, string> = (tree) => {
     // Assume options.
     const settings = this.data('settings') as IOptions;
