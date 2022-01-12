@@ -1,4 +1,4 @@
-import { Options as IToMarkdownOptions, toMarkdown } from 'mdast-util-to-markdown';
+import { Options as IToMarkdownOptions, toTid } from '../tidast-util-to-tid';
 import { Plugin, Processor, CompilerFunction } from 'unified';
 import { Root as MdastRoot, Content as MdastContent } from 'mdast';
 
@@ -11,9 +11,9 @@ export const retidStringify: Plugin<[IOptions], MdastRoot, string> = function (o
     // Assume options.
     const settings = this.data('settings') as IOptions;
 
-    return toMarkdown(
+    return toTid(
       tree,
-      Object.assign({ bullet: '*', bulletOther: '*', bulletOrdered: '#' }, settings, options, {
+      Object.assign({ bullet: '*', bulletOrdered: '#', incrementListMarker: false }, settings, options, {
         // Note: this option is not in the readme.
         // The goal is for it to be set by plugins on `data` instead of being
         // passed by users.
