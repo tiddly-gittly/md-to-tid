@@ -1,7 +1,6 @@
 import type { Context, Join, Parent, Node } from './types';
 
 import { formatCodeAsIndented } from './util/format-code-as-indented';
-import { formatHeadingAsSetext } from './util/format-heading-as-setext';
 
 export const join: Join[] = [joinDefaults];
 
@@ -31,10 +30,7 @@ function joinDefaults(left: Node, right: Node, parent: Parent, context: Context)
     if (
       left.type === 'paragraph' &&
       // Two paragraphs.
-      (left.type === right.type ||
-        right.type === 'definition' ||
-        // Paragraph followed by a setext heading.
-        (right.type === 'heading' && formatHeadingAsSetext(right, context)))
+      (left.type === right.type || right.type === 'definition')
     ) {
       return;
     }

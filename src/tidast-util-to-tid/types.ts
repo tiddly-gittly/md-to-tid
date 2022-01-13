@@ -64,7 +64,6 @@ export type Options = {
   rule?: '-' | '*' | '_' | undefined;
   ruleRepetition?: number | undefined;
   ruleSpaces?: boolean | undefined;
-  setext?: boolean | undefined;
   strong?: '*' | '_' | undefined;
   tightDefinitions?: boolean | undefined;
   extensions?: Options[] | undefined;
