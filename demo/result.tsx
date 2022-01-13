@@ -1,4 +1,4 @@
-import { Card } from '@blueprintjs/core';
+import { Button, Card } from '@blueprintjs/core';
 import styled from 'styled-components';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -21,7 +21,7 @@ const ResultContainer = styled(Card)`
   padding: 40px;
   font-size: 64px;
 `;
-const ResultParagraph = styled.p``;
+const CopyButton = styled(Button)``;
 
 export function GenerationResult(props: { result: string; resultDisplayMode: ResultDisplayMode; template: string }): JSX.Element {
   switch (props.resultDisplayMode) {
@@ -36,6 +36,13 @@ export function GenerationResult(props: { result: string; resultDisplayMode: Res
     case ResultDisplayMode.paragraph: {
       return (
         <ResultContainer as="article">
+          <CopyButton
+            large
+            onClick={() => {
+              navigator.clipboard.writeText(props.result);
+            }}>
+            复制
+          </CopyButton>
           <pre>{props.result}</pre>
         </ResultContainer>
       );
