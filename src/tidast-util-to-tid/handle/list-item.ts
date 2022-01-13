@@ -26,11 +26,12 @@ export const listItem: Handle = function listItem(node: ListItem, parent, contex
 
   const exit = context.enter('listItem');
   const map: Map = function map(line, index, blank) {
+    // in tw, there is no indent for list item
     if (index) {
-      return (blank ? '' : ' '.repeat(size)) + line;
+      return (blank ? '' : bullet) + line;
     }
 
-    return (blank ? bullet : bullet + ' '.repeat(size - bullet.length)) + line;
+    return (blank ? bullet : bullet + ' ') + line;
   };
   const value = indentLines(containerFlow(node, context), map);
   exit();

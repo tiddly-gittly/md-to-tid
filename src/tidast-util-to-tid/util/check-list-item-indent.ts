@@ -1,20 +1,7 @@
-/**
- * @typedef {import('../types').Context} Context
- * @typedef {import('../types').Options} Options
- */
+import type { Context, Options } from '../types';
 
-/**
- * @param {Context} context
- * @returns {Exclude<Options['listItemIndent'], undefined>}
- */
-export function checkListItemIndent(context) {
-  const style = context.options.listItemIndent || 'tab';
-
-  // To do: remove in a major.
-  // @ts-expect-error: deprecated.
-  if (style === 1 || style === '1') {
-    return 'one';
-  }
+export function checkListItemIndent(context: Context): Exclude<Options['listItemIndent'], undefined> {
+  const style = context.options.listItemIndent || 'one';
 
   if (style !== 'tab' && style !== 'one' && style !== 'mixed') {
     throw new Error('Cannot serialize items with `' + style + '` for `options.listItemIndent`, expected `tab`, `one`, or `mixed`');

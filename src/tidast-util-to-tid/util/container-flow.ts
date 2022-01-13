@@ -4,7 +4,6 @@ import type { Context, Node, Parent } from '../types';
 export function containerFlow(parent: Parent, context: Context): string {
   const indexStack = context.indexStack;
   const children = parent.children || [];
-  /** @type {Array.<string>} */
   const results: Array<string> = [];
   let index = -1;
 
