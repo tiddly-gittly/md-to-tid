@@ -74094,8 +74094,8 @@
 	  displayName: "result__ResultContainer",
 	  componentId: "sc-197txjr-0"
 	})(["display:flex;flex:1;flex-direction:column;justify-content:flex-start;align-items:flex-start;max-height:100vh;overflow:scroll;padding:0.4rem;font-size:0.64rem;"]);
-	styled$1.p.withConfig({
-	  displayName: "result__ResultParagraph",
+	const CopyButton = styled$1(Button).withConfig({
+	  displayName: "result__CopyButton",
 	  componentId: "sc-197txjr-1"
 	})([""]);
 	function GenerationResult(props) {
@@ -74110,7 +74110,12 @@
 	      {
 	        return /*#__PURE__*/react.createElement(ResultContainer, {
 	          as: "article"
-	        }, /*#__PURE__*/react.createElement("pre", null, props.result));
+	        }, /*#__PURE__*/react.createElement(CopyButton, {
+	          large: true,
+	          onClick: () => {
+	            navigator.clipboard.writeText(props.result);
+	          }
+	        }, "\u590D\u5236"), /*#__PURE__*/react.createElement("pre", null, props.result));
 	      }
 
 	    case ResultDisplayMode.markdown:
