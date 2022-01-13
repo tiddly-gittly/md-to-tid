@@ -4,7 +4,7 @@ import { VFile } from 'vfile';
 import retidStringify, { IOptions } from './retid-stringify';
 import { Root as MdastRoot, Content as MdastContent } from 'mdast';
 
-const md2tidProcessor = unified().use(remarkParse).use(retidStringify);
+export const md2tidProcessor = unified().use(remarkParse).use(retidStringify);
 
 export async function md2tid(markdownString: string): Promise<string> {
   const vFile = new VFile({ path: 'fileName', value: markdownString });

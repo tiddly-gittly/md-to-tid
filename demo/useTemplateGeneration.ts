@@ -3,14 +3,7 @@ import { useDebouncedFn } from 'beautiful-react-hooks';
 import { VFile } from 'vfile';
 import type { JSONSchema7 } from 'json-schema';
 // import { reporter } from 'vfile-reporter';
-import {
-  IConfiguration,
-  templateFileToNLCSTNodes,
-  getConfigSchemaFromTemplate,
-  IOutputWIthMetadata,
-  randomOutlineToArrayWithMetadataCompiler,
-  ITemplateData,
-} from '../src';
+import { IOptions, md2tidProcessor } from '../src';
 
 function useTrigger() {
   const [a, f] = useState(false);
@@ -22,25 +15,24 @@ function useTrigger() {
   ] as const;
 }
 
-export function useTemplateGeneration(configFormData: IConfiguration | undefined, fileName = 'input.md') {
+export function useTemplateGeneration(configFormData: IOptions | undefined, fileName = 'input.md') {
   const [template, templateSetter] = useState('');
-  const [result, resultSetter] = useState<Array<IOutputWIthMetadata<any[]>>>([]);
-  const [templateData, templateDataSetter] = useState<ITemplateData | undefined>();
+  const [result, resultSetter] = useState<string>('');
+  const [templateData, templateDataSetter] = useState<string>('');
   const [errorMessage, errorMessageSetter] = useState('');
   const [configSchema, configSchemaSetter] = useState<JSONSchema7 | undefined>();
   const [rerender, rerenderHookTrigger] = useTrigger();
   const parseAndGenerateFromTemplate = useDebouncedFn(
-    (templateStringToParse: string): void => {
+    async (templateStringToParse: string): Promise<void> => {
       const vFile = new VFile({ path: fileName, value: templateStringToParse });
       let newErrorMessage = '';
       try {
-        const templateData = templateFileToNLCSTNodes(vFile);
-        configSchemaSetter(getConfigSchemaFromTemplate(templateData));
+        const templateData = await md2tidProcessor.process(vFile);
         if (configFormData === undefined) {
           throw new Error('模板参数不正确');
         }
-        templateDataSetter(templateData);
-        resultSetter(randomOutlineToArrayWithMetadataCompiler(templateData, configFormData));
+        templateDataSetter(vFile.toString());
+        resultSetter(templateData.toString());
       } catch (e) {
         newErrorMessage += (e as Error).message;
       }

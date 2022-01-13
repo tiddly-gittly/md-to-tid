@@ -1,16 +1,14 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
-import { AnchorButton, Button, ButtonGroup, Card, Intent, Tab, Tabs, TextArea } from '@blueprintjs/core';
+import { Button, ButtonGroup, Card, Intent, Tab, Tabs, TextArea } from '@blueprintjs/core';
 import { withTheme } from '@rjsf/core';
 import { Theme as RJSFUITheme } from '@rjsf/fluent-ui';
-import { pick } from 'lodash';
 import { useLocalStorage } from 'beautiful-react-hooks';
 import useQueryString from 'use-query-string';
 import { useTemplateGeneration } from './useTemplateGeneration';
-import { collectSlots, emptyConfigurationString, IConfiguration, templateFileToNLCSTNodes } from '../src';
-import { templates } from '../src';
-import { VFile } from 'vfile';
+import { IOptions } from '../src';
+import { templates } from './data';
 import { GenerationResult, ResultDisplayMode } from './result';
 import GlobalStyle from './globalStyle';
 
@@ -80,15 +78,17 @@ function updateQuery(path: string) {
   window.history.pushState(null, document.title, path);
 }
 
+const emptyConfigurationString = `{}`;
+
 function App(): JSX.Element {
   const [configString, configStringSetter] = useState<string>(emptyConfigurationString);
   const queryString = useQueryString(window.location, updateQuery);
   const [templateTab, templateTabSetter] = useState<keyof typeof templates>('空白');
   const [resultDisplayMode, resultDisplayModeSetter] = useState<ResultDisplayMode>(ResultDisplayMode.paragraph);
   const [空白templateContent, 空白templateContentSetter] = useLocalStorage<string>('空白templateContent', templates['空白']);
-  let configFormData: IConfiguration | undefined;
+  let configFormData: IOptions | undefined;
   try {
-    configFormData = JSON.parse(configString) as IConfiguration;
+    configFormData = JSON.parse(configString) as IOptions;
   } catch {}
   const [rerender, template, templateSetter, result, configSchema, errorMessage, templateData] = useTemplateGeneration(configFormData, `${templateTab}.md`);
   useEffect(() => {
@@ -118,15 +118,7 @@ function App(): JSX.Element {
       const parsedConfig = JSON.parse(nextConfigString);
       // if no error thrown
       configStringSetter(nextConfigString);
-      let usedSlots: string[] = [];
-      if (templateData !== undefined) {
-        usedSlots = collectSlots(templateData);
-      } else {
-        const vFile = new VFile({ path: 'input.md', value: template });
-        const templateDataTemp = templateFileToNLCSTNodes(vFile);
-        usedSlots = collectSlots(templateDataTemp);
-      }
-      queryString[1]({ conf: JSON.stringify({ ...parsedConfig, sub: pick(parsedConfig.sub, usedSlots) }) });
+      queryString[1]({ conf: JSON.stringify({ ...parsedConfig }) });
     },
     [templateData, template, queryString],
   );
@@ -205,11 +197,11 @@ function App(): JSX.Element {
         {resultDisplayMode !== ResultDisplayMode.share && inputGroup}
         <ResultDisplayModeSelectContainer>
           <ButtonGroup>
+            <Button icon="eye-on" onClick={() => updateResultDisplayMode(ResultDisplayMode.paragraph)}>
+              编辑模式
+            </Button>
             <Button icon="share" onClick={() => updateResultDisplayMode(ResultDisplayMode.share)}>
               分享模式
-            </Button>
-            <Button icon="eye-on" onClick={() => updateResultDisplayMode(ResultDisplayMode.paragraph)}>
-              阅读模式
             </Button>
             <Button icon="database" onClick={() => updateResultDisplayMode(ResultDisplayMode.card)}>
               元信息模式

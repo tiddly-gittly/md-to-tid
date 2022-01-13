@@ -1,8 +1,7 @@
-import { Card, Elevation, Tag } from '@blueprintjs/core';
+import { Card } from '@blueprintjs/core';
 import styled from 'styled-components';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { IOutputWIthMetadata } from '../src';
 
 export enum ResultDisplayMode {
   share,
@@ -24,26 +23,12 @@ const ResultContainer = styled(Card)`
 `;
 const ResultParagraph = styled.p``;
 
-export function ResultLine(props: { outputLine: IOutputWIthMetadata<any[]> }): JSX.Element {
-  const { outputLine } = props;
-  return (
-    <Card elevation={Elevation.TWO}>
-      <ResultParagraph>{outputLine.value}</ResultParagraph>
-      {outputLine.metadata?.map((metadata, index) => (
-        <Tag key={index}>{JSON.stringify(metadata)}</Tag>
-      ))}
-    </Card>
-  );
-}
-
-export function GenerationResult(props: { result: Array<IOutputWIthMetadata<any[]>>; resultDisplayMode: ResultDisplayMode; template: string }): JSX.Element {
+export function GenerationResult(props: { result: string; resultDisplayMode: ResultDisplayMode; template: string }): JSX.Element {
   switch (props.resultDisplayMode) {
     case ResultDisplayMode.card: {
       return (
         <ResultContainer>
-          {props.result.map((outputLine, index) => (
-            <ResultLine key={index} outputLine={outputLine} />
-          ))}
+          <pre>{props.result}</pre>
         </ResultContainer>
       );
     }
@@ -51,9 +36,7 @@ export function GenerationResult(props: { result: Array<IOutputWIthMetadata<any[
     case ResultDisplayMode.paragraph: {
       return (
         <ResultContainer as="article">
-          {props.result.map((outputLine, index) => (
-            <ResultParagraph key={index}>{outputLine.value}</ResultParagraph>
-          ))}
+          <pre>{props.result}</pre>
         </ResultContainer>
       );
     }
