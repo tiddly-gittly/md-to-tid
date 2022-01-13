@@ -17,7 +17,7 @@ module.exports = {
     },
     'import/resolver': {
       node: {
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs'],
       },
       typescript: {
         alwaysTryTypes: true,
@@ -27,7 +27,7 @@ module.exports = {
           ['@', './src'],
           ['@services', './src/services'],
         ],
-        extensions: ['.js', '.jsx', '.ts', '.tsx'],
+        extensions: ['.js', '.jsx', '.ts', '.tsx', '.mjs'],
       },
     },
   },

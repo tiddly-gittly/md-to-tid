@@ -45,7 +45,7 @@ export function containerFlow(parent: Parent, context: Context): string {
       }
 
       if (result === false) {
-        return '\n\n<!---->\n\n';
+        return '\n\n';
       }
     }
 
