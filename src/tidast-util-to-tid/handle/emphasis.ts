@@ -1,22 +1,11 @@
-/**
- * @typedef {import('mdast').Emphasis} Emphasis
- * @typedef {import('../types').Handle} Handle
- */
-
+import type { Emphasis } from 'mdast';
+import type { Context } from '../types';
 import { checkEmphasis } from '../util/check-emphasis';
 import { containerPhrasing } from '../util/container-phrasing';
 
 emphasis.peek = emphasisPeek;
 
-// To do: there are cases where emphasis cannot “form” depending on the
-// previous or next character of sequences.
-// There’s no way around that though, except for injecting zero-width stuff.
-// Do we need to safeguard against that?
-/**
- * @type {Handle}
- * @param {Emphasis} node
- */
-export function emphasis(node, _, context) {
+export function emphasis(node: Emphasis, _: unknown, context: Context) {
   const marker = checkEmphasis(context);
   const exit = context.enter('emphasis');
   const value = containerPhrasing(node, context, {
@@ -31,6 +20,6 @@ export function emphasis(node, _, context) {
  * @type {Handle}
  * @param {Emphasis} _
  */
-function emphasisPeek(_, _1, context) {
-  return context.options.emphasis || '*';
+function emphasisPeek(_: Emphasis, _1: unknown, context: Context) {
+  return context.options.emphasis ?? `''`;
 }

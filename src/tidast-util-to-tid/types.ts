@@ -54,7 +54,7 @@ export type Options = {
   bulletOrdered?: '.' | ')' | '#' | '1.' | undefined;
   bulletOrderedOther?: '.' | ')' | '#' | '1.' | undefined;
   closeAtx?: boolean | undefined;
-  emphasis?: '*' | '_' | undefined;
+  emphasis?: '\'\'' | '_' | undefined;
   fence?: '~' | '`' | undefined;
   fences?: boolean | undefined;
   incrementListMarker?: boolean | undefined;

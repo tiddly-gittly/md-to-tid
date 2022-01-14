@@ -138,13 +138,17 @@ describe('blockquote', () => {
             type: 'paragraph',
             children: [
               { type: 'text', value: 'a\n' },
-              { type: 'emphasis', children: [{ type: 'text', value: 'c\nd' }] },
+              { type: 'emphasis', children: [{ type: 'text', value: 'c\nd' }] }, // TODO: should not have > between c and d
               { type: 'text', value: '\nd' },
             ],
           },
         ],
       }),
-    ).toEqual('> a\n> *c\n> d*\n> d\n');
+    ).toEqual(`> a
+> ''c
+> d''
+> d
+`);
   });
 
   test('should support a heading (atx) in a block quote', () => {
