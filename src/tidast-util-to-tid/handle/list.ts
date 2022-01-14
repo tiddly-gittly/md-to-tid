@@ -10,9 +10,7 @@ import { checkBulletOrderedOther } from '../util/check-bullet-ordered-other';
 export const list: Handle = function list(node: List, parent, context) {
   const exit = context.enter('list');
   const bulletCurrent = context.bulletCurrent;
-  /** @type {string} */
   let bullet: string = node.ordered ? checkBulletOrdered(context) : checkBullet(context);
-  /** @type {string} */
   const bulletOther: string = node.ordered ? checkBulletOrderedOther(context) : checkBulletOther(context);
   const bulletLastUsed = context.bulletLastUsed;
   let useDifferentMarker = false;
@@ -34,13 +32,13 @@ export const list: Handle = function list(node: List, parent, context) {
     // we have to use a different bullet:
     //
     // ```markdown
-    // * - *
+    // - - -
     // ```
     //
     // …because otherwise it would become one big thematic break.
     if (
       // Bullet could be used as a thematic break marker:
-      (bullet === '*' || bullet === '-') &&
+      bullet === '-' &&
       // Empty first list item:
       firstListItem &&
       (!firstListItem.children || !firstListItem.children[0]) &&

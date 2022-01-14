@@ -27,7 +27,7 @@ export const listItem: Handle = function listItem(node: ListItem, parent, contex
   const exit = context.enter('listItem');
   const map: Map = function map(line, index, blank) {
     // in tw, there is no indent for list item
-    if (index) {
+    if (line.startsWith(bullet)) {
       return (blank ? '' : bullet) + line;
     }
 

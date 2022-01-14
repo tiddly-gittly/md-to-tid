@@ -334,7 +334,6 @@ describe('blockquote', () => {
 >
 > * e
 > * f
-
 `);
   });
 
