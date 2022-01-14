@@ -6,7 +6,6 @@ import { checkBullet } from '../util/check-bullet';
 import { checkBulletOther } from '../util/check-bullet-other';
 import { checkBulletOrdered } from '../util/check-bullet-ordered';
 import { checkBulletOrderedOther } from '../util/check-bullet-ordered-other';
-import { checkRule } from '../util/check-rule';
 
 export const list: Handle = function list(node: List, parent, context) {
   const exit = context.enter('list');
@@ -56,27 +55,6 @@ export const list: Handle = function list(node: List, parent, context) {
       context.indexStack[context.indexStack.length - 3] === 0
     ) {
       useDifferentMarker = true;
-    }
-
-    // If there’s a thematic break at the start of the first list item,
-    // we have to use a different bullet:
-    //
-    // ```markdown
-    // * ---
-    // ```
-    //
-    // …because otherwise it would become one big thematic break.
-    if (checkRule(context) === bullet && firstListItem) {
-      let index = -1;
-
-      while (++index < node.children.length) {
-        const item = node.children[index];
-
-        if (item && item.type === 'listItem' && item.children && item.children[0] && item.children[0].type === 'thematicBreak') {
-          useDifferentMarker = true;
-          break;
-        }
-      }
     }
   }
 

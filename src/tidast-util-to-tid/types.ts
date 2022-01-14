@@ -61,9 +61,9 @@ export type Options = {
   listItemIndent?: 'tab' | 'one' | 'mixed' | undefined;
   quote?: '"' | "'" | undefined;
   resourceLink?: boolean | undefined;
-  rule?: '-' | '*' | '_' | undefined;
-  ruleRepetition?: number | undefined;
-  ruleSpaces?: boolean | undefined;
+  separateLine?: '-' | '*' | '_' | undefined;
+  separateLineRepetition?: number | undefined;
+  separateLineSpaces?: boolean | undefined;
   strong?: '*' | '_' | undefined;
   tightDefinitions?: boolean | undefined;
   extensions?: Options[] | undefined;

@@ -16,7 +16,7 @@ import { paragraph } from './paragraph';
 import { root } from './root';
 import { strong } from './strong';
 import { text } from './text';
-import { thematicBreak } from './thematic-break';
+import { separateLine } from './separate-line';
 
 export const handle = {
   blockquote,
@@ -38,5 +38,5 @@ export const handle = {
   root,
   strong,
   text,
-  thematicBreak,
+  thematicBreak: separateLine,
 };
