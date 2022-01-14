@@ -60845,11 +60845,7 @@
 	const list$2 = function list(node, parent, context) {
 	  const exit = context.enter('list');
 	  const bulletCurrent = context.bulletCurrent;
-	  /** @type {string} */
-
 	  let bullet = node.ordered ? checkBulletOrdered(context) : checkBullet(context);
-	  /** @type {string} */
-
 	  const bulletOther = node.ordered ? checkBulletOrderedOther(context) : checkBulletOther(context);
 	  const bulletLastUsed = context.bulletLastUsed;
 	  let useDifferentMarker = false;
@@ -60864,13 +60860,13 @@
 	    // we have to use a different bullet:
 	    //
 	    // ```markdown
-	    // * - *
+	    // - - -
 	    // ```
 	    //
 	    // …because otherwise it would become one big thematic break.
 
 	    if ( // Bullet could be used as a thematic break marker:
-	    (bullet === '*' || bullet === '-') && // Empty first list item:
+	    bullet === '-' && // Empty first list item:
 	    firstListItem && (!firstListItem.children || !firstListItem.children[0]) && // Directly in two other list items:
 	    context.stack[context.stack.length - 1] === 'list' && context.stack[context.stack.length - 2] === 'listItem' && context.stack[context.stack.length - 3] === 'list' && context.stack[context.stack.length - 4] === 'listItem' && // That are each the first child.
 	    context.indexStack[context.indexStack.length - 1] === 0 && context.indexStack[context.indexStack.length - 2] === 0 && context.indexStack[context.indexStack.length - 3] === 0) {
@@ -60916,7 +60912,7 @@
 
 	  const map = function map(line, index, blank) {
 	    // in tw, there is no indent for list item
-	    if (index) {
+	    if (line.startsWith(bullet)) {
 	      return (blank ? '' : bullet) + line;
 	    }
 
