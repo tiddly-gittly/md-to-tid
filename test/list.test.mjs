@@ -1,6 +1,6 @@
 import { toString, md2tid } from '../dist/index.mjs';
 
-describe.only('unordered list', () => {
+describe('unordered list', () => {
   test('render 1 level 1 node ast', () => {
     expect(
       toString({
@@ -41,7 +41,7 @@ describe.only('unordered list', () => {
     expect(tidResult).toEqual('* alpha\n** alpha\n');
   });
 
-  test.only('render 2 level 1+1 node ast', () => {
+  test('render 2 level 1+1 node ast', () => {
     const tidResult = toString({
       type: 'list',
       children: [
