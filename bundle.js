@@ -57367,6 +57367,28 @@
 	  return base;
 	}
 
+	const eol = /\r?\n|\r/g;
+	function indentLines(value, map) {
+	  const result = [];
+	  let start = 0;
+	  let line = 0;
+	  let match;
+
+	  while (match = eol.exec(value)) {
+	    one(value.slice(start, match.index));
+	    result.push(match[0]);
+	    start = match.index + match[0].length;
+	    line++;
+	  }
+
+	  one(value.slice(start));
+	  return result.join('');
+
+	  function one(value) {
+	    result.push(map(value, line, !value));
+	  }
+	}
+
 	function containerFlow(parent, context) {
 	  const indexStack = context.indexStack;
 	  const children = parent.children || [];
@@ -57417,49 +57439,16 @@
 	  }
 	}
 
-	const eol = /\r?\n|\r/g;
-	function indentLines(value, map) {
-	  const result = [];
-	  let start = 0;
-	  let line = 0;
-	  let match;
-
-	  while (match = eol.exec(value)) {
-	    one(value.slice(start, match.index));
-	    result.push(match[0]);
-	    start = match.index + match[0].length;
-	    line++;
-	  }
-
-	  one(value.slice(start));
-	  return result.join('');
-
-	  function one(value) {
-	    result.push(map(value, line, !value));
-	  }
-	}
-
-	/**
-	 * @typedef {import('mdast').Blockquote} Blockquote
-	 * @typedef {import('../types').Handle} Handle
-	 * @typedef {import('../util/indent-lines').Map} Map
-	 */
-	/**
-	 * @type {Handle}
-	 * @param {Blockquote} node
-	 */
-
 	function blockquote$1(node, _, context) {
 	  const exit = context.enter('blockquote');
 	  const value = indentLines(containerFlow(node, context), map$1);
 	  exit();
 	  return value;
 	}
-	/** @type {Map} */
 
-	function map$1(line, _, blank) {
+	const map$1 = function map(line, _, blank) {
 	  return '>' + (blank ? '' : ' ') + line;
-	}
+	};
 
 	function patternInScope(stack, pattern) {
 	  return listInScope(stack, pattern.inConstruct, true) && !listInScope(stack, pattern.notInConstruct, false);
