@@ -60842,25 +60842,6 @@
 	  return bulletOrderedOther;
 	}
 
-	/**
-	 * @typedef {import('../types').Context} Context
-	 * @typedef {import('../types').Options} Options
-	 */
-
-	/**
-	 * @param {Context} context
-	 * @returns {Exclude<Options['rule'], undefined>}
-	 */
-	function checkRule(context) {
-	  const marker = context.options.rule || '*';
-
-	  if (marker !== '*' && marker !== '-' && marker !== '_') {
-	    throw new Error('Cannot serialize rules with `' + marker + '` for `options.rule`, expected `*`, `-`, or `_`');
-	  }
-
-	  return marker;
-	}
-
 	const list$2 = function list(node, parent, context) {
 	  const exit = context.enter('list');
 	  const bulletCurrent = context.bulletCurrent;
@@ -60894,27 +60875,6 @@
 	    context.stack[context.stack.length - 1] === 'list' && context.stack[context.stack.length - 2] === 'listItem' && context.stack[context.stack.length - 3] === 'list' && context.stack[context.stack.length - 4] === 'listItem' && // That are each the first child.
 	    context.indexStack[context.indexStack.length - 1] === 0 && context.indexStack[context.indexStack.length - 2] === 0 && context.indexStack[context.indexStack.length - 3] === 0) {
 	      useDifferentMarker = true;
-	    } // If there’s a thematic break at the start of the first list item,
-	    // we have to use a different bullet:
-	    //
-	    // ```markdown
-	    // * ---
-	    // ```
-	    //
-	    // …because otherwise it would become one big thematic break.
-
-
-	    if (checkRule(context) === bullet && firstListItem) {
-	      let index = -1;
-
-	      while (++index < node.children.length) {
-	        const item = node.children[index];
-
-	        if (item && item.type === 'listItem' && item.children && item.children[0] && item.children[0].type === 'thematicBreak') {
-	          useDifferentMarker = true;
-	          break;
-	        }
-	      }
 	    }
 	  }
 
@@ -61067,37 +61027,19 @@
 	  return safe(context, node.value, safeOptions);
 	}
 
-	/**
-	 * @typedef {import('../types').Context} Context
-	 * @typedef {import('../types').Options} Options
-	 */
-
-	/**
-	 * @param {Context} context
-	 * @returns {Exclude<Options['ruleRepetition'], undefined>}
-	 */
-	function checkRuleRepetition(context) {
-	  const repetition = context.options.ruleRepetition || 3;
+	function checkSeparateLineRepetition(context) {
+	  const repetition = context.options.separateLineRepetition || 3;
 
 	  if (repetition < 3) {
-	    throw new Error('Cannot serialize rules with repetition `' + repetition + '` for `options.ruleRepetition`, expected `3` or more');
+	    throw new Error('Cannot serialize rules with repetition `' + repetition + '` for `options.separateLineRepetition`, expected `3` or more');
 	  }
 
 	  return repetition;
 	}
 
-	/**
-	 * @typedef {import('../types').Handle} Handle
-	 * @typedef {import('mdast').ThematicBreak} ThematicBreak
-	 */
-	/**
-	 * @type {Handle}
-	 * @param {ThematicBreak} _
-	 */
-
-	function thematicBreak$2(_, _1, context) {
-	  const value = (checkRule(context) + (context.options.ruleSpaces ? ' ' : '')).repeat(checkRuleRepetition(context));
-	  return context.options.ruleSpaces ? value.slice(0, -1) : value;
+	function separateLine(_, _1, context) {
+	  const value = ((context.options.separateLineSpaces ?? '-') + (context.options.separateLineSpaces ? ' ' : '')).repeat(checkSeparateLineRepetition(context));
+	  return context.options.separateLineSpaces ? value.slice(0, -1) : value;
 	}
 
 	const handle = {
@@ -61120,7 +61062,7 @@
 	  root: root$1,
 	  strong: strong$1,
 	  text: text$3,
-	  thematicBreak: thematicBreak$2
+	  thematicBreak: separateLine
 	};
 
 	const join = [joinDefaults];
