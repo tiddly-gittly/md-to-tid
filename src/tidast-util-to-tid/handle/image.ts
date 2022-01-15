@@ -1,18 +1,12 @@
-/**
- * @typedef {import('mdast').Image} Image
- * @typedef {import('../types').Handle} Handle
- */
+import type { Image } from 'mdast';
+import type { Context } from '../types';
 
 import { checkQuote } from '../util/check-quote';
 import { safe } from '../util/safe';
 
 image.peek = imagePeek;
 
-/**
- * @type {Handle}
- * @param {Image} node
- */
-export function image(node, _, context) {
+export function image(node: Image, _: unknown, context: Context) {
   const quote = checkQuote(context);
   const suffix = quote === '"' ? 'Quote' : 'Apostrophe';
   const exit = context.enter('image');

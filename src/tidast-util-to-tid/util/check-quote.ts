@@ -1,13 +1,6 @@
-/**
- * @typedef {import('../types').Context} Context
- * @typedef {import('../types').Options} Options
- */
+import type { Context, Options } from '../types';
 
-/**
- * @param {Context} context
- * @returns {Exclude<Options['quote'], undefined>}
- */
-export function checkQuote(context) {
+export function checkQuote(context: Context): Exclude<Options['quote'], undefined> {
   const marker = context.options.quote || '"';
 
   if (marker !== '"' && marker !== "'") {

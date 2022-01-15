@@ -1,18 +1,12 @@
-/**
- * @typedef {import('mdast').ImageReference} ImageReference
- * @typedef {import('../types').Handle} Handle
- */
+import type { ImageReference } from 'mdast';
+import type { Context } from '../types';
 
 import { association } from '../util/association';
 import { safe } from '../util/safe';
 
 imageReference.peek = imageReferencePeek;
 
-/**
- * @type {Handle}
- * @param {ImageReference} node
- */
-export function imageReference(node, _, context) {
+export function imageReference(node: ImageReference, _: unknown, context: Context) {
   const type = node.referenceType;
   const exit = context.enter('imageReference');
   let subexit = context.enter('label');

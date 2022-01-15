@@ -1,8 +1,5 @@
-/**
- * @typedef {import('mdast').Link} Link
- * @typedef {import('../types').Handle} Handle
- * @typedef {import('../types').Exit} Exit
- */
+import type { Link } from 'mdast';
+import type { Context, Exit } from '../types';
 
 import { checkQuote } from '../util/check-quote';
 import { formatLinkAsAutolink } from '../util/format-link-as-autolink';
@@ -11,19 +8,12 @@ import { safe } from '../util/safe';
 
 link.peek = linkPeek;
 
-/**
- * @type {Handle}
- * @param {Link} node
- */
-export function link(node, _, context) {
+export function link(node: Link, _: unknown, context: Context) {
   const quote = checkQuote(context);
   const suffix = quote === '"' ? 'Quote' : 'Apostrophe';
-  /** @type {Exit} */
-  let exit;
-  /** @type {Exit} */
-  let subexit;
-  /** @type {string} */
-  let value;
+  let exit: Exit;
+  let subexit: Exit;
+  let value: string;
 
   if (formatLinkAsAutolink(node, context)) {
     // Hide the fact that we’re in phrasing, because escapes don’t work.
@@ -73,9 +63,8 @@ export function link(node, _, context) {
 }
 
 /**
- * @type {Handle}
  * @param {Link} node
  */
-function linkPeek(node, _, context) {
+function linkPeek(node: Link, _: unknown, context: Context) {
   return formatLinkAsAutolink(node, context) ? '<' : '[';
 }
