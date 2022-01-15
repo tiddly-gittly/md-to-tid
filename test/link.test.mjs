@@ -1,68 +1,68 @@
 import { toString, md2tid } from '../dist/index.mjs';
 
-describe('link', () => {
+describe.only('link', () => {
   test('should support a link', () => {
-    expect(toString({ type: 'link' })).toEqual('[]()\n');
+    expect(toString({ type: 'link' })).toEqual('[[]]\n');
   });
 
   test('should support children', () => {
-    expect(toString({ type: 'link', children: [{ type: 'text', value: 'a' }] })).toEqual('[a]()\n');
+    expect(toString({ type: 'link', children: [{ type: 'text', value: 'a' }] })).toEqual('[[a|]]\n');
   });
 
   test('should support a url', () => {
-    expect(toString({ type: 'link', url: 'a', children: [] })).toEqual('[](a)\n');
+    expect(toString({ type: 'link', url: 'a', children: [] })).toEqual('[[a]]\n');
   });
 
-  test('should support a title', () => {
-    expect(toString({ type: 'link', url: '', title: 'a', children: [] })).toEqual('[](<> "a")\n');
+  test("should omit a title (wikitext don't have title(tooltip) syntax)", () => {
+    expect(toString({ type: 'link', url: '', title: 'a', children: [] })).toEqual('[[]]\n');
   });
 
-  test('should support a url and title', () => {
-    expect(toString({ type: 'link', url: 'a', title: 'b', children: [] })).toEqual('[](a "b")\n');
+  test('should support a url and omit a title', () => {
+    expect(toString({ type: 'link', url: 'a', title: 'b', children: [] })).toEqual('[[a]]\n');
   });
 
   test('should support a link w/ enclosed url w/ whitespace in url', () => {
-    expect(toString({ type: 'link', url: 'b c', children: [] })).toEqual('[](<b c>)\n');
+    expect(toString({ type: 'link', url: 'b c', children: [] })).toEqual('[[b c]]\n');
   });
 
   test('should escape an opening angle bracket in `url` in an enclosed url', () => {
-    expect(toString({ type: 'link', url: 'b <c', children: [] })).toEqual('[](<b \\<c>)\n');
+    expect(toString({ type: 'link', url: 'b <c', children: [] })).toEqual('[[b \\<c]]\n');
   });
 
   test('should escape a closing angle bracket in `url` in an enclosed url', () => {
-    expect(toString({ type: 'link', url: 'b >c', children: [] })).toEqual('[](<b \\>c>)\n');
+    expect(toString({ type: 'link', url: 'b >c', children: [] })).toEqual('[[b \\>c]]\n');
   });
 
   test('should escape a backslash in `url` in an enclosed url', () => {
-    expect(toString({ type: 'link', url: 'b \\+c', children: [] })).toEqual('[](<b \\\\+c>)\n');
+    expect(toString({ type: 'link', url: 'b \\+c', children: [] })).toEqual('[[b \\\\+c]]\n');
   });
 
   test('should encode a line ending in `url` in an enclosed url', () => {
-    expect(toString({ type: 'link', url: 'b\nc', children: [] })).toEqual('[](<b&#xA;c>)\n');
+    expect(toString({ type: 'link', url: 'b\nc', children: [] })).toEqual('[[b&#xA;c]]\n');
   });
 
   test('should escape an opening paren in `url` in a raw url', () => {
-    expect(toString({ type: 'link', url: 'b(c', children: [] })).toEqual('[](b\\(c)\n');
+    expect(toString({ type: 'link', url: 'b(c', children: [] })).toEqual('[[b\\(c]]\n');
   });
 
   test('should escape a closing paren in `url` in a raw url', () => {
-    expect(toString({ type: 'link', url: 'b)c', children: [] })).toEqual('[](b\\)c)\n');
+    expect(toString({ type: 'link', url: 'b)c', children: [] })).toEqual('[[b\\)c]]\n');
   });
 
   test('should escape a backslash in `url` in a raw url', () => {
-    expect(toString({ type: 'link', url: 'b\\.c', children: [] })).toEqual('[](b\\\\.c)\n');
+    expect(toString({ type: 'link', url: 'b\\.c', children: [] })).toEqual('[[b\\\\.c]]\n');
   });
 
   test('should support control characters in links', () => {
-    expect(toString({ type: 'link', url: '\f', children: [] })).toEqual('[](<\f>)\n');
+    expect(toString({ type: 'link', url: '\f', children: [] })).toEqual('[[\f]]\n');
   });
 
   test('should escape a double quote in `title`', () => {
-    expect(toString({ type: 'link', url: '', title: 'b"c', children: [] })).toEqual('[](<> "b\\"c")\n');
+    expect(toString({ type: 'link', url: '', title: 'b"c', children: [] })).toEqual('[[]]\n');
   });
 
   test('should escape a backslash in `title`', () => {
-    expect(toString({ type: 'link', url: '', title: 'b\\-c', children: [] })).toEqual('[](<> "b\\\\-c")\n');
+    expect(toString({ type: 'link', url: '', title: 'b\\-c', children: [] })).toEqual('[[]]\n');
   });
 
   test('should use an autolink for nodes w/ a value similar to the url and a protocol', () => {
@@ -72,7 +72,7 @@ describe('link', () => {
         url: 'tel:123',
         children: [{ type: 'text', value: 'tel:123' }],
       }),
-    ).toEqual('<tel:123>\n');
+    ).toEqual('[ext[tel:123|tel:123]]\n');
   });
 
   test('should use a resource link (`resourceLink: true`)', () => {
@@ -85,7 +85,7 @@ describe('link', () => {
         },
         { resourceLink: true },
       ),
-    ).toEqual('[tel:123](tel:123)\n');
+    ).toEqual('[ext[tel:123|tel:123]]\n');
   });
 
   test('should use a normal link for nodes w/ a value similar to the url w/o a protocol', () => {
@@ -95,7 +95,7 @@ describe('link', () => {
         url: 'a',
         children: [{ type: 'text', value: 'a' }],
       }),
-    ).toEqual('[a](a)\n');
+    ).toEqual('[[a|a]]\n');
   });
 
   test('should use an autolink for nodes w/ a value similar to the url and a protocol', () => {
@@ -105,10 +105,10 @@ describe('link', () => {
         url: 'tel:123',
         children: [{ type: 'text', value: 'tel:123' }],
       }),
-    ).toEqual('<tel:123>\n');
+    ).toEqual('[ext[tel:123|tel:123]]\n');
   });
 
-  test('should use a normal link for nodes w/ a value similar to the url w/ a title', () => {
+  test('should use a normal link for nodes w/ a value similar to the url w/ and omit a title', () => {
     expect(
       toString({
         type: 'link',
@@ -116,20 +116,20 @@ describe('link', () => {
         title: 'a',
         children: [{ type: 'text', value: 'tel:123' }],
       }),
-    ).toEqual('[tel:123](tel:123 "a")\n');
+    ).toEqual('[ext[tel:123|tel:123]]\n');
   });
 
-  test('should use an autolink for nodes w/ a value similar to the url and a protocol (email)', () => {
+  test('should use an extlink for nodes w/ a value similar to the url and a protocol (email)', () => {
     expect(
       toString({
         type: 'link',
         url: 'mailto:a@b.c',
         children: [{ type: 'text', value: 'a@b.c' }],
       }),
-    ).toEqual('<a@b.c>\n');
+    ).toEqual('[ext[a@b.c|mailto:a@b.c]]\n');
   });
 
-  test('should not escape in autolinks', () => {
+  test('should not escape in extlinks', () => {
     expect(
       toString({
         type: 'paragraph',
@@ -141,15 +141,31 @@ describe('link', () => {
           },
         ],
       }),
-    ).toEqual('<a.b-c_d@a.b>\n');
+    ).toEqual('[ext[a.b-c_d@a.b|mailto:a.b-c_d@a.b]]\n');
   });
 
-  test('should support a link w/ title when `quote: "\'"`', () => {
-    expect(toString({ type: 'link', url: '', title: 'b', children: [] }, { quote: "'" })).toEqual("[](<> 'b')\n");
+  test('should omit a link w/ title when `quote: "\'"`', () => {
+    expect(toString({ type: 'link', url: '', title: 'b', children: [] }, { quote: "'" })).toEqual('[[]]\n');
   });
 
-  test('should escape a quote in `title` in a title when `quote: "\'"`', () => {
-    expect(toString({ type: 'link', url: '', title: "'", children: [] }, { quote: "'" })).toEqual("[](<> '\\'')\n");
+  test('should omit a quote in a title when `quote: "\'"`', () => {
+    expect(toString({ type: 'link', url: '', title: "'", children: [] }, { quote: "'" })).toEqual('[[]]\n');
+  });
+
+  test('should remove unneeded characters in a `title` (double quotes)', () => {
+    expect(toString({ type: 'link', url: '#', title: 'a![b](c*d_e[f_g`h<i</j', children: [] })).toEqual('[[#]]\n');
+  });
+
+  test('should remove unneeded characters in a `title` (single quotes)', () => {
+    expect(toString({ type: 'link', url: '#', title: 'a![b](c*d_e[f_g`h<i</j', children: [] }, { quote: "'" })).toEqual('[[#]]\n');
+  });
+
+  test('should escape unneeded characters in a `destinationLiteral`', () => {
+    expect(toString({ type: 'link', url: 'a b![c](d*e_f[g_h`i', children: [] })).toEqual('[[a b!\\[c\\](d*e_f\\[g_h`i]]\n');
+  });
+
+  test('should escape unneeded characters in a `destinationRaw`', () => {
+    expect(toString({ type: 'link', url: 'a![b](c*d_e[f_g`h<i</j', children: [] })).toEqual('[[a!\\[b\\](c*d_e\\[f_g`h<i</j]]\n');
   });
 });
 
@@ -288,4 +304,16 @@ describe('linkReference', (t) => {
       }),
     ).toEqual('[a][]\\(b)\n');
   });
+
+  test('should escape unneeded characters in a `reference`', () => {
+    expect(
+      toString({
+        type: 'linkReference',
+        identifier: 'a![b](c*d_e[f_g`h<i</j',
+        referenceType: 'full',
+        children: [],
+      }),
+    ).toEqual('[][a!\\[b\\](c*d_e\\[f_g`h<i</j]\n');
+  });
+
 });

@@ -101,31 +101,4 @@ describe('code (flow)', () => {
   test('should use an indent if the value is indented', () => {
     expect(toString({ type: 'code', value: '  a\n\n b' })).toEqual('      a\n\n     b\n');
   });
-
-  test('should not escape unneeded characters in a `destinationLiteral`', () => {
-    expect(toString({ type: 'link', url: 'a b![c](d*e_f[g_h`i', children: [] })).toEqual('[](<a b![c](d*e_f[g_h`i>)\n');
-  });
-
-  test('should not escape unneeded characters in a `destinationRaw`', () => {
-    expect(toString({ type: 'link', url: 'a![b](c*d_e[f_g`h<i</j', children: [] })).toEqual('[](a![b]\\(c*d_e[f_g`h<i</j)\n');
-  });
-
-  test('should not escape unneeded characters in a `reference`', () => {
-    expect(
-      toString({
-        type: 'linkReference',
-        identifier: 'a![b](c*d_e[f_g`h<i</j',
-        referenceType: 'full',
-        children: [],
-      }),
-    ).toEqual('[][a!\\[b\\](c*d_e\\[f_g`h<i</j]\n');
-  });
-
-  test('should not escape unneeded characters in a `title` (double quotes)', () => {
-    expect(toString({ type: 'link', url: '#', title: 'a![b](c*d_e[f_g`h<i</j', children: [] })).toEqual('[](# "a![b](c*d_e[f_g`h<i</j")\n');
-  });
-
-  test('should not escape unneeded characters in a `title` (single quotes)', () => {
-    expect(toString({ type: 'link', url: '#', title: 'a![b](c*d_e[f_g`h<i</j', children: [] }, { quote: "'" })).toEqual("[](# 'a![b](c*d_e[f_g`h<i</j')\n");
-  });
 });

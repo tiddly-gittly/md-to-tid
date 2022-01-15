@@ -226,7 +226,7 @@ describe('blockquote', () => {
           },
         ],
       }),
-    ).toEqual('> a\n> ![d\n> e](<b&#xA;c> "f\n> g")\n> h\n');
+    ).toEqual('> a\n> [img[d\n> e|b&#xA;c]]\n> h\n');
   });
 
   test('should support an image (reference) in a block quote', () => {
@@ -273,7 +273,7 @@ describe('blockquote', () => {
           },
         ],
       }),
-    ).toEqual('> a\n> [d\n> e](<b&#xA;c> "f\n> g")\n> h\n');
+    ).toEqual('> a\n> [[d\n> e|b&#xA;c]]\n> h\n');
   });
 
   test('should support a link (reference) in a block quote', () => {
