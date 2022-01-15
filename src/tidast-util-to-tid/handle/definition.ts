@@ -1,19 +1,10 @@
-/**
- * @typedef {import('mdast').Definition} Definition
- * @typedef {import('../types').Handle} Handle
- */
+import type { Definition } from 'mdast';
+import type { Context } from '../types';
 
 import { association } from '../util/association';
-import { checkQuote } from '../util/check-quote';
 import { safe } from '../util/safe';
 
-/**
- * @type {Handle}
- * @param {Definition} node
- */
-export function definition(node, _, context) {
-  const marker = checkQuote(context);
-  const suffix = marker === '"' ? 'Quote' : 'Apostrophe';
+export function definition(node: Definition, _: unknown, context: Context) {
   const exit = context.enter('definition');
   let subexit = context.enter('label');
   let value = '[' + safe(context, association(node), { before: '[', after: ']' }) + ']: ';

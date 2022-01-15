@@ -1,15 +1,16 @@
-import type { Context, Options, Handle, SafeOptions } from '../types';
+import type { Context, SafeOptions } from '../types';
 
 import { patternCompile } from './pattern-compile';
 import { patternInScope } from './pattern-in-scope';
 
 /**
- * @param {Context} context
- * @param {string|null|undefined} input
- * @param {} config
- * @returns {string}
+ * Escape and remove some characters from a string, based on information in the Context['inConstruct']
+ * @param context 
+ * @param input 
+ * @param config 
+ * @returns 
  */
-export function safe(context: Context, input: string | null | undefined, config: SafeOptions & { encode?: Array<string> }) {
+export function safe(context: Context, input: string | null | undefined, config: SafeOptions & { encode?: Array<string> }): string {
   const value = (config.before || '') + (input || '') + (config.after || '');
   const positions: number[] = [];
   const result: string[] = [];
@@ -24,8 +25,7 @@ export function safe(context: Context, input: string | null | undefined, config:
     }
 
     const expression = patternCompile(pattern);
-    /** @type {RegExpExecArray|null} */
-    let match;
+    let match: RegExpExecArray | null;
 
     while ((match = expression.exec(value))) {
       const before = 'before' in pattern || Boolean(pattern.atBreak);
@@ -100,7 +100,7 @@ export function safe(context: Context, input: string | null | undefined, config:
  * @param {number} b
  * @returns {number}
  */
-function numerical(a, b) {
+function numerical(a: number, b: number): number {
   return a - b;
 }
 
@@ -109,17 +109,14 @@ function numerical(a, b) {
  * @param {string} after
  * @returns {string}
  */
-function escapeBackslashes(value, after) {
+function escapeBackslashes(value: string, after: string): string {
   const expression = /\\(?=[!-/:-@[-`{-~])/g;
-  /** @type {Array.<number>} */
-  const positions = [];
-  /** @type {Array.<string>} */
-  const results = [];
+  const positions: Array<number> = [];
+  const results: Array<string> = [];
   const whole = value + after;
   let index = -1;
   let start = 0;
-  /** @type {RegExpExecArray|null} */
-  let match;
+  let match: RegExpExecArray | null;
 
   while ((match = expression.exec(whole))) {
     positions.push(match.index);

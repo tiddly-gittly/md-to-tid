@@ -1,21 +1,9 @@
-/**
- * @typedef {import('../types').Node} Node
- * @typedef {import('../types').Parent} Parent
- * @typedef {import('../types').SafeOptions} SafeOptions
- * @typedef {import('../types').Context} Context
- */
+import type { Context, SafeOptions, Parent } from '../types';
 
-/**
- * @param {Parent} parent
- * @param {Context} context
- * @param {SafeOptions} safeOptions
- * @returns {string}
- */
-export function containerPhrasing(parent, context, safeOptions) {
+export function containerPhrasing(parent: Parent, context: Context, safeOptions: SafeOptions): string {
   const indexStack = context.indexStack;
   const children = parent.children || [];
-  /** @type {Array.<string>} */
-  const results = [];
+  const results: Array<string> = [];
   let index = -1;
   let before = safeOptions.before;
 
@@ -23,8 +11,7 @@ export function containerPhrasing(parent, context, safeOptions) {
 
   while (++index < children.length) {
     const child = children[index];
-    /** @type {string} */
-    let after;
+    let after: string;
 
     indexStack[indexStack.length - 1] = index;
 
@@ -53,6 +40,7 @@ export function containerPhrasing(parent, context, safeOptions) {
       before = ' ';
     }
 
+    // @ts-expect-error: hush, it’s actually a `zwitch`.
     results.push(context.handle(child, parent, context, { before, after }));
 
     before = results[results.length - 1].slice(-1);

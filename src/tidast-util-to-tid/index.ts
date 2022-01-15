@@ -24,7 +24,7 @@ export function toTid(tree: Node, options: Options = {}): string {
     configure(context, { join: [joinDefinition] });
   }
 
-  // @ts-expect-error: bad type written by zwitch author.
+  // @ts-expect-error: unknown type from zwitch
   context.handle = zwitch<Handle>('type', {
     invalid,
     unknown,

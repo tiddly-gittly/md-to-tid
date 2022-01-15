@@ -1,17 +1,11 @@
-/**
- * @typedef {import('mdast').InlineCode} InlineCode
- * @typedef {import('../types').Handle} Handle
- */
+import type { InlineCode } from 'mdast';
+import type { Context, Parent, SafeOptions } from '../types';
 
 import { patternCompile } from '../util/pattern-compile';
 
 inlineCode.peek = inlineCodePeek;
 
-/**
- * @type {Handle}
- * @param {InlineCode} node
- */
-export function inlineCode(node, _, context) {
+export function inlineCode(node: InlineCode, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
   let value = node.value || '';
   let sequence = '`';
   let index = -1;
@@ -39,8 +33,7 @@ export function inlineCode(node, _, context) {
   while (++index < context.inConstruct.length) {
     const pattern = context.inConstruct[index];
     const expression = patternCompile(pattern);
-    /** @type {RegExpExecArray|null} */
-    let match;
+    let match: RegExpExecArray | null;
 
     // Only look for `atBreak`s.
     // Btw: note that `atBreak` patterns will always start the regex at LF or
@@ -62,9 +55,6 @@ export function inlineCode(node, _, context) {
   return sequence + value + sequence;
 }
 
-/**
- * @type {Handle}
- */
 function inlineCodePeek() {
   return '`';
 }

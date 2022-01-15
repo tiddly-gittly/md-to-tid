@@ -18,6 +18,9 @@ export type Context = {
    *   Positions of children in their parents.
    */
   indexStack: number[];
+  /**
+   * Add a type label to the context['stack'], and return a function that removes it from the stack.
+   */
   enter: Enter;
   options: Options;
   inConstruct: Array<InConstruct>;
@@ -54,12 +57,11 @@ export type Options = {
   bulletOrdered?: '.' | ')' | '#' | '1.' | undefined;
   bulletOrderedOther?: '.' | ')' | '#' | '1.' | undefined;
   closeAtx?: boolean | undefined;
-  emphasis?: '\'\'' | '_' | undefined;
+  emphasis?: "''" | '_' | undefined;
   fence?: '~' | '`' | undefined;
   fences?: boolean | undefined;
   incrementListMarker?: boolean | undefined;
   listItemIndent?: 'tab' | 'one' | 'mixed' | undefined;
-  quote?: '"' | "'" | undefined;
   resourceLink?: boolean | undefined;
   separateLine?: '-' | '*' | '_' | undefined;
   separateLineRepetition?: number | undefined;

@@ -1,11 +1,15 @@
 import type { Context, Options } from './types';
 
+/**
+ * @param base Context, that will be accessed in each handler.
+ * @param extension Extra functions that user's extension provided, that we want to add to the context to use by the handlers.
+ * @returns Augmented context.
+ */
 export function configure(base: Context, extension: Options): Context {
   let index = -1;
-  /** @type {string} */
-  let key;
+  let key: string;
 
-  // First do subextensions.
+  // First do sub-extensions.
   if (extension.extensions) {
     while (++index < extension.extensions.length) {
       configure(base, extension.extensions[index]);

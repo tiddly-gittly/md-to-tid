@@ -1,13 +1,17 @@
 import type { InConstruct } from './types';
 
 /**
- * List of constructs that occur in phrasing (paragraphs, headings), but cannot
+ * List of types that occur in phrasing (paragraphs, headings), but cannot
  * contain things like attention (emphasis, strong), images, or links.
  * So they sort of cancel each other out.
  * Note: could use a better name.
  */
-const fullPhrasingSpans = ['autolink', 'destinationLiteral', 'destinationRaw', 'reference', 'titleQuote', 'titleApostrophe'];
+const fullPhrasingSpans = ['autolink', 'destinationLiteral', 'destinationRaw', 'reference'];
 
+/**
+ * Each item will be used by `patternCompile` function to be a RegExp before used.
+ * The inConstruct field will be use in patternInScope function to check if the stack have a type.
+ */
 export const inConstruct: InConstruct[] = [
   { character: '\t', after: '[\\r\\n]', inConstruct: 'phrasing' },
   { character: '\t', before: '[\\r\\n]', inConstruct: 'phrasing' },
@@ -45,8 +49,6 @@ export const inConstruct: InConstruct[] = [
   // Dollar sign and percentage are not used in markdown.
   // An ampersand could start a character reference.
   { character: '&', after: '[#A-Za-z]', inConstruct: 'phrasing' },
-  // An apostrophe can break out of a title.
-  { character: "'", inConstruct: 'titleApostrophe' },
   // A left paren could break out of a destination raw.
   { character: '(', inConstruct: 'destinationRaw' },
   // A left paren followed by `]` could make something into a link or image.
