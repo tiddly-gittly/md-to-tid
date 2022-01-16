@@ -55,6 +55,14 @@ describe('escape', () => {
     ).toEqual('a\\\\[ext[https://a.b]]\n');
   });
 
+  test('should not escape single []', () => {
+    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '互联网始于[…] 年' }] })).toEqual('互联网始于[…] 年\n');
+  });
+
+  test('should not escape strong', async () => {
+    await expect(md2tid('> **问题**：互联网始于**[…]** **年**')).resolves.toEqual(`> ''问题''：互联网始于''\[…]'' ''年''`);
+  });
+
   test('should escape what would otherwise be code (flow)', () => {
     expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '```js\n```' }] })).toEqual('\\`\\`\\`js\n\\`\\`\\`\n');
   });
