@@ -63,7 +63,7 @@ export type Options = {
   incrementListMarker?: boolean | undefined;
   listItemIndent?: 'tab' | 'one' | 'mixed' | undefined;
   resourceLink?: boolean | undefined;
-  separateLine?: '-' | '*' | '_' | undefined;
+  separateLineMarker?: '-' | '*' | '_' | undefined;
   separateLineRepetition?: number | undefined;
   separateLineSpaces?: boolean | undefined;
   strong?: '*' | '_' | undefined;
