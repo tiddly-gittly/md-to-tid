@@ -1,6 +1,6 @@
 {
   "name": "md-to-tid",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Transform markdown to tiddlywiki5 wikitext syntax.",
   "main": "dist/index.mjs",
   "type": "module",
@@ -21,7 +21,7 @@
     "url": "git+https://github.com/tiddly-gittly/md-to-tid.git"
   },
   "files": [
-    "dist/**/*.mjs",
+    "dist/index.mjs",
     "dist/**/*.d.ts",
     "README.md"
   ],
