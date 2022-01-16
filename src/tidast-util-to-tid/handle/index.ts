@@ -2,7 +2,7 @@ import { blockquote } from './blockquote';
 import { hardBreak } from './break';
 import { code } from './code';
 import { definition } from './definition';
-import { emphasis } from './emphasis';
+import { italic } from './italic';
 import { heading } from './heading';
 import { html } from './html';
 import { image } from './image';
@@ -14,7 +14,7 @@ import { list } from './list';
 import { listItem } from './list-item';
 import { paragraph } from './paragraph';
 import { root } from './root';
-import { strong } from './strong';
+import { bold } from './bold';
 import { text } from './text';
 import { separateLine } from './separate-line';
 
@@ -23,7 +23,7 @@ export const handle = {
   break: hardBreak,
   code,
   definition,
-  emphasis,
+  emphasis: italic,
   hardBreak,
   heading,
   html,
@@ -36,7 +36,7 @@ export const handle = {
   listItem,
   paragraph,
   root,
-  strong,
+  strong: bold,
   text,
   thematicBreak: separateLine,
 };

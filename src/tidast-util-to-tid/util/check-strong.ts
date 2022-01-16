@@ -1,17 +1,10 @@
-/**
- * @typedef {import('../types').Context} Context
- * @typedef {import('../types').Options} Options
- */
+import type { Context, Options } from '../types';
 
-/**
- * @param {Context} context
- * @returns {Exclude<Options['strong'], undefined>}
- */
-export function checkStrong(context) {
-  const marker = context.options.strong || '*';
+export function checkStrong(context: Context): Exclude<Options['strong'], undefined> {
+  const marker = context.options.strong || `''`;
 
-  if (marker !== '*' && marker !== '_') {
-    throw new Error('Cannot serialize strong with `' + marker + '` for `options.strong`, expected `*`, or `_`');
+  if (marker !== `''` && marker !== '_') {
+    throw new Error('Cannot serialize strong with `' + marker + '` for `options.strong`, expected `\'\'`, or `_`');
   }
 
   return marker;

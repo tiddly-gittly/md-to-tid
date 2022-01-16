@@ -54,3 +54,25 @@ describe('integration test', () => {
     await expect(md2tid(listArticleMD)).resolves.toEqual(listArticleTid);
   });
 });
+
+describe('extension', () => {
+  test('render 2 level 1 list ast', () => {
+    expect(
+      toString(
+        {
+          type: 'root',
+          children: [{ type: 'strong', children: [{ type: 'text', value: 'a' }] }],
+        },
+        {
+          extensions: [
+            {
+              join: undefined,
+              handlers: undefined,
+              extensions: undefined,
+            },
+          ],
+        },
+      ),
+    ).toEqual(`''a''\n`);
+  });
+});

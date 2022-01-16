@@ -57,7 +57,7 @@ export type Options = {
   bulletOrdered?: '.' | ')' | '#' | '1.' | undefined;
   bulletOrderedOther?: '.' | ')' | '#' | '1.' | undefined;
   closeAtx?: boolean | undefined;
-  emphasis?: "''" | '_' | undefined;
+  italic?: '//' | '_' | undefined;
   fence?: '~' | '`' | undefined;
   fences?: boolean | undefined;
   incrementListMarker?: boolean | undefined;
@@ -66,7 +66,7 @@ export type Options = {
   separateLineMarker?: '-' | '*' | '_' | undefined;
   separateLineRepetition?: number | undefined;
   separateLineSpaces?: boolean | undefined;
-  strong?: '*' | '_' | undefined;
+  strong?: "''" | '_' | undefined;
   tightDefinitions?: boolean | undefined;
   extensions?: Options[] | undefined;
   handlers?: Handlers | undefined;

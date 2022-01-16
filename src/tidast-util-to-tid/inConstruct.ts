@@ -2,7 +2,7 @@ import type { InConstruct } from './types';
 
 /**
  * List of types that occur in phrasing (paragraphs, headings), but cannot
- * contain things like attention (emphasis, strong), images, or links.
+ * contain things like attention (italic, strong), images, or links.
  * So they sort of cancel each other out.
  * Note: could use a better name.
  */
@@ -62,7 +62,7 @@ export const inConstruct: InConstruct[] = [
   // raw.
   { atBreak: true, before: '\\d+', character: ')' },
   { character: ')', inConstruct: 'destinationRaw' },
-  // An asterisk can start thematic breaks, list items, emphasis, strong.
+  // An asterisk can start thematic breaks, list items, italic, strong.
   { atBreak: true, character: '*' },
   { character: '*', inConstruct: 'phrasing', notInConstruct: fullPhrasingSpans },
   // A plus sign could start a list item.
@@ -104,7 +104,7 @@ export const inConstruct: InConstruct[] = [
   // A right bracket can exit labels.
   { character: ']', inConstruct: ['label', 'reference'] },
   // Caret is not used in markdown for constructs.
-  // An underscore can start emphasis, strong, or a thematic break.
+  // An underscore can start italic, strong, or a thematic break.
   { atBreak: true, character: '_' },
   { character: '_', inConstruct: 'phrasing', notInConstruct: fullPhrasingSpans },
   // A grave accent can start code (fenced or text), or it can break out of

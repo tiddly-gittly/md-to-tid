@@ -129,7 +129,7 @@ describe('blockquote', () => {
     ).toEqual('> [a\n> b]: <c&#xA;d>\n>\n> a\n> b\n');
   });
 
-  test('should support an emphasis in a block quote', () => {
+  test('should support an italic in a block quote', () => {
     expect(
       toString({
         type: 'blockquote',
@@ -138,15 +138,15 @@ describe('blockquote', () => {
             type: 'paragraph',
             children: [
               { type: 'text', value: 'a\n' },
-              { type: 'emphasis', children: [{ type: 'text', value: 'c\nd' }] }, // TODO: should not have > between c and d
+              { type: 'emphasis', children: [{ type: 'text', value: 'c\nd' }] }, // TODO: should not have > between c and d, use <<<
               { type: 'text', value: '\nd' },
             ],
           },
         ],
       }),
     ).toEqual(`> a
-> ''c
-> d''
+> //c
+> d//
 > d
 `);
   });
@@ -356,7 +356,7 @@ describe('blockquote', () => {
           },
         ],
       }),
-    ).toEqual('> a\n> **c\n> d**\n> d\n');
+    ).toEqual(`> a\n> ''c\n> d''\n> d\n`);
   });
 
   test('should support a thematic break in a block quote', () => {
