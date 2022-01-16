@@ -60155,11 +60155,11 @@
 	  return value;
 	}
 
-	function checkEmphasis(context) {
-	  const marker = context.options.emphasis ?? `''`;
+	function checkItalic(context) {
+	  const marker = context.options.italic ?? `//`;
 
-	  if (marker !== `''` && marker !== '_') {
-	    throw new Error(`Cannot serialize emphasis with ${marker} for options.emphasis, expected  \`''\`, or \`_\``);
+	  if (marker !== `//` && marker !== '_') {
+	    throw new Error(`Cannot serialize italic with ${marker} for options.italic, expected  \`''\`, or \`_\``);
 	  }
 
 	  return marker;
@@ -60213,10 +60213,10 @@
 	  return results.join('');
 	}
 
-	emphasis$1.peek = emphasisPeek;
-	function emphasis$1(node, _, context) {
-	  const marker = checkEmphasis(context);
-	  const exit = context.enter('emphasis');
+	italic.peek = italicPeek;
+	function italic(node, _, context) {
+	  const marker = checkItalic(context);
+	  const exit = context.enter('italic');
 	  const value = containerPhrasing(node, context, {
 	    before: marker,
 	    after: marker
@@ -60224,13 +60224,9 @@
 	  exit();
 	  return marker + value + marker;
 	}
-	/**
-	 * @type {Handle}
-	 * @param {Emphasis} _
-	 */
 
-	function emphasisPeek(_, _1, context) {
-	  return context.options.emphasis ?? `''`;
+	function italicPeek(_, _1, context) {
+	  return context.options.italic ?? `''`;
 	}
 
 	function heading$1(node, _, context) {
@@ -60749,16 +60745,7 @@
 	  return value;
 	};
 
-	/**
-	 * @typedef {import('mdast').Paragraph} Paragraph
-	 * @typedef {import('../types').Handle} Handle
-	 */
-	/**
-	 * @type {Handle}
-	 * @param {Paragraph} node
-	 */
-
-	function paragraph$1(node, _, context) {
+	function paragraph$1(node, parent, context, safeOptions) {
 	  const exit = context.enter('paragraph');
 	  const subexit = context.enter('phrasing');
 	  const value = containerPhrasing(node, context, {
@@ -60770,53 +60757,22 @@
 	  return value;
 	}
 
-	/**
-	 * @typedef {import('mdast').Root} Root
-	 * @typedef {import('../types').Handle} Handle
-	 */
-	/**
-	 * @type {Handle}
-	 * @param {Root} node
-	 */
-
-	function root$1(node, _, context) {
+	function root$1(node, parent, context, safeOptions) {
 	  return containerFlow(node, context);
 	}
 
-	/**
-	 * @typedef {import('../types').Context} Context
-	 * @typedef {import('../types').Options} Options
-	 */
-
-	/**
-	 * @param {Context} context
-	 * @returns {Exclude<Options['strong'], undefined>}
-	 */
 	function checkStrong(context) {
-	  const marker = context.options.strong || '*';
+	  const marker = context.options.strong || `''`;
 
-	  if (marker !== '*' && marker !== '_') {
-	    throw new Error('Cannot serialize strong with `' + marker + '` for `options.strong`, expected `*`, or `_`');
+	  if (marker !== `''` && marker !== '_') {
+	    throw new Error('Cannot serialize strong with `' + marker + '` for `options.strong`, expected `\'\'`, or `_`');
 	  }
 
 	  return marker;
 	}
 
-	/**
-	 * @typedef {import('mdast').Strong} Strong
-	 * @typedef {import('../types').Handle} Handle
-	 */
-	strong$1.peek = strongPeek; // To do: there are cases where emphasis cannot “form” depending on the
-	// previous or next character of sequences.
-	// There’s no way around that though, except for injecting zero-width stuff.
-	// Do we need to safeguard against that?
-
-	/**
-	 * @type {Handle}
-	 * @param {Strong} node
-	 */
-
-	function strong$1(node, _, context) {
+	bold.peek = boldPeek;
+	function bold(node, parent, context, safeOptions) {
 	  const marker = checkStrong(context);
 	  const exit = context.enter('strong');
 	  const value = containerPhrasing(node, context, {
@@ -60824,15 +60780,15 @@
 	    after: marker
 	  });
 	  exit();
-	  return marker + marker + value + marker + marker;
+	  return marker + value + marker;
 	}
 	/**
 	 * @type {Handle}
 	 * @param {Strong} _
 	 */
 
-	function strongPeek(_, _1, context) {
-	  return context.options.strong || '*';
+	function boldPeek(_, parent, context, safeOptions) {
+	  return context.options.strong || `''`;
 	}
 
 	function text$3(node, parent, context, safeOptions) {
@@ -60871,7 +60827,7 @@
 	  break: hardBreak$1,
 	  code: code$1,
 	  definition: definition$1,
-	  emphasis: emphasis$1,
+	  emphasis: italic,
 	  hardBreak: hardBreak$1,
 	  heading: heading$1,
 	  html: html$3,
@@ -60884,7 +60840,7 @@
 	  listItem: listItem$1,
 	  paragraph: paragraph$1,
 	  root: root$1,
-	  strong: strong$1,
+	  strong: bold,
 	  text: text$3,
 	  thematicBreak: separateLine
 	};
@@ -60916,7 +60872,7 @@
 
 	/**
 	 * List of types that occur in phrasing (paragraphs, headings), but cannot
-	 * contain things like attention (emphasis, strong), images, or links.
+	 * contain things like attention (italic, strong), images, or links.
 	 * So they sort of cancel each other out.
 	 * Note: could use a better name.
 	 */
@@ -60998,7 +60954,7 @@
 	}, {
 	  character: ')',
 	  inConstruct: 'destinationRaw'
-	}, // An asterisk can start thematic breaks, list items, emphasis, strong.
+	}, // An asterisk can start thematic breaks, list items, italic, strong.
 	{
 	  atBreak: true,
 	  character: '*'
@@ -61075,7 +61031,7 @@
 	  character: ']',
 	  inConstruct: ['label', 'reference']
 	}, // Caret is not used in markdown for constructs.
-	// An underscore can start emphasis, strong, or a thematic break.
+	// An underscore can start italic, strong, or a thematic break.
 	{
 	  atBreak: true,
 	  character: '_'
