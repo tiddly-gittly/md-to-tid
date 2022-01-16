@@ -1,6 +1,6 @@
 import { toString, md2tid } from '../dist/index.mjs';
 
-describe.only('image', () => {
+describe.skip('image', () => {
   test('should support an image', () => {
     expect(toString({ type: 'image' })).toEqual('[img[]]\n');
   });
@@ -74,7 +74,7 @@ describe.only('image', () => {
   });
 });
 
-describe('imageReference', (t) => {
+describe.skip('imageReference', (t) => {
   test('should support a link reference (nonsensical)', () => {
     expect(toString({ type: 'imageReference' })).toEqual('[img[][]\n');
   });

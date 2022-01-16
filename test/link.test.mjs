@@ -13,7 +13,7 @@ describe.only('link', () => {
     expect(toString({ type: 'link', url: 'a', children: [] })).toEqual('[[a]]\n');
   });
 
-  test("should omit a title (wikitext don't have title(tooltip) syntax)", () => {
+  test.only("should omit a title (wikitext don't have title(tooltip) syntax)", () => {
     expect(toString({ type: 'link', url: '', title: 'a', children: [] })).toEqual('[[]]\n');
   });
 

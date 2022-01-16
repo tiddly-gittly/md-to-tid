@@ -27,12 +27,6 @@ export function definition(node: Definition, _: unknown, context: Context) {
 
   subexit();
 
-  if (node.title) {
-    subexit = context.enter('title' + suffix);
-    value += ' ' + marker + safe(context, node.title, { before: marker, after: marker }) + marker;
-    subexit();
-  }
-
   exit();
 
   return value;

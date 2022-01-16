@@ -1,8 +1,5 @@
-/**
- * @typedef {import('mdast').Link} Link
- * @typedef {import('../types').Context} Context
- */
-
+import type { Link } from 'mdast';
+import type { Context } from '../types';
 import { toString } from 'mdast-util-to-string';
 
 /**
@@ -10,7 +7,7 @@ import { toString } from 'mdast-util-to-string';
  * @param {Context} context
  * @returns {boolean}
  */
-export function formatLinkAsAutolink(node, context) {
+export function formatLinkAsExtLink(node: Link, context: Context): boolean {
   const raw = toString(node);
 
   return Boolean(

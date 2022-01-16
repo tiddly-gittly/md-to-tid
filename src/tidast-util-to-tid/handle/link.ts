@@ -1,26 +1,23 @@
 import type { Link } from 'mdast';
-import type { Context, Exit } from '../types';
+import type { Context, Exit, Parent } from '../types';
 
-import { checkQuote } from '../util/check-quote';
-import { formatLinkAsAutolink } from '../util/format-link-as-autolink';
+import { formatLinkAsExtLink } from '../util/format-link-as-external-link';
 import { containerPhrasing } from '../util/container-phrasing';
 import { safe } from '../util/safe';
 
 link.peek = linkPeek;
 
-export function link(node: Link, _: unknown, context: Context) {
-  const quote = checkQuote(context);
-  const suffix = quote === '"' ? 'Quote' : 'Apostrophe';
+export function link(node: Link, parent: Parent | null | undefined, context: Context) {
   let exit: Exit;
   let subexit: Exit;
-  let value: string;
+  let value: string = '';
 
-  if (formatLinkAsAutolink(node, context)) {
+  if (formatLinkAsExtLink(node, context)) {
     // Hide the fact that we’re in phrasing, because escapes don’t work.
     const stack = context.stack;
     context.stack = [];
     exit = context.enter('autolink');
-    value = '<' + containerPhrasing(node, context, { before: '<', after: '>' }) + '>';
+    value = '[ext[' + containerPhrasing(node, context, { before: '[ext[', after: ']]' }) + ']]';
     exit();
     context.stack = stack;
     return value;
@@ -28,7 +25,8 @@ export function link(node: Link, _: unknown, context: Context) {
 
   exit = context.enter('link');
   subexit = context.enter('label');
-  value = '[' + containerPhrasing(node, context, { before: '[', after: ']' }) + '](';
+  const childValue = containerPhrasing(node, context, { before: '[[', after: ']]' });
+  const separateLine = childValue ? '|' : '';
   subexit();
 
   if (
@@ -38,33 +36,22 @@ export function link(node: Link, _: unknown, context: Context) {
     /[\0- \u007F]/.test(node.url)
   ) {
     subexit = context.enter('destinationLiteral');
-    value += '<' + safe(context, node.url, { before: '<', after: '>' }) + '>';
+    value = `[[${childValue}${separateLine}${safe(context, node.url, { before: '[[', after: ']]' })}]]`;
   } else {
     // No whitespace, raw is prettier.
     subexit = context.enter('destinationRaw');
-    value += safe(context, node.url, {
-      before: '(',
-      after: node.title ? ' ' : ')',
-    });
+    value = `[[${childValue}${separateLine}${safe(context, node.url, {
+      before: '[[',
+      after: node.title ? ' ' : ']]',
+    })}]]`;
   }
 
   subexit();
-
-  if (node.title) {
-    subexit = context.enter('title' + suffix);
-    value += ' ' + quote + safe(context, node.title, { before: quote, after: quote }) + quote;
-    subexit();
-  }
-
-  value += ')';
 
   exit();
   return value;
 }
 
-/**
- * @param {Link} node
- */
-function linkPeek(node: Link, _: unknown, context: Context) {
-  return formatLinkAsAutolink(node, context) ? '<' : '[';
+function linkPeek(node: Link, parent: Parent | null | undefined, context: Context) {
+  return formatLinkAsExtLink(node, context) ? '[ext[' : '[[';
 }
