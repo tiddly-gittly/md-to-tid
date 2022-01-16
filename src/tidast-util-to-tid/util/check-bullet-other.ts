@@ -1,15 +1,8 @@
-/**
- * @typedef {import('../types').Context} Context
- * @typedef {import('../types').Options} Options
- */
+import type { Context, Options } from '../types';
 
 import { checkBullet } from './check-bullet';
 
-/**
- * @param {Context} context
- * @returns {Exclude<Options['bullet'], undefined>}
- */
-export function checkBulletOther(context) {
+export function checkBulletOther(context: Context): Exclude<Options['bullet'], undefined> {
   const bullet = checkBullet(context);
   const bulletOther = context.options.bulletOther;
 

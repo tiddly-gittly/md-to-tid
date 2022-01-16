@@ -1,21 +1,12 @@
-/**
- * @typedef {import('mdast').HTML} HTML
- * @typedef {import('../types').Handle} Handle
- */
+import type { HTML } from 'mdast';
+import type { Context, Exit, Parent, SafeOptions } from '../types';
 
 html.peek = htmlPeek;
 
-/**
- * @type {Handle}
- * @param {HTML} node
- */
-export function html(node) {
+export function html(node: HTML, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
   return node.value || '';
 }
 
-/**
- * @type {Handle}
- */
-function htmlPeek() {
+function htmlPeek(node: HTML, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
   return '<';
 }

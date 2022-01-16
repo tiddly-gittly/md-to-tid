@@ -1,15 +1,8 @@
-/**
- * @typedef {import('../types').Context} Context
- * @typedef {import('../types').Options} Options
- */
+import type { Context, Options } from '../types';
 
 import { checkBulletOrdered } from './check-bullet-ordered';
 
-/**
- * @param {Context} context
- * @returns {Exclude<Options['bulletOrdered'], undefined>}
- */
-export function checkBulletOrderedOther(context) {
+export function checkBulletOrderedOther(context: Context): Exclude<Options['bulletOrdered'], undefined> {
   const bulletOrdered = checkBulletOrdered(context);
   const bulletOrderedOther = context.options.bulletOrderedOther;
 

@@ -1,7 +1,4 @@
-/**
- * @typedef {import('mdast').Association} Association
- */
-
+import { Association } from 'mdast'
 import {decodeString} from 'micromark-util-decode-string'
 
 /**
@@ -19,7 +16,7 @@ import {decodeString} from 'micromark-util-decode-string'
  * @param {Association} node
  * @returns {string}
  */
-export function association(node) {
+export function association(node: Association): string {
   if (node.label || !node.identifier) {
     return node.label || ''
   }

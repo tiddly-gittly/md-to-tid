@@ -1,7 +1,5 @@
-/**
- * @typedef {import('mdast').LinkReference} LinkReference
- * @typedef {import('../types').Handle} Handle
- */
+import type { LinkReference } from 'mdast';
+import type { Context, Exit, Parent, SafeOptions } from '../types';
 
 import { association } from '../util/association';
 import { containerPhrasing } from '../util/container-phrasing';
@@ -9,11 +7,7 @@ import { safe } from '../util/safe';
 
 linkReference.peek = linkReferencePeek;
 
-/**
- * @type {Handle}
- * @param {LinkReference} node
- */
-export function linkReference(node, _, context) {
+export function linkReference(node: LinkReference, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
   const type = node.referenceType;
   const exit = context.enter('linkReference');
   let subexit = context.enter('label');
@@ -39,9 +33,6 @@ export function linkReference(node, _, context) {
   return value;
 }
 
-/**
- * @type {Handle}
- */
-function linkReferencePeek() {
+function linkReferencePeek(node: LinkReference, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
   return '[';
 }

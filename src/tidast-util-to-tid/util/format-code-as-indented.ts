@@ -1,14 +1,12 @@
-/**
- * @typedef {import('mdast').Code} Code
- * @typedef {import('../types').Context} Context
- */
+import { Code } from 'mdast';
+import type { Context } from '../types';
 
 /**
  * @param {Code} node
  * @param {Context} context
  * @returns {boolean}
  */
-export function formatCodeAsIndented(node, context) {
+export function formatCodeAsIndented(node: Code, context: Context): boolean {
   return Boolean(
     !context.options.fences &&
       node.value &&

@@ -1,13 +1,6 @@
-/**
- * @typedef {import('../types').Context} Context
- * @typedef {import('../types').Options} Options
- */
+import type { Context, Options } from '../types';
 
-/**
- * @param {Context} context
- * @returns {Exclude<Options['fence'], undefined>}
- */
-export function checkFence(context) {
+export function checkFence(context: Context): Exclude<Options['fence'], undefined> {
   const marker = context.options.fence || '`';
 
   if (marker !== '`' && marker !== '~') {
