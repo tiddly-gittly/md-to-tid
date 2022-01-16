@@ -57339,11 +57339,14 @@
 	  return one
 	}
 
+	/**
+	 * @param base Context, that will be accessed in each handler.
+	 * @param extension Extra functions that user's extension provided, that we want to add to the context to use by the handlers.
+	 * @returns Augmented context.
+	 */
 	function configure$1(base, extension) {
 	  let index = -1;
-	  /** @type {string} */
-
-	  let key; // First do subextensions.
+	  let key; // First do sub-extensions.
 
 	  if (extension.extensions) {
 	    while (++index < extension.extensions.length) {
@@ -57450,6 +57453,11 @@
 	  return '>' + (blank ? '' : ' ') + line;
 	};
 
+	/**
+	 * @param stack Context['stack']
+	 * @param pattern an inConstruct object, but we actually use its inConstruct['inConstruct'] and try find it in the stack.
+	 * @returns
+	 */
 	function patternInScope(stack, pattern) {
 	  return listInScope(stack, pattern.inConstruct, true) && !listInScope(stack, pattern.notInConstruct, false);
 	}
@@ -57474,23 +57482,14 @@
 	  return false;
 	}
 
-	/**
-	 * @typedef {import('../types').Handle} Handle
-	 * @typedef {import('mdast').Break} Break
-	 */
-	/**
-	 * @type {Handle}
-	 * @param {Break} _
-	 */
-
-	function hardBreak$1(_, _1, context, safe) {
+	function hardBreak$1(node, parent, context, safeOptions) {
 	  let index = -1;
 
 	  while (++index < context.inConstruct.length) {
 	    // If we can’t put eols in this construct (setext headings, tables), use a
 	    // space instead.
 	    if (context.inConstruct[index].character === '\n' && patternInScope(context.stack, context.inConstruct[index])) {
-	      return /[ \t]/.test(safe.before) ? '' : ' ';
+	      return /[ \t]/.test(safeOptions.before) ? '' : ' ';
 	    }
 	  }
 
@@ -57580,10 +57579,11 @@
 	}
 
 	/**
-	 * @param {Context} context
-	 * @param {string|null|undefined} input
-	 * @param {} config
-	 * @returns {string}
+	 * Escape and remove some characters from a string, based on information in the Context['inConstruct']
+	 * @param context 
+	 * @param input 
+	 * @param config 
+	 * @returns 
 	 */
 
 	function safe(context, input, config) {
@@ -57601,8 +57601,6 @@
 	    }
 
 	    const expression = patternCompile(pattern);
-	    /** @type {RegExpExecArray|null} */
-
 	    let match;
 
 	    while (match = expression.exec(value)) {
@@ -57687,17 +57685,11 @@
 
 	function escapeBackslashes(value, after) {
 	  const expression = /\\(?=[!-/:-@[-`{-~])/g;
-	  /** @type {Array.<number>} */
-
 	  const positions = [];
-	  /** @type {Array.<string>} */
-
 	  const results = [];
 	  const whole = value + after;
 	  let index = -1;
 	  let start = 0;
-	  /** @type {RegExpExecArray|null} */
-
 	  let match;
 
 	  while (match = expression.exec(whole)) {
@@ -60132,37 +60124,7 @@
 	  return decodeString(node.identifier);
 	}
 
-	/**
-	 * @typedef {import('../types').Context} Context
-	 * @typedef {import('../types').Options} Options
-	 */
-
-	/**
-	 * @param {Context} context
-	 * @returns {Exclude<Options['quote'], undefined>}
-	 */
-	function checkQuote(context) {
-	  const marker = context.options.quote || '"';
-
-	  if (marker !== '"' && marker !== "'") {
-	    throw new Error('Cannot serialize title with `' + marker + '` for `options.quote`, expected `"`, or `\'`');
-	  }
-
-	  return marker;
-	}
-
-	/**
-	 * @typedef {import('mdast').Definition} Definition
-	 * @typedef {import('../types').Handle} Handle
-	 */
-	/**
-	 * @type {Handle}
-	 * @param {Definition} node
-	 */
-
 	function definition$1(node, _, context) {
-	  const marker = checkQuote(context);
-	  const suffix = marker === '"' ? 'Quote' : 'Apostrophe';
 	  const exit = context.enter('definition');
 	  let subexit = context.enter('label');
 	  let value = '[' + safe(context, association(node), {
@@ -60189,16 +60151,6 @@
 	  }
 
 	  subexit();
-
-	  if (node.title) {
-	    subexit = context.enter('title' + suffix);
-	    value += ' ' + marker + safe(context, node.title, {
-	      before: marker,
-	      after: marker
-	    }) + marker;
-	    subexit();
-	  }
-
 	  exit();
 	  return value;
 	}
@@ -60213,24 +60165,9 @@
 	  return marker;
 	}
 
-	/**
-	 * @typedef {import('../types').Node} Node
-	 * @typedef {import('../types').Parent} Parent
-	 * @typedef {import('../types').SafeOptions} SafeOptions
-	 * @typedef {import('../types').Context} Context
-	 */
-
-	/**
-	 * @param {Parent} parent
-	 * @param {Context} context
-	 * @param {SafeOptions} safeOptions
-	 * @returns {string}
-	 */
 	function containerPhrasing(parent, context, safeOptions) {
 	  const indexStack = context.indexStack;
 	  const children = parent.children || [];
-	  /** @type {Array.<string>} */
-
 	  const results = [];
 	  let index = -1;
 	  let before = safeOptions.before;
@@ -60238,8 +60175,6 @@
 
 	  while (++index < children.length) {
 	    const child = children[index];
-	    /** @type {string} */
-
 	    let after;
 	    indexStack[indexStack.length - 1] = index;
 
@@ -60264,7 +60199,8 @@
 	    if (results.length > 0 && (before === '\r' || before === '\n') && child.type === 'html') {
 	      results[results.length - 1] = results[results.length - 1].replace(/(\r?\n|\r)$/, ' ');
 	      before = ' ';
-	    }
+	    } // @ts-expect-error: hush, it’s actually a `zwitch`.
+
 
 	    results.push(context.handle(child, parent, context, {
 	      before,
@@ -60346,56 +60282,37 @@
 	  return '<';
 	}
 
-	/**
-	 * @typedef {import('mdast').Image} Image
-	 * @typedef {import('../types').Handle} Handle
-	 */
 	image$1.peek = imagePeek;
-	/**
-	 * @type {Handle}
-	 * @param {Image} node
-	 */
-
 	function image$1(node, _, context) {
-	  const quote = checkQuote(context);
-	  const suffix = quote === '"' ? 'Quote' : 'Apostrophe';
 	  const exit = context.enter('image');
 	  let subexit = context.enter('label');
-	  let value = '![' + safe(context, node.alt, {
+	  /**
+	   * Use alt as tooltip first, if no alt provided, use title instead.
+	   */
+
+	  let value = '[img[';
+	  const tooltip = safe(context, node.alt ?? node.title, {
 	    before: '[',
-	    after: ']'
-	  }) + '](';
+	    after: '|]'
+	  });
+	  const separateLine = tooltip ? '|' : '';
+	  value += `${tooltip}${separateLine}`;
 	  subexit();
 
-	  if ( // If there’s no url but there is a title…
-	  !node.url && node.title || // If there are control characters or whitespace.
+	  if ( // If there are control characters or whitespace.
 	  /[\0- \u007F]/.test(node.url)) {
 	    subexit = context.enter('destinationLiteral');
-	    value += '<' + safe(context, node.url, {
-	      before: '<',
-	      after: '>'
-	    }) + '>';
 	  } else {
 	    // No whitespace, raw is prettier.
 	    subexit = context.enter('destinationRaw');
-	    value += safe(context, node.url, {
-	      before: '(',
-	      after: node.title ? ' ' : ')'
-	    });
 	  }
 
+	  value += safe(context, node.url, {
+	    before: '|',
+	    after: ']]'
+	  });
 	  subexit();
-
-	  if (node.title) {
-	    subexit = context.enter('title' + suffix);
-	    value += ' ' + quote + safe(context, node.title, {
-	      before: quote,
-	      after: quote
-	    }) + quote;
-	    subexit();
-	  }
-
-	  value += ')';
+	  value += ']]';
 	  exit();
 	  return value;
 	}
@@ -60404,19 +60321,10 @@
 	 */
 
 	function imagePeek() {
-	  return '!';
+	  return '[img[';
 	}
 
-	/**
-	 * @typedef {import('mdast').ImageReference} ImageReference
-	 * @typedef {import('../types').Handle} Handle
-	 */
 	imageReference$1.peek = imageReferencePeek;
-	/**
-	 * @type {Handle}
-	 * @param {ImageReference} node
-	 */
-
 	function imageReference$1(node, _, context) {
 	  const type = node.referenceType;
 	  const exit = context.enter('imageReference');
@@ -60455,17 +60363,8 @@
 	  return '!';
 	}
 
-	/**
-	 * @typedef {import('mdast').InlineCode} InlineCode
-	 * @typedef {import('../types').Handle} Handle
-	 */
 	inlineCode$1.peek = inlineCodePeek;
-	/**
-	 * @type {Handle}
-	 * @param {InlineCode} node
-	 */
-
-	function inlineCode$1(node, _, context) {
+	function inlineCode$1(node, parent, context, safeOptions) {
 	  let value = node.value || '';
 	  let sequence = '`';
 	  let index = -1; // If there is a single grave accent on its own in the code, use a fence of
@@ -60492,8 +60391,6 @@
 	  while (++index < context.inConstruct.length) {
 	    const pattern = context.inConstruct[index];
 	    const expression = patternCompile(pattern);
-	    /** @type {RegExpExecArray|null} */
-
 	    let match; // Only look for `atBreak`s.
 	    // Btw: note that `atBreak` patterns will always start the regex at LF or
 	    // CR.
@@ -60517,9 +60414,6 @@
 
 	  return sequence + value + sequence;
 	}
-	/**
-	 * @type {Handle}
-	 */
 
 	function inlineCodePeek() {
 	  return '`';
@@ -60582,16 +60476,12 @@
 	}
 
 	/**
-	 * @typedef {import('mdast').Link} Link
-	 * @typedef {import('../types').Context} Context
-	 */
-	/**
 	 * @param {Link} node
 	 * @param {Context} context
 	 * @returns {boolean}
 	 */
 
-	function formatLinkAsAutolink(node, context) {
+	function formatLinkAsExtLink(node, context) {
 	  const raw = toString(node);
 	  return Boolean(!context.options.resourceLink && // If there’s a url…
 	  node.url && // And there’s a no title…
@@ -60603,39 +60493,21 @@
 	  !/[\0- <>\u007F]/.test(node.url));
 	}
 
-	/**
-	 * @typedef {import('mdast').Link} Link
-	 * @typedef {import('../types').Handle} Handle
-	 * @typedef {import('../types').Exit} Exit
-	 */
 	link$1.peek = linkPeek;
-	/**
-	 * @type {Handle}
-	 * @param {Link} node
-	 */
-
-	function link$1(node, _, context) {
-	  const quote = checkQuote(context);
-	  const suffix = quote === '"' ? 'Quote' : 'Apostrophe';
-	  /** @type {Exit} */
-
+	function link$1(node, parent, context) {
 	  let exit;
-	  /** @type {Exit} */
-
 	  let subexit;
-	  /** @type {string} */
+	  let value = '';
 
-	  let value;
-
-	  if (formatLinkAsAutolink(node, context)) {
+	  if (formatLinkAsExtLink(node, context)) {
 	    // Hide the fact that we’re in phrasing, because escapes don’t work.
 	    const stack = context.stack;
 	    context.stack = [];
 	    exit = context.enter('autolink');
-	    value = '<' + containerPhrasing(node, context, {
-	      before: '<',
-	      after: '>'
-	    }) + '>';
+	    value = '[ext[' + containerPhrasing(node, context, {
+	      before: '[ext[',
+	      after: ']]'
+	    }) + ']]';
 	    exit();
 	    context.stack = stack;
 	    return value;
@@ -60643,51 +60515,37 @@
 
 	  exit = context.enter('link');
 	  subexit = context.enter('label');
-	  value = '[' + containerPhrasing(node, context, {
-	    before: '[',
-	    after: ']'
-	  }) + '](';
+	  const childValue = containerPhrasing(node, context, {
+	    before: '[[',
+	    after: ']]'
+	  });
+	  const separateLine = childValue ? '|' : '';
 	  subexit();
 
 	  if ( // If there’s no url but there is a title…
 	  !node.url && node.title || // If there are control characters or whitespace.
 	  /[\0- \u007F]/.test(node.url)) {
 	    subexit = context.enter('destinationLiteral');
-	    value += '<' + safe(context, node.url, {
-	      before: '<',
-	      after: '>'
-	    }) + '>';
+	    value = `[[${childValue}${separateLine}${safe(context, node.url, {
+      before: '[[',
+      after: ']]'
+    })}]]`;
 	  } else {
 	    // No whitespace, raw is prettier.
 	    subexit = context.enter('destinationRaw');
-	    value += safe(context, node.url, {
-	      before: '(',
-	      after: node.title ? ' ' : ')'
-	    });
+	    value = `[[${childValue}${separateLine}${safe(context, node.url, {
+      before: '[[',
+      after: node.title ? ' ' : ']]'
+    })}]]`;
 	  }
 
 	  subexit();
-
-	  if (node.title) {
-	    subexit = context.enter('title' + suffix);
-	    value += ' ' + quote + safe(context, node.title, {
-	      before: quote,
-	      after: quote
-	    }) + quote;
-	    subexit();
-	  }
-
-	  value += ')';
 	  exit();
 	  return value;
 	}
-	/**
-	 * @type {Handle}
-	 * @param {Link} node
-	 */
 
-	function linkPeek(node, _, context) {
-	  return formatLinkAsAutolink(node, context) ? '<' : '[';
+	function linkPeek(node, parent, context) {
+	  return formatLinkAsExtLink(node, context) ? '[ext[' : '[[';
 	}
 
 	/**
@@ -60977,16 +60835,7 @@
 	  return context.options.strong || '*';
 	}
 
-	/**
-	 * @typedef {import('mdast').Text} Text
-	 * @typedef {import('../types').Handle} Handle
-	 */
-	/**
-	 * @type {Handle}
-	 * @param {Text} node
-	 */
-
-	function text$3(node, _, context, safeOptions) {
+	function text$3(node, parent, context, safeOptions) {
 	  return safe(context, node.value, safeOptions);
 	}
 
@@ -61054,12 +60903,17 @@
 	}
 
 	/**
-	 * List of constructs that occur in phrasing (paragraphs, headings), but cannot
+	 * List of types that occur in phrasing (paragraphs, headings), but cannot
 	 * contain things like attention (emphasis, strong), images, or links.
 	 * So they sort of cancel each other out.
 	 * Note: could use a better name.
 	 */
-	const fullPhrasingSpans = ['autolink', 'destinationLiteral', 'destinationRaw', 'reference', 'titleQuote', 'titleApostrophe'];
+	const fullPhrasingSpans = ['autolink', 'destinationLiteral', 'destinationRaw', 'reference'];
+	/**
+	 * Each item will be used by `patternCompile` function to be a RegExp before used.
+	 * The inConstruct field will be use in patternInScope function to check if the stack have a type.
+	 */
+
 	const inConstruct = [{
 	  character: '\t',
 	  after: '[\\r\\n]',
@@ -61113,10 +60967,6 @@
 	  character: '&',
 	  after: '[#A-Za-z]',
 	  inConstruct: 'phrasing'
-	}, // An apostrophe can break out of a title.
-	{
-	  character: "'",
-	  inConstruct: 'titleApostrophe'
 	}, // A left paren could break out of a destination raw.
 	{
 	  character: '(',
@@ -61262,7 +61112,7 @@
 	    configure$1(context, {
 	      join: [joinDefinition]
 	    });
-	  } // @ts-expect-error: bad type written by zwitch author.
+	  } // @ts-expect-error: unknown type from zwitch
 
 
 	  context.handle = zwitch('type', {
