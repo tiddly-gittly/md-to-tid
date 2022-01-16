@@ -29234,7 +29234,7 @@
 	 * together in the order provided. If an object creates a circular reference, it will assign the
 	 * original reference.
 	 */
-	function merge$1(target) {
+	function merge$2(target) {
 	    var args = [];
 	    for (var _i = 1; _i < arguments.length; _i++) {
 	        args[_i - 1] = arguments[_i];
@@ -30722,7 +30722,7 @@
 	function mergeThemes(theme, partialTheme) {
 	    var _a, _b, _c;
 	    if (partialTheme === void 0) { partialTheme = {}; }
-	    var mergedTheme = merge$1({}, theme, partialTheme, {
+	    var mergedTheme = merge$2({}, theme, partialTheme, {
 	        semanticColors: getSemanticColors(partialTheme.palette, partialTheme.effects, partialTheme.semanticColors, partialTheme.isInverted === undefined ? theme.isInverted : partialTheme.isInverted),
 	    });
 	    if (((_a = partialTheme.palette) === null || _a === void 0 ? void 0 : _a.themePrimary) && !((_b = partialTheme.palette) === null || _b === void 0 ? void 0 : _b.accent)) {
@@ -30731,7 +30731,7 @@
 	    if (partialTheme.defaultFontStyle) {
 	        for (var _i = 0, _d = Object.keys(mergedTheme.fonts); _i < _d.length; _i++) {
 	            var fontStyle = _d[_i];
-	            mergedTheme.fonts[fontStyle] = merge$1(mergedTheme.fonts[fontStyle], partialTheme.defaultFontStyle, (_c = partialTheme === null || partialTheme === void 0 ? void 0 : partialTheme.fonts) === null || _c === void 0 ? void 0 : _c[fontStyle]);
+	            mergedTheme.fonts[fontStyle] = merge$2(mergedTheme.fonts[fontStyle], partialTheme.defaultFontStyle, (_c = partialTheme === null || partialTheme === void 0 ? void 0 : partialTheme.fonts) === null || _c === void 0 ? void 0 : _c[fontStyle]);
 	        }
 	    }
 	    return mergedTheme;
@@ -57277,6 +57277,43 @@
 	  }
 	}
 
+	/**
+	 * This method is like `_.assign` except that it recursively merges own and
+	 * inherited enumerable string keyed properties of source objects into the
+	 * destination object. Source properties that resolve to `undefined` are
+	 * skipped if a destination value exists. Array and plain object properties
+	 * are merged recursively. Other objects and value types are overridden by
+	 * assignment. Source objects are applied from left to right. Subsequent
+	 * sources overwrite property assignments of previous sources.
+	 *
+	 * **Note:** This method mutates `object`.
+	 *
+	 * @static
+	 * @memberOf _
+	 * @since 0.5.0
+	 * @category Object
+	 * @param {Object} object The destination object.
+	 * @param {...Object} [sources] The source objects.
+	 * @returns {Object} Returns `object`.
+	 * @example
+	 *
+	 * var object = {
+	 *   'a': [{ 'b': 2 }, { 'd': 4 }]
+	 * };
+	 *
+	 * var other = {
+	 *   'a': [{ 'c': 3 }, { 'e': 5 }]
+	 * };
+	 *
+	 * _.merge(object, other);
+	 * // => { 'a': [{ 'b': 2, 'c': 3 }, { 'd': 4, 'e': 5 }] }
+	 */
+	var merge$1 = _createAssigner(function(object, source, srcIndex) {
+	  _baseMerge(object, source, srcIndex);
+	});
+
+	var merge_1 = merge$1;
+
 	var own$9 = {}.hasOwnProperty;
 
 	/**
@@ -57355,7 +57392,7 @@
 	  }
 
 	  for (key in extension) {
-	    if (key === 'extensions') ; else if (key === 'inConstruct' || key === 'join') {
+	    if (key === 'extensions') ; else if (key === 'conflict' || key === 'join') {
 	      /* c8 ignore next 2 */
 	      // @ts-expect-error: hush.
 	      base[key] = [...(base[key] || []), ...(extension[key] || [])];
@@ -57455,11 +57492,11 @@
 
 	/**
 	 * @param stack Context['stack']
-	 * @param pattern an inConstruct object, but we actually use its inConstruct['inConstruct'] and try find it in the stack.
+	 * @param pattern an conflict object, but we actually use its conflict['conflict'] and try find it in the stack.
 	 * @returns
 	 */
 	function patternInScope(stack, pattern) {
-	  return listInScope(stack, pattern.inConstruct, true) && !listInScope(stack, pattern.notInConstruct, false);
+	  return listInScope(stack, pattern.conflict, true) && !listInScope(stack, pattern.notConflict, false);
 	}
 
 	function listInScope(stack, list, none) {
@@ -57485,10 +57522,10 @@
 	function hardBreak$1(node, parent, context, safeOptions) {
 	  let index = -1;
 
-	  while (++index < context.inConstruct.length) {
+	  while (++index < context.conflict.length) {
 	    // If we can’t put eols in this construct (setext headings, tables), use a
 	    // space instead.
-	    if (context.inConstruct[index].character === '\n' && patternInScope(context.stack, context.inConstruct[index])) {
+	    if (context.conflict[index].character === '\n' && patternInScope(context.stack, context.conflict[index])) {
 	      return /[ \t]/.test(safeOptions.before) ? '' : ' ';
 	    }
 	  }
@@ -57579,7 +57616,7 @@
 	}
 
 	/**
-	 * Escape and remove some characters from a string, based on information in the Context['inConstruct']
+	 * Escape and remove some characters from a string, based on information in the Context['conflict']
 	 * @param context 
 	 * @param input 
 	 * @param config 
@@ -57593,8 +57630,8 @@
 	  const infos = {};
 	  let index = -1;
 
-	  while (++index < context.inConstruct.length) {
-	    const pattern = context.inConstruct[index];
+	  while (++index < context.conflict.length) {
+	    const pattern = context.conflict[index];
 
 	    if (!patternInScope(context.stack, pattern)) {
 	      continue;
@@ -60384,8 +60421,8 @@
 	  // them out.
 
 
-	  while (++index < context.inConstruct.length) {
-	    const pattern = context.inConstruct[index];
+	  while (++index < context.conflict.length) {
+	    const pattern = context.conflict[index];
 	    const expression = patternCompile(pattern);
 	    let match; // Only look for `atBreak`s.
 	    // Btw: note that `atBreak` patterns will always start the regex at LF or
@@ -60879,72 +60916,72 @@
 	const fullPhrasingSpans = ['autolink', 'destinationLiteral', 'destinationRaw', 'reference'];
 	/**
 	 * Each item will be used by `patternCompile` function to be a RegExp before used.
-	 * The inConstruct field will be use in patternInScope function to check if the stack have a type.
+	 * The conflict field will be use in patternInScope function to check if the stack have a type.
 	 */
 
-	const inConstruct = [{
+	const conflict = [{
 	  character: '\t',
 	  after: '[\\r\\n]',
-	  inConstruct: 'phrasing'
+	  conflict: 'phrasing'
 	}, {
 	  character: '\t',
 	  before: '[\\r\\n]',
-	  inConstruct: 'phrasing'
+	  conflict: 'phrasing'
 	}, {
 	  character: '\t',
-	  inConstruct: ['codeFencedLangGraveAccent', 'codeFencedLangTilde']
+	  conflict: ['codeFencedLangGraveAccent', 'codeFencedLangTilde']
 	}, {
 	  character: '\r',
-	  inConstruct: ['codeFencedLangGraveAccent', 'codeFencedLangTilde', 'codeFencedMetaGraveAccent', 'codeFencedMetaTilde', 'destinationLiteral', 'headingAtx']
+	  conflict: ['codeFencedLangGraveAccent', 'codeFencedLangTilde', 'codeFencedMetaGraveAccent', 'codeFencedMetaTilde', 'destinationLiteral', 'headingAtx']
 	}, {
 	  character: '\n',
-	  inConstruct: ['codeFencedLangGraveAccent', 'codeFencedLangTilde', 'codeFencedMetaGraveAccent', 'codeFencedMetaTilde', 'destinationLiteral', 'headingAtx']
+	  conflict: ['codeFencedLangGraveAccent', 'codeFencedLangTilde', 'codeFencedMetaGraveAccent', 'codeFencedMetaTilde', 'destinationLiteral', 'headingAtx']
 	}, {
 	  character: ' ',
 	  after: '[\\r\\n]',
-	  inConstruct: 'phrasing'
+	  conflict: 'phrasing'
 	}, {
 	  character: ' ',
 	  before: '[\\r\\n]',
-	  inConstruct: 'phrasing'
+	  conflict: 'phrasing'
 	}, {
 	  character: ' ',
-	  inConstruct: ['codeFencedLangGraveAccent', 'codeFencedLangTilde']
+	  conflict: ['codeFencedLangGraveAccent', 'codeFencedLangTilde']
 	}, // An exclamation mark can start an image, if it is followed by a link or
 	// a link reference.
 	{
 	  character: '!',
 	  after: '\\[',
-	  inConstruct: 'phrasing',
-	  notInConstruct: fullPhrasingSpans
+	  conflict: 'phrasing',
+	  notConflict: fullPhrasingSpans
 	}, // A quote can break out of a title.
 	{
 	  character: '"',
-	  inConstruct: 'titleQuote'
-	}, // A number sign could start an ATX heading if it starts a line.
+	  conflict: 'titleQuote'
+	}, // A ! sign could start an ATX heading if it starts a line.
 	{
 	  atBreak: true,
-	  character: '#'
+	  character: '!'
 	}, {
-	  character: '#',
-	  inConstruct: 'headingAtx',
+	  character: '!',
+	  conflict: 'headingAtx',
 	  after: '(?:[\r\n]|$)'
 	}, // Dollar sign and percentage are not used in markdown.
 	// An ampersand could start a character reference.
 	{
 	  character: '&',
 	  after: '[#A-Za-z]',
-	  inConstruct: 'phrasing'
+	  conflict: 'phrasing'
 	}, // A left paren could break out of a destination raw.
 	{
 	  character: '(',
-	  inConstruct: 'destinationRaw'
-	}, // A left paren followed by `]` could make something into a link or image.
+	  conflict: 'destinationRaw'
+	}, // A left [ followed by `]` could make something into a link or image.
 	{
 	  before: '\\]',
-	  character: '(',
-	  inConstruct: 'phrasing',
-	  notInConstruct: fullPhrasingSpans
+	  character: '[',
+	  conflict: 'phrasing',
+	  notConflict: fullPhrasingSpans
 	}, // A right paren could start a list item or break out of a destination
 	// raw.
 	{
@@ -60953,15 +60990,23 @@
 	  character: ')'
 	}, {
 	  character: ')',
-	  inConstruct: 'destinationRaw'
-	}, // An asterisk can start thematic breaks, list items, italic, strong.
+	  conflict: 'destinationRaw'
+	}, // An # can start list items, italic, strong.
 	{
 	  atBreak: true,
-	  character: '*'
+	  character: '#'
+	}, // An // can start list italic
+	{
+	  atBreak: true,
+	  character: '//'
+	}, // An '' can start list strong.
+	{
+	  atBreak: true,
+	  character: `''`
 	}, {
 	  character: '*',
-	  inConstruct: 'phrasing',
-	  notInConstruct: fullPhrasingSpans
+	  conflict: 'phrasing',
+	  notConflict: fullPhrasingSpans
 	}, // A plus sign could start a list item.
 	{
 	  atBreak: true,
@@ -60990,11 +61035,11 @@
 	}, {
 	  character: '<',
 	  after: '[!/?A-Za-z]',
-	  inConstruct: 'phrasing',
-	  notInConstruct: fullPhrasingSpans
+	  conflict: 'phrasing',
+	  notConflict: fullPhrasingSpans
 	}, {
 	  character: '<',
-	  inConstruct: 'destinationLiteral'
+	  conflict: 'destinationLiteral'
 	}, // An equals to can start setext heading underlines.
 	{
 	  atBreak: true,
@@ -61006,7 +61051,7 @@
 	  character: '>'
 	}, {
 	  character: '>',
-	  inConstruct: 'destinationLiteral'
+	  conflict: 'destinationLiteral'
 	}, // Question mark and at sign are not used in markdown for constructs.
 	// A left bracket can start definitions, references, labels,
 	{
@@ -61014,22 +61059,22 @@
 	  character: '['
 	}, {
 	  character: '[',
-	  inConstruct: 'phrasing',
-	  notInConstruct: fullPhrasingSpans
+	  conflict: 'phrasing',
+	  notConflict: fullPhrasingSpans
 	}, {
 	  character: '[',
-	  inConstruct: ['label', 'reference']
+	  conflict: ['label', 'reference']
 	}, // A backslash can start an escape (when followed by punctuation) or a
 	// hard break (when followed by an eol).
 	// Note: typical escapes are handled in `safe`!
 	{
 	  character: '\\',
 	  after: '[\\r\\n]',
-	  inConstruct: 'phrasing'
+	  conflict: 'phrasing'
 	}, // A right bracket can exit labels.
 	{
 	  character: ']',
-	  inConstruct: ['label', 'reference']
+	  conflict: ['label', 'reference']
 	}, // Caret is not used in markdown for constructs.
 	// An underscore can start italic, strong, or a thematic break.
 	{
@@ -61037,8 +61082,8 @@
 	  character: '_'
 	}, {
 	  character: '_',
-	  inConstruct: 'phrasing',
-	  notInConstruct: fullPhrasingSpans
+	  conflict: 'phrasing',
+	  notConflict: fullPhrasingSpans
 	}, // A grave accent can start code (fenced or text), or it can break out of
 	// a grave accent code fence.
 	{
@@ -61046,11 +61091,11 @@
 	  character: '`'
 	}, {
 	  character: '`',
-	  inConstruct: ['codeFencedLangGraveAccent', 'codeFencedMetaGraveAccent']
+	  conflict: ['codeFencedLangGraveAccent', 'codeFencedMetaGraveAccent']
 	}, {
 	  character: '`',
-	  inConstruct: 'phrasing',
-	  notInConstruct: fullPhrasingSpans
+	  conflict: 'phrasing',
+	  notConflict: fullPhrasingSpans
 	}, // Left brace, vertical bar, right brace are not used in markdown for
 	// constructs.
 	// A tilde can start code (fenced).
@@ -61063,14 +61108,14 @@
 	  const context = {
 	    enter,
 	    stack: [],
-	    inConstruct: [],
+	    conflict: [],
 	    join: [],
 	    handlers: {},
 	    options: {},
 	    indexStack: []
 	  };
 	  configure$1(context, {
-	    inConstruct,
+	    conflict,
 	    join,
 	    handlers: handle
 	  });
@@ -61129,7 +61174,7 @@
 	  const compiler = tree => {
 	    // Assume options.
 	    const settings = this.data('settings');
-	    return toTid(tree, Object.assign({
+	    return toTid(tree, merge_1({
 	      bullet: '*',
 	      bulletOrdered: '#',
 	      incrementListMarker: false
