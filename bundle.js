@@ -57571,11 +57571,6 @@
 	}
 
 	/**
-	 * @typedef {import('mdast').Code} Code
-	 * @typedef {import('../types').Context} Context
-	 */
-
-	/**
 	 * @param {Code} node
 	 * @param {Context} context
 	 * @returns {boolean}
@@ -57587,15 +57582,6 @@
 	  !/^[\t ]*(?:[\r\n]|$)|(?:^|[\r\n])[\t ]*$/.test(node.value));
 	}
 
-	/**
-	 * @typedef {import('../types').Context} Context
-	 * @typedef {import('../types').Options} Options
-	 */
-
-	/**
-	 * @param {Context} context
-	 * @returns {Exclude<Options['fence'], undefined>}
-	 */
 	function checkFence(context) {
 	  const marker = context.options.fence || '`';
 
@@ -57747,25 +57733,15 @@
 	}
 
 	/**
-	 * @typedef {import('mdast').Code} Code
-	 * @typedef {import('../types').Handle} Handle
-	 * @typedef {import('../types').Exit} Exit
-	 * @typedef {import('../util/indent-lines').Map} Map
-	 */
-	/**
 	 * @type {Handle}
 	 * @param {Code} node
 	 */
 
-	function code$1(node, _, context) {
+	function code$1(node, parent, context, safeOptions) {
 	  const marker = checkFence(context);
 	  const raw = node.value || '';
 	  const suffix = marker === '`' ? 'GraveAccent' : 'Tilde';
-	  /** @type {string} */
-
 	  let value;
-	  /** @type {Exit} */
-
 	  let exit;
 
 	  if (formatCodeAsIndented(node, context)) {
@@ -57773,8 +57749,6 @@
 	    value = indentLines(raw, map);
 	  } else {
 	    const sequence = marker.repeat(Math.max(longestStreak(raw, marker) + 1, 3));
-	    /** @type {Exit} */
-
 	    let subexit;
 	    exit = context.enter('codeFenced');
 	    value = sequence;
@@ -57811,11 +57785,10 @@
 	  exit();
 	  return value;
 	}
-	/** @type {Map} */
 
-	function map(line, _, blank) {
+	const map = function map(line, _, blank) {
 	  return (blank ? '' : '    ') + line;
-	}
+	};
 
 	/**
 	 * Map of named character references.
@@ -60135,9 +60108,6 @@
 	}
 
 	/**
-	 * @typedef {import('mdast').Association} Association
-	 */
-	/**
 	 * The `label` of an association is the string value: character escapes and
 	 * references work, and casing is intact.
 	 * The `identifier` is used to match one association to another: controversially,
@@ -60294,24 +60264,12 @@
 	  return value;
 	}
 
-	/**
-	 * @typedef {import('mdast').HTML} HTML
-	 * @typedef {import('../types').Handle} Handle
-	 */
 	html$3.peek = htmlPeek;
-	/**
-	 * @type {Handle}
-	 * @param {HTML} node
-	 */
-
-	function html$3(node) {
+	function html$3(node, parent, context, safeOptions) {
 	  return node.value || '';
 	}
-	/**
-	 * @type {Handle}
-	 */
 
-	function htmlPeek() {
+	function htmlPeek(node, parent, context, safeOptions) {
 	  return '<';
 	}
 
@@ -60581,17 +60539,8 @@
 	  return formatLinkAsExtLink(node, context) ? '[ext[' : '[[';
 	}
 
-	/**
-	 * @typedef {import('mdast').LinkReference} LinkReference
-	 * @typedef {import('../types').Handle} Handle
-	 */
 	linkReference$1.peek = linkReferencePeek;
-	/**
-	 * @type {Handle}
-	 * @param {LinkReference} node
-	 */
-
-	function linkReference$1(node, _, context) {
+	function linkReference$1(node, parent, context, safeOptions) {
 	  const type = node.referenceType;
 	  const exit = context.enter('linkReference');
 	  let subexit = context.enter('label');
@@ -60621,11 +60570,8 @@
 
 	  return value;
 	}
-	/**
-	 * @type {Handle}
-	 */
 
-	function linkReferencePeek() {
+	function linkReferencePeek(node, parent, context, safeOptions) {
 	  return '[';
 	}
 
@@ -60638,15 +60584,6 @@
 
 	  return marker;
 	}
-
-	/**
-	 * @typedef {import('../types').Context} Context
-	 * @typedef {import('../types').Options} Options
-	 */
-	/**
-	 * @param {Context} context
-	 * @returns {Exclude<Options['bullet'], undefined>}
-	 */
 
 	function checkBulletOther(context) {
 	  const bullet = checkBullet(context);
@@ -60671,15 +60608,6 @@
 	  const marker = context.options.bulletOrdered || '#';
 	  return marker;
 	}
-
-	/**
-	 * @typedef {import('../types').Context} Context
-	 * @typedef {import('../types').Options} Options
-	 */
-	/**
-	 * @param {Context} context
-	 * @returns {Exclude<Options['bulletOrdered'], undefined>}
-	 */
 
 	function checkBulletOrderedOther(context) {
 	  const bulletOrdered = checkBulletOrdered(context);
