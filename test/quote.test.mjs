@@ -126,7 +126,7 @@ describe('blockquote', () => {
           },
         ],
       }),
-    ).toEqual('> [a\n> b]: <c&#xA;d> "e\n> f"\n>\n> a\n> b\n');
+    ).toEqual('> [a\n> b]: <c&#xA;d>\n>\n> a\n> b\n');
   });
 
   test('should support an emphasis in a block quote', () => {

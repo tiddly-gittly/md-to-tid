@@ -1,6 +1,6 @@
 import { toString, md2tid } from '../dist/index.mjs';
 
-describe.skip('image', () => {
+describe('image', () => {
   test('should support an image', () => {
     expect(toString({ type: 'image' })).toEqual('[img[]]\n');
   });
@@ -58,7 +58,7 @@ describe.skip('image', () => {
   });
 
   test('should escape a double quote in `title`', () => {
-    expect(toString({ type: 'image', url: '', title: 'b"c' })).toEqual('[img[b\\"c|]]\n');
+    expect(toString({ type: 'image', url: '', title: 'b"c' })).toEqual('[img[b"c|]]\n');
   });
 
   test('should escape a backslash in `title`', () => {
@@ -70,7 +70,7 @@ describe.skip('image', () => {
   });
 
   test('shouldn\'t escape a quote in `title` in a title when `quote: "\'"`', () => {
-    expect(toString({ type: 'image', url: '', title: "'" }, { quote: "'" })).toEqual("[img[|']]\n");
+    expect(toString({ type: 'image', url: '', title: "'" }, { quote: "'" })).toEqual("[img['|]]\n");
   });
 });
 

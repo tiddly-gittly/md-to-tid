@@ -8,36 +8,33 @@ image.peek = imagePeek;
 export function image(node: Image, _: unknown, context: Context) {
   const exit = context.enter('image');
   let subexit = context.enter('label');
-  let value = '![' + safe(context, node.alt, { before: '[', after: ']' }) + '](';
+  /**
+   * Use alt as tooltip first, if no alt provided, use title instead.
+   */
+  let value = '[img[';
+  const tooltip = safe(context, node.alt ?? node.title, { before: '[', after: '|]' });
+  const separateLine = tooltip ? '|' : '';
+  value += `${tooltip}${separateLine}`;
 
   subexit();
 
   if (
-    // If there’s no url but there is a title…
-    (!node.url && node.title) ||
     // If there are control characters or whitespace.
     /[\0- \u007F]/.test(node.url)
   ) {
     subexit = context.enter('destinationLiteral');
-    value += '<' + safe(context, node.url, { before: '<', after: '>' }) + '>';
   } else {
     // No whitespace, raw is prettier.
     subexit = context.enter('destinationRaw');
-    value += safe(context, node.url, {
-      before: '(',
-      after: node.title ? ' ' : ')',
-    });
   }
+  value += safe(context, node.url, {
+    before: '|',
+    after: ']]',
+  });
 
   subexit();
 
-  // if (node.title) {
-  //   subexit = context.enter('title' + suffix);
-  //   value += ' ' + quote + safe(context, node.title, { before: quote, after: quote }) + quote;
-  //   subexit();
-  // }
-
-  value += ')';
+  value += ']]';
   exit();
 
   return value;
@@ -47,5 +44,5 @@ export function image(node: Image, _: unknown, context: Context) {
  * @type {Handle}
  */
 function imagePeek() {
-  return '!';
+  return '[img[';
 }
