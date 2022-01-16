@@ -1,15 +1,15 @@
-import type { InConstruct } from '../types';
+import type { Conflict } from '../types';
 
 /**
  * @param stack Context['stack']
- * @param pattern an inConstruct object, but we actually use its inConstruct['inConstruct'] and try find it in the stack.
+ * @param pattern an conflict object, but we actually use its conflict['conflict'] and try find it in the stack.
  * @returns
  */
-export function patternInScope(stack: Array<string>, pattern: InConstruct): boolean {
-  return listInScope(stack, pattern.inConstruct, true) && !listInScope(stack, pattern.notInConstruct, false);
+export function patternInScope(stack: Array<string>, pattern: Conflict): boolean {
+  return listInScope(stack, pattern.conflict, true) && !listInScope(stack, pattern.notConflict, false);
 }
 
-function listInScope(stack: Array<string>, list: InConstruct['inConstruct'], none: boolean): boolean {
+function listInScope(stack: Array<string>, list: Conflict['conflict'], none: boolean): boolean {
   if (!list) {
     return none;
   }

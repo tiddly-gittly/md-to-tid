@@ -1,6 +1,6 @@
-import type { InConstruct } from '../types';
+import type { Conflict } from '../types';
 
-export function patternCompile(pattern: InConstruct): RegExp {
+export function patternCompile(pattern: Conflict): RegExp {
   if (!pattern._compiled) {
     const before = (pattern.atBreak ? '[\\r\\n][\\t ]*' : '') + (pattern.before ? '(?:' + pattern.before + ')' : '');
 

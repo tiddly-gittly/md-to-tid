@@ -19,7 +19,7 @@ export function configure(base: Context, extension: Options): Context {
   for (key in extension) {
     if (key === 'extensions') {
       // Empty.
-    } else if (key === 'inConstruct' || key === 'join') {
+    } else if (key === 'conflict' || key === 'join') {
       /* c8 ignore next 2 */
       // @ts-expect-error: hush.
       base[key] = [...(base[key] || []), ...(extension[key] || [])];

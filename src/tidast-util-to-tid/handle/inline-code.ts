@@ -30,8 +30,8 @@ export function inlineCode(node: InlineCode, parent: Parent | null | undefined, 
   // We can’t escape characters in `inlineCode`, but because eols are
   // transformed to spaces when going from markdown to HTML anyway, we can swap
   // them out.
-  while (++index < context.inConstruct.length) {
-    const pattern = context.inConstruct[index];
+  while (++index < context.conflict.length) {
+    const pattern = context.conflict[index];
     const expression = patternCompile(pattern);
     let match: RegExpExecArray | null;
 

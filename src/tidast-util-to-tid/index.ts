@@ -2,7 +2,7 @@ import { zwitch } from 'zwitch';
 import { configure } from './configure';
 import { handle } from './handle/index';
 import { join } from './join';
-import { inConstruct } from './inConstruct';
+import { conflict } from './conflicts';
 import type { Context, Node, Options, Handle } from './types';
 export * from './types';
 
@@ -10,14 +10,14 @@ export function toTid(tree: Node, options: Options = {}): string {
   const context: Context = {
     enter,
     stack: [],
-    inConstruct: [],
+    conflict: [],
     join: [],
     handlers: {},
     options: {},
     indexStack: [],
   };
 
-  configure(context, { inConstruct, join, handlers: handle });
+  configure(context, { conflict, join, handlers: handle });
   configure(context, options);
 
   if (context.options.tightDefinitions) {

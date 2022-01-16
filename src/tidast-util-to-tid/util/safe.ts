@@ -4,7 +4,7 @@ import { patternCompile } from './pattern-compile';
 import { patternInScope } from './pattern-in-scope';
 
 /**
- * Escape and remove some characters from a string, based on information in the Context['inConstruct']
+ * Escape and remove some characters from a string, based on information in the Context['conflict']
  * @param context 
  * @param input 
  * @param config 
@@ -17,8 +17,8 @@ export function safe(context: Context, input: string | null | undefined, config:
   const infos: Record<number, { before: boolean; after: boolean }> = {};
   let index = -1;
 
-  while (++index < context.inConstruct.length) {
-    const pattern = context.inConstruct[index];
+  while (++index < context.conflict.length) {
+    const pattern = context.conflict[index];
 
     if (!patternInScope(context.stack, pattern)) {
       continue;

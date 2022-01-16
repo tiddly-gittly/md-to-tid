@@ -23,7 +23,7 @@ export type Context = {
    */
   enter: Enter;
   options: Options;
-  inConstruct: Array<InConstruct>;
+  conflict: Array<Conflict>;
   join: Array<Join>;
   handle?: Handle;
   handlers: Handlers;
@@ -39,15 +39,15 @@ export type Context = {
 export type Handle = (node: any, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) => string;
 export type Handlers = Record<string, Handle>;
 export type Join = (left: Node, right: Node, parent: Parent, context: Context) => boolean | null | void | number;
-export type InConstruct = {
+export type Conflict = {
   character: string;
-  inConstruct?: string | string[] | undefined;
-  notInConstruct?: string | string[] | undefined;
+  conflict?: string | string[] | undefined;
+  notConflict?: string | string[] | undefined;
   after?: string | undefined;
   before?: string | undefined;
   atBreak?: boolean | undefined;
   /**
-   * The inConstruct pattern compiled as a regex
+   * The conflict pattern compiled as a regex
    */
   _compiled?: RegExp | undefined;
 };
@@ -71,5 +71,5 @@ export type Options = {
   extensions?: Options[] | undefined;
   handlers?: Handlers | undefined;
   join?: Join[] | undefined;
-  inConstruct?: InConstruct[] | undefined;
+  conflict?: Conflict[] | undefined;
 };
