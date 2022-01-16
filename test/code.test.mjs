@@ -1,7 +1,6 @@
 import { toString, md2tid } from '../dist/index.mjs';
 
 describe('code (flow)', () => {
-
   test('should support empty code', () => {
     expect(toString({ type: 'code' })).toEqual('```\n```\n');
   });
@@ -100,5 +99,79 @@ describe('code (flow)', () => {
 
   test('should use an indent if the value is indented', () => {
     expect(toString({ type: 'code', value: '  a\n\n b' })).toEqual('      a\n\n     b\n');
+  });
+});
+
+describe('code (text)', () => {
+  test('should support an empty code text', () => {
+    expect(toString({ type: 'inlineCode' })).toEqual('``\n');
+  });
+
+  test('should support a code text', () => {
+    expect(toString({ type: 'inlineCode', value: 'a' })).toEqual('`a`\n');
+  });
+
+  test('should support a space', () => {
+    expect(toString({ type: 'inlineCode', value: ' ' })).toEqual('` `\n');
+  });
+
+  test('should support an eol', () => {
+    expect(toString({ type: 'inlineCode', value: '\n' })).toEqual('`\n`\n');
+  });
+
+  test('should support several spaces', () => {
+    expect(toString({ type: 'inlineCode', value: '  ' })).toEqual('`  `\n');
+  });
+
+  test('should use a fence of two grave accents if the value contains one', () => {
+    expect(toString({ type: 'inlineCode', value: 'a`b' })).toEqual('``a`b``\n');
+  });
+
+  test('should use a fence of one grave accent if the value contains two', () => {
+    expect(toString({ type: 'inlineCode', value: 'a``b' })).toEqual('`a``b`\n');
+  });
+
+  test('should use a fence of three grave accents if the value contains two and one', () => {
+    expect(toString({ type: 'inlineCode', value: 'a``b`c' })).toEqual('```a``b`c```\n');
+  });
+
+  test('should pad w/ a space if the value starts w/ a grave accent', () => {
+    expect(toString({ type: 'inlineCode', value: '`a' })).toEqual('`` `a ``\n');
+  });
+
+  test('should pad w/ a space if the value ends w/ a grave accent', () => {
+    expect(toString({ type: 'inlineCode', value: 'a`' })).toEqual('`` a` ``\n');
+  });
+
+  test('should pad w/ a space if the value starts and ends w/ a space', () => {
+    expect(toString({ type: 'inlineCode', value: ' a ' })).toEqual('`  a  `\n');
+  });
+
+  test('should not pad w/ spaces if the value ends w/ a non-space', () => {
+    expect(toString({ type: 'inlineCode', value: ' a' })).toEqual('` a`\n');
+  });
+
+  test('should not pad w/ spaces if the value starts w/ a non-space', () => {
+    expect(toString({ type: 'inlineCode', value: 'a ' })).toEqual('`a `\n');
+  });
+
+  test('should prevent breaking out of code (-)', () => {
+    expect(toString({ type: 'inlineCode', value: 'a\n-' })).toEqual('`a -`\n');
+  });
+
+  test('should prevent breaking out of code (#)', () => {
+    expect(toString({ type: 'inlineCode', value: 'a\n#' })).toEqual('`a #`\n');
+  });
+
+  test('should prevent breaking out of code (\\d\\.)', () => {
+    expect(toString({ type: 'inlineCode', value: 'a\n1. ' })).toEqual('`a 1. `\n');
+  });
+
+  test('should prevent breaking out of code (cr)', () => {
+    expect(toString({ type: 'inlineCode', value: 'a\r-' })).toEqual('`a -`\n');
+  });
+
+  test('should prevent breaking out of code (crlf)', () => {
+    expect(toString({ type: 'inlineCode', value: 'a\r\n-' })).toEqual('`a -`\n');
   });
 });
