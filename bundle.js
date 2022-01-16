@@ -60840,17 +60840,29 @@
 	}
 
 	function checkSeparateLineRepetition(context) {
-	  const repetition = context.options.separateLineRepetition || 3;
+	  const minimum = 3;
+	  const repetition = context.options.separateLineRepetition ?? minimum;
 
-	  if (repetition < 3) {
-	    throw new Error('Cannot serialize rules with repetition `' + repetition + '` for `options.separateLineRepetition`, expected `3` or more');
+	  if (repetition < minimum) {
+	    throw new Error('Cannot serialize rules with repetition `' + repetition + '` for `options.separateLineRepetition`, expected `' + minimum + '` or more');
 	  }
 
 	  return repetition;
 	}
 
+	function checkSeparateLineMarker(context) {
+	  const marker = context.options.separateLineMarker || '-';
+
+	  if (marker !== '*' && marker !== '-' && marker !== '_') {
+	    throw new Error('Cannot serialize rules with `' + marker + '` for `options.rule`, expected `*`, `-`, or `_`');
+	  }
+
+	  return marker;
+	}
+
 	function separateLine(_, _1, context) {
-	  const value = ((context.options.separateLineSpaces ?? '-') + (context.options.separateLineSpaces ? ' ' : '')).repeat(checkSeparateLineRepetition(context));
+	  const marker = checkSeparateLineMarker(context);
+	  const value = (marker + (context.options.separateLineSpaces ? ' ' : '')).repeat(checkSeparateLineRepetition(context));
 	  return context.options.separateLineSpaces ? value.slice(0, -1) : value;
 	}
 
