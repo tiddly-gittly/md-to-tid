@@ -64,14 +64,17 @@ describe('escape', () => {
   });
 
   test('should escape what would otherwise be emphasis (slash)', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '//a//' }] })).toEqual('\\/\\/a\\/\\/\n');
+    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '//a//' }] })).toEqual('\\//a//\n');
   });
 
   test('should escape what would otherwise be bold (underscore)', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: `''a''` }] })).toEqual(`\\'\\'a\\'\\'\n`);
+    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: `''a''` }] })).toEqual(`\\''a''\n`);
   });
 
   test('should escape what would otherwise be a heading (atx)', () => {
+    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '! a' }] })).toEqual('\\! a\n');
+  });
+  test('should not escape what would otherwise not be a heading (atx)', () => {
     expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '# a' }] })).toEqual('\\# a\n');
   });
 
@@ -126,11 +129,15 @@ describe('escape', () => {
   });
 
   test('should escape what would otherwise be an image (reference)', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '![a][b]' }] })).toEqual('!\\[a]\\[b]\n');
+    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '![a][b]' }] })).toEqual('\\!\\[a]\\[b]\n');
   });
 
   test('should escape what would otherwise be an image (resource)', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '![](a.jpg)' }] })).toEqual('!\\[]\\(a.jpg)\n');
+    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '[img[a.jpg]]' }] })).toEqual('\\[img\\[a.jpg]]\n');
+  });
+
+  test('should not escape what would otherwise not be an image (resource), but escape because it might be heading', () => {
+    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '![](a.jpg)' }] })).toEqual('\\!\\[](a.jpg)\n');
   });
 
   test('should escape what would otherwise be a link (reference)', () => {
@@ -138,7 +145,11 @@ describe('escape', () => {
   });
 
   test('should escape what would otherwise be a link (resource)', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '[](a.jpg)' }] })).toEqual('\\[]\\(a.jpg)\n');
+    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '[[a.jpg]]' }] })).toEqual('\\[\\[a.jpg]]\n');
+  });
+
+  test('should not escape what would otherwise not be a link (resource)', () => {
+    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '[](a.jpg)' }] })).toEqual('\\[](a.jpg)\n');
   });
 
   test('should escape what would otherwise be a list item (plus)', () => {

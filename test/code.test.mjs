@@ -155,12 +155,12 @@ describe('code (text)', () => {
     expect(toString({ type: 'inlineCode', value: 'a ' })).toEqual('`a `\n');
   });
 
-  test('should prevent breaking out of code (-)', () => {
-    expect(toString({ type: 'inlineCode', value: 'a\n-' })).toEqual('`a -`\n');
-  });
-
   test('should prevent breaking out of code (#)', () => {
     expect(toString({ type: 'inlineCode', value: 'a\n#' })).toEqual('`a #`\n');
+  });
+
+  test('should prevent breaking out of code (!)', () => {
+    expect(toString({ type: 'inlineCode', value: 'a\n!' })).toEqual('`a !`\n');
   });
 
   test('should prevent breaking out of code (\\d\\.)', () => {

@@ -43,18 +43,18 @@ export const conflict: Conflict[] = [
   },
   // A quote can break out of a title.
   { character: '"', conflict: 'titleQuote' },
-  // A number sign could start an ATX heading if it starts a line.
-  { atBreak: true, character: '#' },
-  { character: '#', conflict: 'headingAtx', after: '(?:[\r\n]|$)' },
+  // A ! sign could start an ATX heading if it starts a line.
+  { atBreak: true, character: '!' },
+  { character: '!', conflict: 'headingAtx', after: '(?:[\r\n]|$)' },
   // Dollar sign and percentage are not used in markdown.
   // An ampersand could start a character reference.
   { character: '&', after: '[#A-Za-z]', conflict: 'phrasing' },
   // A left paren could break out of a destination raw.
   { character: '(', conflict: 'destinationRaw' },
-  // A left paren followed by `]` could make something into a link or image.
+  // A left [ followed by `]` could make something into a link or image.
   {
     before: '\\]',
-    character: '(',
+    character: '[',
     conflict: 'phrasing',
     notConflict: fullPhrasingSpans,
   },
@@ -62,8 +62,12 @@ export const conflict: Conflict[] = [
   // raw.
   { atBreak: true, before: '\\d+', character: ')' },
   { character: ')', conflict: 'destinationRaw' },
-  // An asterisk can start thematic breaks, list items, italic, strong.
-  { atBreak: true, character: '*' },
+  // An # can start list items, italic, strong.
+  { atBreak: true, character: '#' },
+  // An // can start list italic
+  { atBreak: true, character: '//' },
+  // An '' can start list strong.
+  { atBreak: true, character: `''` },
   { character: '*', conflict: 'phrasing', notConflict: fullPhrasingSpans },
   // A plus sign could start a list item.
   { atBreak: true, character: '+' },

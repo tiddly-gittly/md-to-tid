@@ -102,11 +102,11 @@ describe('title', () => {
   });
 
   test('should escape a `#` at the end of a heading (1)', () => {
-    expect(toString({ type: 'heading', depth: 1, children: [{ type: 'text', value: 'a #' }] })).toEqual('! a \\#\n');
+    expect(toString({ type: 'heading', depth: 1, children: [{ type: 'text', value: 'a #' }] })).toEqual('! a #\n');
   });
 
   test('should escape a `#` at the end of a heading (2)', () => {
-    expect(toString({ type: 'heading', depth: 1, children: [{ type: 'text', value: 'a ##' }] })).toEqual('! a #\\#\n');
+    expect(toString({ type: 'heading', depth: 1, children: [{ type: 'text', value: 'a ##' }] })).toEqual('! a ##\n');
   });
 
   test('should not escape a `#` in a heading (2)', () => {
