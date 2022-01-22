@@ -54,7 +54,7 @@ describe('integration test', () => {
     await expect(md2tid(listArticleMD)).resolves.toEqual(listArticleTid);
   });
 
-  test('multiple mixed type of list', async () => {
+  test('multiple mixed type of list 1', async () => {
     const listArticleMD = `
 - item 1
 - item 2
@@ -64,8 +64,23 @@ describe('integration test', () => {
 1. item 3
   - item 3.1
     - item 3.1.1
+`;
 
+    const listArticleTid = `* item 2
+*# item 2.1
+*# item 2.2
+** asdfasdf
 
+# item 3
+
+* item 3.1
+** item 3.1.1
+`;
+
+    await expect(md2tid(listArticleMD)).resolves.toEqual(listArticleTid);
+  });
+  test('multiple mixed type of list 2', async () => {
+    const listArticleMD = `
 1. item
 1. item2
   - item3
@@ -78,17 +93,7 @@ describe('integration test', () => {
   - bbbb
 `;
 
-    const listArticleTid = `* item 2
-*# item 2.1
-*# item 2.2
-** asdfasdf
-
-# item 3
-
-* item 3.1
-** item 3.1.1
-
-# item
+    const listArticleTid = `# item
 # item2
 ** item3
 *# item3
