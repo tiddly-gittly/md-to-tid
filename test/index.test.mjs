@@ -17,7 +17,7 @@ describe('integration test', () => {
     ).toEqual('a\n\n*\n\n*\n\n#\n\n#\n\nd\n');
   });
 
-  test('multiple list', async () => {
+  test('multiple same type of list', async () => {
     const listArticleMD = `
 - item 1
 - item 2
@@ -49,6 +49,54 @@ describe('integration test', () => {
 ## item3
 # item2
 # only four spaces indent will be recognized as next level
+`;
+
+    await expect(md2tid(listArticleMD)).resolves.toEqual(listArticleTid);
+  });
+
+  test('multiple mixed type of list', async () => {
+    const listArticleMD = `
+- item 1
+- item 2
+  1. item 2.1
+  1. item 2.2
+  - asdfasdf
+1. item 3
+  - item 3.1
+    - item 3.1.1
+
+
+1. item
+1. item2
+  - item3
+  1. item3
+
+
+1. item2
+  - only four spaces indent will be recognized as next level
+    - bbbb
+  - bbbb
+`;
+
+    const listArticleTid = `* item 2
+*# item 2.1
+*# item 2.2
+** asdfasdf
+
+# item 3
+
+* item 3.1
+** item 3.1.1
+
+# item
+# item2
+** item3
+*# item3
+# item2
+
+** only four spaces indent will be recognized as next level
+*** bbbb
+** bbbb
 `;
 
     await expect(md2tid(listArticleMD)).resolves.toEqual(listArticleTid);
