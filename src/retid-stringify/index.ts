@@ -1,4 +1,4 @@
-import { Options as IToMarkdownOptions, toTid } from '../tidast-util-to-tid';
+import { Options as IToMarkdownOptions, toTid } from '../mdast-util-to-wikitext';
 import { Plugin, Processor, CompilerFunction } from 'unified';
 import { Root as MdastRoot, Content as MdastContent } from 'mdast';
 import { merge } from 'lodash';
