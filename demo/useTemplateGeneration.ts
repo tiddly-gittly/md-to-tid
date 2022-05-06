@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useDebouncedFn } from 'beautiful-react-hooks';
+import { useDebouncedCallback } from 'beautiful-react-hooks';
 import { VFile } from 'vfile';
 import type { JSONSchema7 } from 'json-schema';
 // import { reporter } from 'vfile-reporter';
@@ -22,7 +22,7 @@ export function useTemplateGeneration(configFormData: IOptions | undefined, file
   const [errorMessage, errorMessageSetter] = useState('');
   const [configSchema, configSchemaSetter] = useState<JSONSchema7 | undefined>();
   const [rerender, rerenderHookTrigger] = useTrigger();
-  const parseAndGenerateFromTemplate = useDebouncedFn(
+  const parseAndGenerateFromTemplate = useDebouncedCallback(
     async (templateStringToParse: string): Promise<void> => {
       const vFile = new VFile({ path: fileName, value: templateStringToParse });
       let newErrorMessage = '';
