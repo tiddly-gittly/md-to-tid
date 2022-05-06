@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import styled from 'styled-components';
 import { Button, ButtonGroup, Card, Intent, Tab, Tabs, TextArea } from '@blueprintjs/core';
-import { withTheme } from '@rjsf/core';
+import { ErrorSchema, IChangeEvent, withTheme } from '@rjsf/core';
 import { Theme as RJSFUITheme } from '@rjsf/fluent-ui';
 import { useLocalStorage } from 'beautiful-react-hooks';
 import useQueryString from 'use-query-string';
@@ -166,7 +166,7 @@ function App(): JSX.Element {
           <ConfigJSONSchemaForm
             formData={configFormData}
             schema={configSchema}
-            onChange={(submitEvent) => {
+            onChange={(submitEvent: IChangeEvent, es?: ErrorSchema) => {
               const nextConfigString = JSON.stringify(submitEvent.formData);
               updateConfigString(nextConfigString);
             }}

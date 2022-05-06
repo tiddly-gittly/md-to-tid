@@ -39,9 +39,8 @@ export function useTemplateGeneration(configFormData: IOptions | undefined, file
       // newErrorMessage += reporter(vFile);
       errorMessageSetter(newErrorMessage);
     },
-    500,
-    undefined,
     [configFormData],
+    500,
   );
   useEffect(() => {
     parseAndGenerateFromTemplate(template);

@@ -45,7 +45,7 @@
     "zwitch": "^2.0.2"
   },
   "devDependencies": {
-    "@blueprintjs/core": "^3.54.0",
+    "@blueprintjs/core": "^4.3.0",
     "@fluentui/react": "^8.67.2",
     "@rjsf/core": "^4.1.1",
     "@rjsf/fluent-ui": "^4.1.1",
