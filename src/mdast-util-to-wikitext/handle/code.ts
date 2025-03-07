@@ -1,18 +1,14 @@
 import type { Code } from 'mdast';
-import type { Context, Exit, Parent, SafeOptions } from '../types';
+import type { Context, Exit, SafeOptions } from '../types';
 
 import { longestStreak } from 'longest-streak';
 import { formatCodeAsIndented } from '../util/format-code-as-indented';
-import { checkFence } from '../util/check-fence';
-import { indentLines, Map } from '../util/indent-lines';
-import { safe } from '../util/safe';
+import { indentLines, type Map } from '../util/indent-lines';
 
-/**
- * @type {Handle}
- * @param {Code} node
- */
-export function code(node: Code, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
-  const marker = checkFence(context);
+export function code(node: Code, parent: unknown, context: Context, safeOptions: SafeOptions): string {
+  const marker = context.options.fence || '`';
+  if (marker !== '`' && marker !== '~') throw new Error('Cannot serialize code with `' + marker + '` for `options.fence`, expected `` ` `` or `~`');
+
   const raw = node.value || '';
   const suffix = marker === '`' ? 'GraveAccent' : 'Tilde';
   let value: string;
@@ -29,32 +25,18 @@ export function code(node: Code, parent: Parent | null | undefined, context: Con
 
     if (node.lang) {
       subexit = context.enter('codeFencedLang' + suffix);
-      value += safe(context, node.lang, {
-        before: '`',
-        after: ' ',
-        encode: ['`'],
-      });
+      value += node.lang;
       subexit();
     }
 
     if (node.lang && node.meta) {
       subexit = context.enter('codeFencedMeta' + suffix);
-      value +=
-        ' ' +
-        safe(context, node.meta, {
-          before: ' ',
-          after: '\n',
-          encode: ['`'],
-        });
+      value += ' ' + node.meta;
       subexit();
     }
 
     value += '\n';
-
-    if (raw) {
-      value += raw + '\n';
-    }
-
+    if (raw !== '') value += raw + '\n';
     value += sequence;
   }
 
@@ -62,6 +44,6 @@ export function code(node: Code, parent: Parent | null | undefined, context: Con
   return value;
 }
 
-const map: Map = function map(line, _, blank) {
+const map: Map = function map(line, blank) {
   return (blank ? '' : '    ') + line;
 };

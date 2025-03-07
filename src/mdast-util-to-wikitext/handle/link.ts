@@ -1,18 +1,16 @@
 import type { Link } from 'mdast';
-import type { Context, Exit, Parent } from '../types';
+import type { Context, Exit } from '../types';
 
-import { formatLinkAsExtLink } from '../util/format-link-as-external-link';
+import { formatLinkAsExtensionLink } from '../util/format-link-as-external-link';
 import { containerPhrasing } from '../util/container-phrasing';
-import { safe } from '../util/safe';
 
-link.peek = linkPeek;
-
-export function link(node: Link, parent: Parent | null | undefined, context: Context) {
+export function link(node: Link, parent: unknown, context: Context): string {
+  // return formatLinkAsExtensionLink(node, context) ? '[ext[' : '[[';peek
   let exit: Exit;
   let subexit: Exit;
   let value: string = '';
 
-  if (formatLinkAsExtLink(node, context)) {
+  if (formatLinkAsExtensionLink(node, context)) {
     // Hide the fact that we’re in phrasing, because escapes don’t work.
     const stack = context.stack;
     context.stack = [];
@@ -29,29 +27,19 @@ export function link(node: Link, parent: Parent | null | undefined, context: Con
   const separateLine = childValue ? '|' : '';
   subexit();
 
-  if (
+  if ((!node.url && node.title) || /[\0- \u007F]/.test(node.url)) {
     // If there’s no url but there is a title…
-    (!node.url && node.title) ||
     // If there are control characters or whitespace.
-    /[\0- \u007F]/.test(node.url)
-  ) {
     subexit = context.enter('destinationLiteral');
-    value = `[[${childValue}${separateLine}${safe(context, node.url, { before: '[[', after: ']]' })}]]`;
+    value = `[[${childValue}${separateLine}${node.url}]]`;
   } else {
     // No whitespace, raw is prettier.
     subexit = context.enter('destinationRaw');
-    value = `[[${childValue}${separateLine}${safe(context, node.url, {
-      before: '[[',
-      after: node.title ? ' ' : ']]',
-    })}]]`;
+    value = `[[${childValue}${separateLine}${node.url}]]`;
   }
 
   subexit();
 
   exit();
   return value;
-}
-
-function linkPeek(node: Link, parent: Parent | null | undefined, context: Context) {
-  return formatLinkAsExtLink(node, context) ? '[ext[' : '[[';
 }

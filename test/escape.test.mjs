@@ -1,8 +1,13 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { md2tid, toString } from '../dist/index.mjs';
 
 describe('escape', () => {
   test('should escape what would otherwise be a block quote in a paragraph', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '> a\n> b\nc >' }] })).toEqual('\\> a\n\\> b\nc >\n');
+    expect(
+      toString({
+        type: 'paragraph',
+        children: [{ type: 'text', value: '> a\n> b\nc >' }],
+      }),
+    ).toEqual('\\> a\n\\> b\nc >\n');
   });
 
   test('should escape what would otherwise be a block quote in a list item', () => {
@@ -56,15 +61,25 @@ describe('escape', () => {
   });
 
   test('should not escape single []', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '互联网始于[…] 年' }] })).toEqual('互联网始于[…] 年\n');
+    expect(
+      toString({
+        type: 'paragraph',
+        children: [{ type: 'text', value: '互联网始于[…] 年' }],
+      }),
+    ).toEqual('互联网始于[…] 年\n');
   });
 
-  test('should not escape strong', async () => {
-    await expect(md2tid('> **问题**：互联网始于**[…]** **年**')).resolves.toEqual(`> ''问题''：互联网始于''\[…]'' ''年''`);
+  test('should not escape strong', () => {
+    expect(md2tid('> **问题**：互联网始于**[…]** **年**')).toEqual(`> ''问题''：互联网始于''\[…]'' ''年''`);
   });
 
   test('should escape what would otherwise be code (flow)', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '```js\n```' }] })).toEqual('\\`\\`\\`js\n\\`\\`\\`\n');
+    expect(
+      toString({
+        type: 'paragraph',
+        children: [{ type: 'text', value: '```js\n```' }],
+      }),
+    ).toEqual('\\`\\`\\`js\n\\`\\`\\`\n');
   });
 
   test('should escape what would otherwise be a definition', () => {
@@ -99,7 +114,12 @@ describe('escape', () => {
   });
 
   test('should escape what would otherwise be code (text)', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: 'a `b`\n`c` d' }] })).toEqual('a \\`b\\`\n\\`c\\` d\n');
+    expect(
+      toString({
+        type: 'paragraph',
+        children: [{ type: 'text', value: 'a `b`\n`c` d' }],
+      }),
+    ).toEqual('a \\`b\\`\n\\`c\\` d\n');
   });
 
   test('should escape what would otherwise turn a link into an image', () => {
@@ -141,11 +161,21 @@ describe('escape', () => {
   });
 
   test('should escape what would otherwise be an image (resource)', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '[img[a.jpg]]' }] })).toEqual('\\[img\\[a.jpg]]\n');
+    expect(
+      toString({
+        type: 'paragraph',
+        children: [{ type: 'text', value: '[img[a.jpg]]' }],
+      }),
+    ).toEqual('\\[img\\[a.jpg]]\n');
   });
 
   test('should not escape what would otherwise not be an image (resource), but escape because it might be heading', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '![](a.jpg)' }] })).toEqual('\\!\\[](a.jpg)\n');
+    expect(
+      toString({
+        type: 'paragraph',
+        children: [{ type: 'text', value: '![](a.jpg)' }],
+      }),
+    ).toEqual('\\!\\[](a.jpg)\n');
   });
 
   test('should escape what would otherwise be a link (reference)', () => {
@@ -153,7 +183,12 @@ describe('escape', () => {
   });
 
   test('should escape what would otherwise be a link (resource)', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '[[a.jpg]]' }] })).toEqual('\\[\\[a.jpg]]\n');
+    expect(
+      toString({
+        type: 'paragraph',
+        children: [{ type: 'text', value: '[[a.jpg]]' }],
+      }),
+    ).toEqual('\\[\\[a.jpg]]\n');
   });
 
   test('should not escape what would otherwise not be a link (resource)', () => {
@@ -173,11 +208,21 @@ describe('escape', () => {
   });
 
   test('should escape what would otherwise be a list item (dot)', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '1. a\n2. b' }] })).toEqual('1\\. a\n2\\. b\n');
+    expect(
+      toString({
+        type: 'paragraph',
+        children: [{ type: 'text', value: '1. a\n2. b' }],
+      }),
+    ).toEqual('1\\. a\n2\\. b\n');
   });
 
   test('should escape what would otherwise be a list item (paren)', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '1) a\n2) b' }] })).toEqual('1\\) a\n2\\) b\n');
+    expect(
+      toString({
+        type: 'paragraph',
+        children: [{ type: 'text', value: '1) a\n2) b' }],
+      }),
+    ).toEqual('1\\) a\n2\\) b\n');
   });
 
   test('should not escape what can’t be a list (dot)', () => {

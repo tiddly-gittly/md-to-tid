@@ -1,4 +1,4 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { md2tid, toString } from '../dist/index.mjs';
 
 describe('blockquote', () => {
   test('should support adjacent texts in a block quote', () => {
@@ -65,7 +65,12 @@ describe('blockquote', () => {
   });
 
   test('should support code (flow, indented) in a block quote', () => {
-    expect(toString({ type: 'blockquote', children: [{ type: 'code', value: 'a\nb\n\nc' }] })).toEqual('>     a\n>     b\n>\n>     c\n');
+    expect(
+      toString({
+        type: 'blockquote',
+        children: [{ type: 'code', value: 'a\nb\n\nc' }],
+      }),
+    ).toEqual('>     a\n>     b\n>\n>     c\n');
   });
 
   test('should support code (flow, fenced) in a block quote', () => {
@@ -368,7 +373,7 @@ describe('blockquote', () => {
     ).toEqual('> ---\n>\n> ---\n');
   });
 
-  test('1. to #', async () => {
-    await expect(md2tid('1. item 1')).resolves.toEqual('# item 1\n');
+  test('1. to #', () => {
+    expect(md2tid('1. item 1')).toEqual('# item 1\n');
   });
 });

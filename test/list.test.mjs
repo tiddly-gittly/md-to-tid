@@ -1,4 +1,4 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { md2tid, toString } from '../dist/index.mjs';
 
 describe('unordered list', () => {
   test('render 1 level 1 node ast', () => {
@@ -69,8 +69,8 @@ describe('unordered list', () => {
 `);
   });
 
-  test('- to *', async () => {
-    await expect(md2tid('- item 1')).resolves.toEqual('* item 1\n');
+  test('- to *', () => {
+    expect(md2tid('- item 1')).toEqual('* item 1\n');
   });
 });
 
@@ -95,7 +95,7 @@ describe('ordered list', () => {
     ).toEqual('# item 1\n');
   });
 
-  test('1. to #', async () => {
-    await expect(md2tid('1. item 1')).resolves.toEqual('# item 1\n');
+  test('1. to #', () => {
+    expect(md2tid('1. item 1')).resolves.toEqual('# item 1\n');
   });
 });

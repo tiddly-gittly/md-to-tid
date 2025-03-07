@@ -2,23 +2,21 @@ import type { ImageReference } from 'mdast';
 import type { Context } from '../types';
 
 import { association } from '../util/association';
-import { safe } from '../util/safe';
 
-imageReference.peek = imageReferencePeek;
-
-export function imageReference(node: ImageReference, _: unknown, context: Context) {
+export function imageReference(node: ImageReference, parent: unknown, context: Context): string {
+  //   return '!';peek
   const type = node.referenceType;
   const exit = context.enter('imageReference');
   let subexit = context.enter('label');
-  const alt = safe(context, node.alt, { before: '[', after: ']' });
+  const alt = node.alt;
   let value = '![' + alt + ']';
-
   subexit();
+
   // Hide the fact that we’re in phrasing, because escapes don’t work.
   const stack = context.stack;
   context.stack = [];
   subexit = context.enter('reference');
-  const reference = safe(context, association(node), { before: '[', after: ']' });
+  const reference = association(node);
   subexit();
   context.stack = stack;
   exit();
@@ -30,11 +28,4 @@ export function imageReference(node: ImageReference, _: unknown, context: Contex
   }
 
   return value;
-}
-
-/**
- * @type {Handle}
- */
-function imageReferencePeek() {
-  return '!';
 }

@@ -1,4 +1,4 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { md2tid, toString } from '../dist/index.mjs';
 
 describe('bold', () => {
   test('should support an empty bold', () => {
@@ -15,7 +15,7 @@ describe('bold', () => {
     expect(tidResult).toEqual(`_a_\n`);
   });
 
-  test('should transform strong to bold', async () => {
-    await expect(md2tid('**asdf**')).resolves.toEqual(`''asdf''\n`);
+  test('should transform strong to bold', () => {
+    expect(md2tid('**asdf**')).toEqual(`''asdf''\n`);
   });
 });

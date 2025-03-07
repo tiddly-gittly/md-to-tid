@@ -1,4 +1,4 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { toString } from '../dist/index.mjs';
 
 describe('code (flow)', () => {
   test('should support empty code', () => {
@@ -70,7 +70,15 @@ describe('code (flow)', () => {
   });
 
   test('should use more tildes for fences if there are streaks of tildes in the value (fences)', () => {
-    expect(toString({ type: 'code', value: '~~~\nasd\n~~~' }, { fence: '~', fences: true })).toEqual('~~~~\n~~~\nasd\n~~~\n~~~~\n');
+    expect(
+      toString(
+        { type: 'code', value: '~~~\nasd\n~~~' },
+        {
+          fence: '~',
+          fences: true,
+        },
+      ),
+    ).toEqual('~~~~\n~~~\nasd\n~~~\n~~~~\n');
   });
 
   test('should use a fence if there is an info', () => {

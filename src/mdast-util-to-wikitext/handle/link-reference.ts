@@ -1,13 +1,11 @@
 import type { LinkReference } from 'mdast';
-import type { Context, Exit, Parent, SafeOptions } from '../types';
+import type { Context, SafeOptions } from '../types';
 
 import { association } from '../util/association';
 import { containerPhrasing } from '../util/container-phrasing';
-import { safe } from '../util/safe';
 
-linkReference.peek = linkReferencePeek;
-
-export function linkReference(node: LinkReference, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
+export function linkReference(node: LinkReference, parent: unknown, context: Context, safeOptions: SafeOptions): string {
+  // return '[';peek
   const type = node.referenceType;
   const exit = context.enter('linkReference');
   let subexit = context.enter('label');
@@ -19,7 +17,7 @@ export function linkReference(node: LinkReference, parent: Parent | null | undef
   const stack = context.stack;
   context.stack = [];
   subexit = context.enter('reference');
-  const reference = safe(context, association(node), { before: '[', after: ']' });
+  const reference = association(node);
   subexit();
   context.stack = stack;
   exit();
@@ -31,8 +29,4 @@ export function linkReference(node: LinkReference, parent: Parent | null | undef
   }
 
   return value;
-}
-
-function linkReferencePeek(node: LinkReference, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
-  return '[';
 }

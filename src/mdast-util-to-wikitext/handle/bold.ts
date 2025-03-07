@@ -1,26 +1,18 @@
 import type { Strong } from 'mdast';
-import type { Context, Parent, SafeOptions } from '../types';
+import type { Context, SafeOptions } from '../types';
 
-import { checkStrong } from '../util/check-strong';
 import { containerPhrasing } from '../util/container-phrasing';
 
-bold.peek = boldPeek;
+export function bold(node: Strong, parent: unknown, context: Context, safeOptions: SafeOptions): string {
+  const marker = context.options.strong || `''`;
+  if (marker !== `''` && marker !== '_') {
+    throw new Error('Cannot serialize strong with `' + marker + "` for `options.strong`, expected `''`, or `_`");
+  }
 
-export function bold(node: Strong, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
-  const marker = checkStrong(context);
   const exit = context.enter('strong');
-  const value = containerPhrasing(node, context, {
-    before: marker,
-    after: marker,
-  });
+
+  const value = containerPhrasing(node, context, { before: marker, after: marker });
+
   exit();
   return marker + value + marker;
-}
-
-/**
- * @type {Handle}
- * @param {Strong} _
- */
-function boldPeek(_: Strong, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
-  return context.options.strong || `''`;
 }

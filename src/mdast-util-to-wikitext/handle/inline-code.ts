@@ -1,11 +1,8 @@
 import type { InlineCode } from 'mdast';
-import type { Context, Parent, SafeOptions } from '../types';
+import type { Conflict, Context, SafeOptions } from '../types';
 
-import { patternCompile } from '../util/pattern-compile';
-
-inlineCode.peek = inlineCodePeek;
-
-export function inlineCode(node: InlineCode, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
+export function inlineCode(node: InlineCode, parent: unknown, context: Context, safeOptions: SafeOptions): string {
+  // return '`';peek
   let value = node.value || '';
   let sequence = '`';
   let index = -1;
@@ -19,7 +16,7 @@ export function inlineCode(node: InlineCode, parent: Parent | null | undefined, 
 
   // If this is not just spaces or eols (tabs don’t count), and either the
   // first or last character are a space, eol, or tick, then pad with spaces.
-  if (/[^ \r\n]/.test(value) && ((/^[ \r\n]/.test(value) && /[ \r\n]$/.test(value)) || /^`|`$/.test(value))) {
+  if (/[^\n\r ]/.test(value) && ((/^[\n\r ]/.test(value) && /[\n\r ]$/.test(value)) || /^`|`$/.test(value))) {
     value = ' ' + value + ' ';
   }
 
@@ -55,6 +52,20 @@ export function inlineCode(node: InlineCode, parent: Parent | null | undefined, 
   return sequence + value + sequence;
 }
 
-function inlineCodePeek() {
-  return '`';
+function patternCompile(pattern: Conflict): RegExp {
+  if (!pattern._compiled) {
+    // before要么是换行要么是空字符串
+    const before = (pattern.atBreak ? '[\\r\\n][\\t ]*' : '') + (pattern.before ? '(?:' + pattern.before + ')' : '');
+
+    // 四部分表达式组成，第二部分是含有任意一个字符就被自动替换为\\，问题在这里，为啥要这样做？
+    pattern._compiled = new RegExp(
+      (before ? '(' + before + ')' : '') +
+        (/[|\\{}()[\]^$+*?.-]/.test(pattern.character) ? '\\' : '') +
+        pattern.character +
+        (pattern.after ? '(?:' + pattern.after + ')' : ''),
+      'g',
+    );
+  }
+
+  return pattern._compiled;
 }

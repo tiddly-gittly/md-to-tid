@@ -1,4 +1,4 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { md2tid, toString } from '../dist/index.mjs';
 
 describe('integration test', () => {
   test('render 2 level 1 list ast', () => {
@@ -17,7 +17,7 @@ describe('integration test', () => {
     ).toEqual('a\n\n*\n\n*\n\n#\n\n#\n\nd\n');
   });
 
-  test('multiple same type of list', async () => {
+  test('multiple same type of list', () => {
     const listArticleMD = `
 - item 1
 - item 2
@@ -51,10 +51,10 @@ describe('integration test', () => {
 # only four spaces indent will be recognized as next level
 `;
 
-    await expect(md2tid(listArticleMD)).resolves.toEqual(listArticleTid);
+    expect(md2tid(listArticleMD)).toEqual(listArticleTid);
   });
 
-  test('multiple mixed type of list 1', async () => {
+  test('multiple mixed type of list 1', () => {
     const listArticleMD = `
 - item 1
 - item 2
@@ -77,9 +77,9 @@ describe('integration test', () => {
 ** item 3.1.1
 `;
 
-    await expect(md2tid(listArticleMD)).resolves.toEqual(listArticleTid);
+    expect(md2tid(listArticleMD)).toEqual(listArticleTid);
   });
-  test('multiple mixed type of list 2', async () => {
+  test('multiple mixed type of list 2', () => {
     const listArticleMD = `
 1. item
 1. item2
@@ -104,7 +104,7 @@ describe('integration test', () => {
 ** bbbb
 `;
 
-    await expect(md2tid(listArticleMD)).resolves.toEqual(listArticleTid);
+    expect(md2tid(listArticleMD)).toEqual(listArticleTid);
   });
 });
 

@@ -1,4 +1,4 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { toString } from '../dist/index.mjs';
 
 describe.only('link', () => {
   test('should support a link', () => {
@@ -157,15 +157,37 @@ describe.only('link', () => {
   });
 
   test('should remove unneeded characters in a `title` (single quotes)', () => {
-    expect(toString({ type: 'link', url: '#', title: 'a![b](c*d_e[f_g`h<i</j', children: [] }, { quote: "'" })).toEqual('[[#]]\n');
+    expect(
+      toString(
+        {
+          type: 'link',
+          url: '#',
+          title: 'a![b](c*d_e[f_g`h<i</j',
+          children: [],
+        },
+        { quote: "'" },
+      ),
+    ).toEqual('[[#]]\n');
   });
 
   test('should escape unneeded characters in a `destinationLiteral`', () => {
-    expect(toString({ type: 'link', url: 'a b![c](d*e_f[g_h`i', children: [] })).toEqual('[[a b!\\[c\\](d*e_f\\[g_h`i]]\n');
+    expect(
+      toString({
+        type: 'link',
+        url: 'a b![c](d*e_f[g_h`i',
+        children: [],
+      }),
+    ).toEqual('[[a b!\\[c\\](d*e_f\\[g_h`i]]\n');
   });
 
   test('should escape unneeded characters in a `destinationRaw`', () => {
-    expect(toString({ type: 'link', url: 'a![b](c*d_e[f_g`h<i</j', children: [] })).toEqual('[[a!\\[b\\](c*d_e\\[f_g`h<i</j]]\n');
+    expect(
+      toString({
+        type: 'link',
+        url: 'a![b](c*d_e[f_g`h<i</j',
+        children: [],
+      }),
+    ).toEqual('[[a!\\[b\\](c*d_e\\[f_g`h<i</j]]\n');
   });
 });
 
@@ -315,5 +337,4 @@ describe('linkReference', (t) => {
       }),
     ).toEqual('[][a!\\[b\\](c*d_e\\[f_g`h<i</j]\n');
   });
-
 });

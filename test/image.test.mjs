@@ -1,4 +1,4 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { toString } from '../dist/index.mjs';
 
 describe('image', () => {
   test('should support an image', () => {
@@ -66,7 +66,7 @@ describe('image', () => {
   });
 
   test('should support an image w/ title when `quote: "\'"`', () => {
-    expect(toString({ type: 'image', url: '', title: 'b' }, { quote: "'" })).toEqual("[img[b|]]\n");
+    expect(toString({ type: 'image', url: '', title: 'b' }, { quote: "'" })).toEqual('[img[b|]]\n');
   });
 
   test('shouldn\'t escape a quote in `title` in a title when `quote: "\'"`', () => {

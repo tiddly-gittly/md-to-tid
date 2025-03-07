@@ -1,36 +1,42 @@
-import type { Context, Join, Parent, Node } from './types';
+import { formatCodeAsIndented } from './util/format-code-as-indented.js';
+import { formatHeadingAsSetext } from './util/format-heading-as-setext.js';
+import { Join, State } from './types';
+import { Nodes, Parent } from 'mdast';
 
-import { formatCodeAsIndented } from './util/format-code-as-indented';
+/**
+ * 定义一个用于合并节点的函数数组，初始包含一个默认的合并函数。
+ */
+export const join: Array<Join> = [joinDefaults];
 
-export const join: Join[] = [joinDefaults];
-
-function joinDefaults(left: Node, right: Node, parent: Parent, context: Context): boolean | null | void | number {
-  // Indented code after list or another indented code.
+/**
+ * 默认的节点合并函数，用于判断两个相邻节点是否应该合并。
+ * 
+ * @param left - 左侧节点。
+ * @param right - 右侧节点。
+ * @param parent - 父节点。
+ * @param state - 当前转换状态。
+ * @returns 如果节点应该合并，返回相应的合并规则；否则返回 undefined。
+ */
+function joinDefaults(left: Nodes, right: Nodes, parent: Parent, state: State): boolean | number | undefined {
+  // 列表或另一个缩进代码块后的缩进代码块。
   if (
     right.type === 'code' &&
-    formatCodeAsIndented(right, context) &&
-    (left.type === 'list' || (left.type === right.type && formatCodeAsIndented(left, context)))
+    formatCodeAsIndented(right, state) &&
+    (left.type === 'list' || (left.type === right.type && formatCodeAsIndented(left, state)))
   ) {
     return false;
   }
 
-  // Two lists with the same marker.
-  if (
-    left.type === 'list' &&
-    left.type === right.type &&
-    Boolean(left.ordered) === Boolean(right.ordered) &&
-    !(left.ordered ? context.options.bulletOrderedOther : context.options.bulletOther)
-  ) {
-    return false;
-  }
-
-  // Join children of a list or an item.
-  // In which case, `parent` has a `spread` field.
+  // 合并列表或列表项的子节点。
+  // 在这种情况下，`parent` 有一个 `spread` 字段。
   if ('spread' in parent && typeof parent.spread === 'boolean') {
     if (
       left.type === 'paragraph' &&
-      // Two paragraphs.
-      (left.type === right.type || right.type === 'definition')
+      // 两个段落。
+      (left.type === right.type ||
+        right.type === 'definition' ||
+        // 段落后面跟着一个 Setext 标题。
+        (right.type === 'heading' && formatHeadingAsSetext(right, state)))
     ) {
       return;
     }

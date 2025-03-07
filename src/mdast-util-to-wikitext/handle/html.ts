@@ -1,12 +1,7 @@
-import type { HTML } from 'mdast';
-import type { Context, Exit, Parent, SafeOptions } from '../types';
+import type { Html } from 'mdast';
+import type { Context, SafeOptions } from '../types';
 
-html.peek = htmlPeek;
-
-export function html(node: HTML, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
+export function html(node: Html, parent: unknown, context: Context, safeOptions: SafeOptions): string {
+  //    return '<';peek
   return node.value || '';
-}
-
-function htmlPeek(node: HTML, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
-  return '<';
 }

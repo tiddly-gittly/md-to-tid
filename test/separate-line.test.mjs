@@ -1,4 +1,4 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { md2tid, toString } from '../dist/index.mjs';
 
 describe('separate-line', () => {
   test('should support a separate-line', () => {
@@ -26,7 +26,7 @@ describe('separate-line', () => {
     expect(tidResult).toEqual(`___\n`);
   });
 
-  test('should transform thematicBreak to separate-line', async () => {
-    await expect(md2tid('***\n')).resolves.toEqual('---\n');
+  test('should transform thematicBreak to separate-line', () => {
+    expect(md2tid('***\n')).toEqual('---\n');
   });
 });

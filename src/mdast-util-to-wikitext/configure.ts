@@ -1,15 +1,12 @@
-import type { Context, Options } from './types';
+import { Options, State } from './types';
 
-/**
- * @param base Context, that will be accessed in each handler.
- * @param extension Extra functions that user's extension provided, that we want to add to the context to use by the handlers.
- * @returns Augmented context.
- */
-export function configure(base: Context, extension: Options): Context {
+const own = {}.hasOwnProperty;
+
+export function configure(base: State, extension: Options): State {
   let index = -1;
-  let key: string;
+  let key: keyof Options;
 
-  // First do sub-extensions.
+  // First do subextensions.
   if (extension.extensions) {
     while (++index < extension.extensions.length) {
       configure(base, extension.extensions[index]);
@@ -17,19 +14,58 @@ export function configure(base: Context, extension: Options): Context {
   }
 
   for (key in extension) {
-    if (key === 'extensions') {
-      // Empty.
-    } else if (key === 'conflict' || key === 'join') {
-      /* c8 ignore next 2 */
-      // @ts-expect-error: hush.
-      base[key] = [...(base[key] || []), ...(extension[key] || [])];
-    } else if (key === 'handlers') {
-      base[key] = Object.assign(base[key], extension[key] || {});
-    } else {
-      // @ts-expect-error: hush.
-      base.options[key] = extension[key];
+    if (own.call(extension, key)) {
+      switch (key) {
+        case 'extensions': {
+          // Empty.
+          break;
+        }
+
+        /* c8 ignore next 4 */
+        case 'unsafe': {
+          list(base[key], extension[key]);
+          break;
+        }
+
+        case 'join': {
+          list(base[key], extension[key]);
+          break;
+        }
+
+        case 'handlers': {
+          map(base[key], extension[key]);
+          break;
+        }
+
+        default: {
+          // @ts-expect-error: matches.
+          base.options[key] = extension[key];
+        }
+      }
     }
   }
 
   return base;
+}
+
+/**
+ * @template T
+ * @param {Array<T>} left
+ * @param {Array<T> | null | undefined} right
+ */
+function list<T>(left: Array<T>, right: Array<T> | null | undefined) {
+  if (right) {
+    left.push(...right);
+  }
+}
+
+/**
+ * @template T
+ * @param {Record<string, T>} left
+ * @param {Record<string, T> | null | undefined} right
+ */
+function map<T>(left: Record<string, T>, right: Record<string, T> | null | undefined) {
+  if (right) {
+    Object.assign(left, right);
+  }
 }
