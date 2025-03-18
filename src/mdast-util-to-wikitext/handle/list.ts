@@ -1,25 +1,77 @@
-import type { List } from 'mdast';
-import type { Handle } from '../types';
+import { checkBullet } from '../util/check-bullet.js';
+import { checkBulletOther } from '../util/check-bullet-other.js';
+import { checkBulletOrdered } from '../util/check-bullet-ordered.js';
+import { checkRule } from '../util/check-rule.js';
+import { List, Parents } from 'mdast';
+import { Info, State } from '../types';
 
-import { containerFlow } from '../util/container-flow';
+export function list(node: List, parent: Parents | undefined, state: State, info: Info): string {
+  const exit = state.enter('list');
+  const bulletCurrent = state.bulletCurrent;
+  let bullet: string = node.ordered ? checkBulletOrdered(state) : checkBullet(state);
+  const bulletOther: string = node.ordered ? (bullet === '.' ? ')' : '.') : checkBulletOther(state);
+  let useDifferentMarker = parent && state.bulletLastUsed ? bullet === state.bulletLastUsed : false;
 
-// 我需要把bullet给子元素item。
-// 现在是子元素为当前元素，现在我的子元素有有两种情况，段落或者list，假设 是list，我要把父元素给我的bullet给list。
-// 现在回到list函数，item父元素通过祖父元素list给我了bullet。我需要把他们结合起来然后再给子元素。
-// list的任务就是选择bullet，然后接收上级元素给的bullet，然后传递结合好的bullet给下级元素。
-// 现在是第二种情况，段落。我现在是当前元素是item，我的子元素是最终的段落，我把积累下来的bullet传递给段落，段落接收到bullet
-// 解析段落结点，然后结合bullet，并返回。
-// 现在就逐层返回了。通过变量 = 函数的方式。
-// 现在是一条路径，我有很多条路径，现在推演第二条路径推算bullet如何去适应修改。
-let bullet_stack: string[] = [];
-export const list: Handle = function list(node: List, parent: unknown, context): string {
-  const exit = context.enter(`list`);
+  if (!node.ordered) {
+    const firstListItem = node.children ? node.children[0] : undefined;
 
-  bullet_stack.push(node.ordered === true ? '#' : '*');
-  context.bullet = bullet_stack.join('');
-  const value = containerFlow(node, context);
-  bullet_stack.pop();
-  context.bullet = '';
+    // If there’s an empty first list item directly in two list items,
+    // we have to use a different bullet:
+    //
+    // ```markdown
+    // * - *
+    // ```
+    //
+    // …because otherwise it would become one big thematic break.
+    if (
+      // Bullet could be used as a thematic break marker:
+      (bullet === '*' || bullet === '-') &&
+      // Empty first list item:
+      firstListItem &&
+      (!firstListItem.children || !firstListItem.children[0]) &&
+      // Directly in two other list items:
+      state.stack[state.stack.length - 1] === 'list' &&
+      state.stack[state.stack.length - 2] === 'listItem' &&
+      state.stack[state.stack.length - 3] === 'list' &&
+      state.stack[state.stack.length - 4] === 'listItem' &&
+      // That are each the first child.
+      state.indexStack[state.indexStack.length - 1] === 0 &&
+      state.indexStack[state.indexStack.length - 2] === 0 &&
+      state.indexStack[state.indexStack.length - 3] === 0
+    ) {
+      useDifferentMarker = true;
+    }
+
+    // If there’s a thematic break at the start of the first list item,
+    // we have to use a different bullet:
+    //
+    // ```markdown
+    // * ---
+    // ```
+    //
+    // …because otherwise it would become one big thematic break.
+    if (checkRule(state) === bullet && firstListItem) {
+      let index = -1;
+
+      while (++index < node.children.length) {
+        const item = node.children[index];
+
+        if (item && item.type === 'listItem' && item.children && item.children[0] && item.children[0].type === 'thematicBreak') {
+          useDifferentMarker = true;
+          break;
+        }
+      }
+    }
+  }
+
+  if (useDifferentMarker) {
+    bullet = bulletOther;
+  }
+
+  state.bulletCurrent = bullet;
+  const value = state.containerFlow(node, info);
+  state.bulletLastUsed = bullet;
+  state.bulletCurrent = bulletCurrent;
   exit();
   return value;
-};
+}

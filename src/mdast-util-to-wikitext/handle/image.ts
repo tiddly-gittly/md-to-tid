@@ -1,31 +1,65 @@
-import type { Image } from 'mdast';
-import type { Context } from '../types';
+import { checkQuote } from '../util/check-quote.js';
+import { Image, Parents } from 'mdast';
+import { Info, State } from '../types';
 
-export function image(node: Image, parent: unknown, context: Context): string {
-  //   return '[img[';peek
-  const exit = context.enter('image');
-  let subexit = context.enter('label');
-  /**
-   * Use alt as tooltip first, if no alt provided, use title instead.
-   */
-  let value = '[img[';
-  const tooltip = node.alt ?? node.title;
-  const separateLine = tooltip ? '|' : '';
-  value += `${tooltip}${separateLine}`;
+image.peek = imagePeek;
+
+export function image(node: Image, _: Parents | undefined, state: State, info: Info): string {
+  const quote = checkQuote(state);
+  const suffix = quote === '"' ? 'Quote' : 'Apostrophe';
+  const exit = state.enter('image');
+  let subexit = state.enter('label');
+  const tracker = state.createTracker(info);
+  let value = tracker.move('![');
+  value += tracker.move(state.safe(node.alt, { before: value, after: ']', ...tracker.current() }));
+  value += tracker.move('](');
 
   subexit();
 
-  if (/[\0- \u007F]/.test(node.url)) {
+  if (
+    // If there’s no url but there is a title…
+    (!node.url && node.title) ||
     // If there are control characters or whitespace.
-    subexit = context.enter('destinationLiteral');
+    /[\0- \u007F]/.test(node.url)
+  ) {
+    subexit = state.enter('destinationLiteral');
+    value += tracker.move('<');
+    value += tracker.move(state.safe(node.url, { before: value, after: '>', ...tracker.current() }));
+    value += tracker.move('>');
   } else {
     // No whitespace, raw is prettier.
-    subexit = context.enter('destinationRaw');
+    subexit = state.enter('destinationRaw');
+    value += tracker.move(
+      state.safe(node.url, {
+        before: value,
+        after: node.title ? ' ' : ')',
+        ...tracker.current(),
+      }),
+    );
   }
-  value += node.url;
+
   subexit();
 
-  value += ']]';
+  if (node.title) {
+    subexit = state.enter(`title${suffix}`);
+    value += tracker.move(' ' + quote);
+    value += tracker.move(
+      state.safe(node.title, {
+        before: value,
+        after: quote,
+        ...tracker.current(),
+      }),
+    );
+    value += tracker.move(quote);
+    subexit();
+  }
+
+  value += tracker.move(')');
   exit();
+
   return value;
+}
+
+function imagePeek(): string {
+  return '!';
 }

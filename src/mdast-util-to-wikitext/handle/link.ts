@@ -1,45 +1,95 @@
-import type { Link } from 'mdast';
-import type { Context, Exit } from '../types';
+import { checkQuote } from '../util/check-quote.js';
+import { formatLinkAsAutolink } from '../util/format-link-as-autolink.js';
+import { Link, Parents } from 'mdast';
+import { Info, State } from '../types';
 
-import { formatLinkAsExtensionLink } from '../util/format-link-as-external-link';
-import { containerPhrasing } from '../util/container-phrasing';
+link.peek = linkPeek;
 
-export function link(node: Link, parent: unknown, context: Context): string {
-  // return formatLinkAsExtensionLink(node, context) ? '[ext[' : '[[';peek
-  let exit: Exit;
-  let subexit: Exit;
-  let value: string = '';
+export function link(node: Link, _: Parents | undefined, state: State, info: Info): string {
+  const quote = checkQuote(state);
+  const suffix = quote === '"' ? 'Quote' : 'Apostrophe';
+  const tracker = state.createTracker(info);
+  /** @type {Exit} */
+  let exit;
+  /** @type {Exit} */
+  let subexit;
 
-  if (formatLinkAsExtensionLink(node, context)) {
+  if (formatLinkAsAutolink(node, state)) {
     // Hide the fact that we’re in phrasing, because escapes don’t work.
-    const stack = context.stack;
-    context.stack = [];
-    exit = context.enter('autolink');
-    value = '[ext[' + containerPhrasing(node, context, { before: '[ext[', after: ']]' }) + ']]';
+    const stack = state.stack;
+    state.stack = [];
+    exit = state.enter('autolink');
+    let value = tracker.move('<');
+    value += tracker.move(
+      state.containerPhrasing(node, {
+        before: value,
+        after: '>',
+        ...tracker.current(),
+      }),
+    );
+    value += tracker.move('>');
     exit();
-    context.stack = stack;
+    state.stack = stack;
     return value;
   }
 
-  exit = context.enter('link');
-  subexit = context.enter('label');
-  const childValue = containerPhrasing(node, context, { before: '[[', after: ']]' });
-  const separateLine = childValue ? '|' : '';
+  exit = state.enter('link');
+  subexit = state.enter('label');
+  let value = tracker.move('[');
+  value += tracker.move(
+    state.containerPhrasing(node, {
+      before: value,
+      after: '](',
+      ...tracker.current(),
+    }),
+  );
+  value += tracker.move('](');
   subexit();
 
-  if ((!node.url && node.title) || /[\0- \u007F]/.test(node.url)) {
+  if (
     // If there’s no url but there is a title…
+    (!node.url && node.title) ||
     // If there are control characters or whitespace.
-    subexit = context.enter('destinationLiteral');
-    value = `[[${childValue}${separateLine}${node.url}]]`;
+    /[\0- \u007F]/.test(node.url)
+  ) {
+    subexit = state.enter('destinationLiteral');
+    value += tracker.move('<');
+    value += tracker.move(state.safe(node.url, { before: value, after: '>', ...tracker.current() }));
+    value += tracker.move('>');
   } else {
     // No whitespace, raw is prettier.
-    subexit = context.enter('destinationRaw');
-    value = `[[${childValue}${separateLine}${node.url}]]`;
+    subexit = state.enter('destinationRaw');
+    value += tracker.move(
+      state.safe(node.url, {
+        before: value,
+        after: node.title ? ' ' : ')',
+        ...tracker.current(),
+      }),
+    );
   }
 
   subexit();
 
+  if (node.title) {
+    subexit = state.enter(`title${suffix}`);
+    value += tracker.move(' ' + quote);
+    value += tracker.move(
+      state.safe(node.title, {
+        before: value,
+        after: quote,
+        ...tracker.current(),
+      }),
+    );
+    value += tracker.move(quote);
+    subexit();
+  }
+
+  value += tracker.move(')');
+
   exit();
   return value;
+}
+
+function linkPeek(node: Link, _: Parents | undefined, state: State): string {
+  return formatLinkAsAutolink(node, state) ? '<' : '[';
 }

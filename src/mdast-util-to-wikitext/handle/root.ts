@@ -1,8 +1,13 @@
-import type { Root } from 'mdast';
-import type { Context, SafeOptions } from '../types';
+import { phrasing } from 'mdast-util-phrasing';
+import { Parents, Root } from 'mdast';
+import { Info, State } from '../types';
 
-import { containerFlow } from '../util/container-flow';
+export function root(node: Root, _: Parents | undefined, state: State, info: Info): string {
+  // Note: `html` nodes are ambiguous.
+  const hasPhrasing = node.children.some(function (d) {
+    return phrasing(d);
+  });
 
-export function root(node: Root, parent: unknown, context: Context, safeOptions: SafeOptions): string {
-  return containerFlow(node, context);
+  const container = hasPhrasing ? state.containerPhrasing : state.containerFlow;
+  return container.call(state, node, info);
 }

@@ -1,20 +1,39 @@
-import type { ListItem } from 'mdast';
-import type { Handle } from '../types';
-import { containerFlow } from '../util/container-flow';
-import { indentLines, type Map } from '../util/indent-lines';
+import { checkBullet } from '../util/check-bullet.js';
+import { checkListItemIndent } from '../util/check-list-item-indent.js';
+import { ListItem, Parents } from 'mdast';
+import { Info, Map, State } from '../types';
 
-export const listItem: Handle = function listItem(node: ListItem, parent, context) {
-  const exit = context.enter('listItem');
+export function listItem(node: ListItem, parent: Parents | undefined, state: State, info: Info): string {
+  const listItemIndent = checkListItemIndent(state);
+  let bullet = state.bulletCurrent || checkBullet(state);
 
-  const bullet = context.bullet;
-  const map: Map = function map(line, blank) {
-    // in tw, there is no indent for list item. blank考虑了只有列表无内容的情况
-    if (line.startsWith(bullet)) return (blank ? '' : bullet) + line;
-    return (blank ? bullet : bullet + ' ') + line;
+  // 为有序列表添加标记值
+  if (parent && parent.type === 'list' && parent.ordered) {
+    bullet =
+      (typeof parent.start === 'number' && parent.start > -1 ? parent.start : 1) +
+      (state.options.incrementListMarker === false ? 0 : parent.children.indexOf(node)) +
+      bullet;
+  }
+
+  let size = bullet.length + 1;
+
+  if (listItemIndent === 'tab' || (listItemIndent === 'mixed' && ((parent && parent.type === 'list' && parent.spread) || node.spread))) {
+    size = Math.ceil(size / 4) * 4;
+  }
+
+  const tracker = state.createTracker(info);
+  tracker.move(bullet + ' '.repeat(size - bullet.length));
+  tracker.shift(size);
+  const exit = state.enter('listItem');
+  const map: Map = function map(line, index, blank) {
+    if (index) {
+      return (blank ? '' : ' '.repeat(size)) + line;
+    }
+
+    return (blank ? bullet : bullet + ' '.repeat(size - bullet.length)) + line;
   };
-  // TODO：等待分类处理
-  const value = indentLines(containerFlow(node, context), map);
-
+  const value = state.indentLines(state.containerFlow(node, tracker.current()), map);
   exit();
+
   return value;
-};
+}

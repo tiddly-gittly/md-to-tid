@@ -1,17 +1,18 @@
 import type { Emphasis } from 'mdast';
-import type { Context } from '../types';
+import { Info, State } from '../types';
+import { checkItalic } from '../util/check-italic';
 import { containerPhrasing } from '../util/container-phrasing';
 
-export function italic(node: Emphasis, parent: unknown, context: Context): string {
-  // return context.options.italic ?? `''`;peek
-  const marker = context.options.italic ?? `//`;
-  if (marker !== `//` && marker !== '_') throw new Error(`Cannot serialize italic with ${marker} for options.italic, expected  \`''\`, or \`_\``);
+italic.peek = italicPeek;
 
-  const exit = context.enter('italic');
-  const value = containerPhrasing(node, context, {
-    before: marker,
-    after: marker,
-  });
+export function italic(node: Emphasis, _: unknown, state: State, info: Info) {
+  const marker = checkItalic(state);
+  const exit = state.enter('italic');
+  const value = containerPhrasing(node, state, info);
   exit();
   return marker + value + marker;
+}
+
+function italicPeek(_: Emphasis, _1: unknown, state: State): string {
+  return state.options.italic ?? `''`;
 }
