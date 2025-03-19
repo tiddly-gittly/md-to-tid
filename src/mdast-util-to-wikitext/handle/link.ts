@@ -27,13 +27,8 @@ export function link(node: Link, _: Parents | undefined, state: State, info: Inf
     // [ext[
     let value = tracker.move('[ext[');
     // [ext[ + node
-    value += tracker.move(
-      state.containerPhrasing(node, {
-        before: value,
-        after: ']]',
-        ...tracker.current(),
-      }),
-    );
+    // TODO 这里不知道是需要node 还是 node.url，暂时选择url吧
+    value += tracker.move(node.url);
     // [ext[ + node + ]]
     value += tracker.move(']]');
     exit();

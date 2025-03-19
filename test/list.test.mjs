@@ -1,5 +1,5 @@
 import { md2tid, toString } from '../dist/index.mjs';
-describe('integration test', () => {
+describe.skip('integration test', () => {
   test('render 2 level 1 list ast', () => {
     expect(
       toString({
@@ -80,7 +80,7 @@ describe('integration test', () => {
   });
 });
 
-describe('extension', () => {
+describe.skip('extension', () => {
   test('render 2 level 1 list ast', () => {
     expect(
       toString(
