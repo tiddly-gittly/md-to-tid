@@ -1,5 +1,5 @@
 import { md2tid, toString } from '../dist/index.mjs';
-describe.skip('integration test', () => {
+describe('integration test', () => {
   test('render 2 level 1 list ast', () => {
     expect(
       toString({
@@ -65,8 +65,7 @@ describe.skip('integration test', () => {
     - item 3.1.1
 `;
 
-    const listArticleTid = `
-* item 1
+    const listArticleTid = `* item 1
 * item 2
 *# item 2.1
 *# item 2.2
@@ -80,7 +79,7 @@ describe.skip('integration test', () => {
   });
 });
 
-describe.skip('extension', () => {
+describe('extension', () => {
   test('render 2 level 1 list ast', () => {
     expect(
       toString(

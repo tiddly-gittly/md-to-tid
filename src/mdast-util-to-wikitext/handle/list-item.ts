@@ -30,13 +30,18 @@ export function listItem(node: ListItem, parent: Parents | undefined, state: Sta
   tracker.move(bullet.repeat(size - bullet.length));
   tracker.shift(size);
   const exit = state.enter('listItem');
-  // TODO 有时列表bullet和line没空格，但不影响使用
   const map: Map = function map(line, index, blank) {
     if (index) {
-      return (blank ? '' : bullet.repeat(size - bullet.length)) + line;
+      if (line.startsWith("#") || line.startsWith("*")) {
+        let old_bullet = line.split(" ")[0]
+        let old_line = line.split(" ").slice(1).join(" ")
+        return (blank ? '' : bullet.repeat(size - bullet.length) + old_bullet + ' ') + old_line;
+      } else {
+        return (blank ? '' : bullet.repeat(size - bullet.length) + ' ') + line;
+      }
     }
 
-    return (blank ? bullet : bullet.repeat(size - bullet.length)) + ' ' + line;
+    return (blank ? bullet : bullet.repeat(size - bullet.length) + ' ') + line;
   };
   const value = state.indentLines(state.containerFlow(node, tracker.current()), map);
   exit();
