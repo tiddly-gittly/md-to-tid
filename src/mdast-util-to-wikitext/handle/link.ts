@@ -1,33 +1,41 @@
-import { checkQuote } from '../util/check-quote.js';
 import { formatLinkAsAutolink } from '../util/format-link-as-autolink.js';
 import { Link, Parents } from 'mdast';
-import { Info, State } from '../types';
+import { Exit, Info, State } from '../types';
 
 link.peek = linkPeek;
 
 export function link(node: Link, _: Parents | undefined, state: State, info: Info): string {
-  const quote = checkQuote(state);
-  const suffix = quote === '"' ? 'Quote' : 'Apostrophe';
-  const tracker = state.createTracker(info);
-  /** @type {Exit} */
-  let exit;
-  /** @type {Exit} */
-  let subexit;
+  // [[Tiddler Title]]
+  // [[Displayed Link Title|Tiddler Title]]
+  // 驼峰式链接: HelloThere
+  // 自动链接：[ext[Title|https://tiddlywiki.com/]]
+  // [[TW5|https://tiddlywiki.com/]]
 
+  // const quote = checkQuote(state);
+  // const suffix = quote === '"' ? 'Quote' : 'Apostrophe';
+
+  const tracker = state.createTracker(info);
+  let exit: Exit;
+  let subexit: Exit;
+
+  // 若是自动链接`[ext[https://example.com]]`
   if (formatLinkAsAutolink(node, state)) {
     // Hide the fact that we’re in phrasing, because escapes don’t work.
     const stack = state.stack;
     state.stack = [];
     exit = state.enter('autolink');
-    let value = tracker.move('<');
+    // [ext[
+    let value = tracker.move('[ext[');
+    // [ext[ + node
     value += tracker.move(
       state.containerPhrasing(node, {
         before: value,
-        after: '>',
+        after: ']]',
         ...tracker.current(),
       }),
     );
-    value += tracker.move('>');
+    // [ext[ + node + ]]
+    value += tracker.move(']]');
     exit();
     state.stack = stack;
     return value;
@@ -35,61 +43,50 @@ export function link(node: Link, _: Parents | undefined, state: State, info: Inf
 
   exit = state.enter('link');
   subexit = state.enter('label');
-  let value = tracker.move('[');
-  value += tracker.move(
+  // [[
+  let value = tracker.move('[[');
+  // linkText = tel:123
+  let linkText = tracker.move(
     state.containerPhrasing(node, {
       before: value,
-      after: '](',
+      after: ']]',
       ...tracker.current(),
     }),
   );
-  value += tracker.move('](');
+  // [[ linkText
+  value += linkText;
+  const separateLine = linkText ? '|' : '';
   subexit();
 
+  // @image.ts
   if (
-    // If there’s no url but there is a title…
+    // 如果没有 url 但有标题...
     (!node.url && node.title) ||
-    // If there are control characters or whitespace.
+    // 如果 url 中包含控制字符或空白字符。
     /[\0- \u007F]/.test(node.url)
   ) {
     subexit = state.enter('destinationLiteral');
-    value += tracker.move('<');
-    value += tracker.move(state.safe(node.url, { before: value, after: '>', ...tracker.current() }));
-    value += tracker.move('>');
+    // [[ linkText |
+    value += tracker.move(separateLine);
+    // [[ linkText | url
+    value += tracker.move(state.safe(node.url, { before: '[[', after: ']]', ...tracker.current() }));
   } else {
-    // No whitespace, raw is prettier.
+    // 没有空白字符，原始格式更美观。
     subexit = state.enter('destinationRaw');
-    value += tracker.move(
-      state.safe(node.url, {
-        before: value,
-        after: node.title ? ' ' : ')',
-        ...tracker.current(),
-      }),
-    );
+    // [[ linkText |
+    value += tracker.move(separateLine);
+    // [[ linkText | url
+    value += tracker.move(state.safe(node.url, { before: '[[', after: node.title ? ' ' : ']]', ...tracker.current() }));
   }
 
   subexit();
-
-  if (node.title) {
-    subexit = state.enter(`title${suffix}`);
-    value += tracker.move(' ' + quote);
-    value += tracker.move(
-      state.safe(node.title, {
-        before: value,
-        after: quote,
-        ...tracker.current(),
-      }),
-    );
-    value += tracker.move(quote);
-    subexit();
-  }
-
-  value += tracker.move(')');
+  // [[ linkText | url ]]
+  value += tracker.move(']]');
 
   exit();
   return value;
 }
 
 function linkPeek(node: Link, _: Parents | undefined, state: State): string {
-  return formatLinkAsAutolink(node, state) ? '<' : '[';
+  return formatLinkAsAutolink(node, state) ? '[ext[' : '[[';
 }

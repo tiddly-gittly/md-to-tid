@@ -25,4 +25,4 @@ $tw.wiki.setText(title, 'text', undefined, tidText);
 $tw.wiki.setText(title, 'type', undefined, 'text/vnd.tiddlywiki');
 ```
 
-Or if you have a [MDAST](https://github.com/syntax-tree/mdast): See [Our test case](./test/index.test.mjs) for details.
+Or if you have a [MDAST](https://github.com/syntax-tree/mdast): See [Our test case](./test) for details.

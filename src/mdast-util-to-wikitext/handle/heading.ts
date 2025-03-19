@@ -1,48 +1,22 @@
 import { encodeCharacterReference } from '../util/encode-character-reference.js';
-import { formatHeadingAsSetext } from '../util/format-heading-as-setext.js';
 import { Heading, Parents } from 'mdast';
 import { Info, State } from '../types';
 
 export function heading(node: Heading, _: Parents | undefined, state: State, info: Info): string {
+  const marker = '!';
   const rank = Math.max(Math.min(6, node.depth || 1), 1);
   const tracker = state.createTracker(info);
-
-  if (formatHeadingAsSetext(node, state)) {
-    const exit = state.enter('headingSetext');
-    const subexit = state.enter('phrasing');
-    const value = state.containerPhrasing(node, {
-      ...tracker.current(),
-      before: '\n',
-      after: '\n',
-    });
-    subexit();
-    exit();
-
-    return (
-      value +
-      '\n' +
-      (rank === 1 ? '=' : '-').repeat(
-        // The whole size…
-        value.length -
-          // Minus the position of the character after the last EOL (or
-          // 0 if there is none)…
-          (Math.max(value.lastIndexOf('\r'), value.lastIndexOf('\n')) + 1),
-      )
-    );
-  }
-
-  const sequence = '#'.repeat(rank);
+  const sequence = marker.repeat(rank);
   const exit = state.enter('headingAtx');
   const subexit = state.enter('phrasing');
 
-  // Note: for proper tracking, we should reset the output positions when there
-  // is no content returned, because then the space is not output.
-  // Practically, in that case, there is no content, so it doesn’t matter that
-  // we’ve tracked one too many characters.
+  // 注意：为了实现正确的跟踪，当没有内容返回时，我们应该重置输出位置，
+  // 因为此时空格不会被输出。
+  // 实际上，在这种情况下，没有内容，所以多跟踪了一个字符也无关紧要。
   tracker.move(sequence + ' ');
 
   let value = state.containerPhrasing(node, {
-    before: '# ',
+    before: `${marker} `,
     after: '\n',
     ...tracker.current(),
   });
@@ -53,10 +27,6 @@ export function heading(node: Heading, _: Parents | undefined, state: State, inf
   }
 
   value = value ? sequence + ' ' + value : sequence;
-
-  if (state.options.closeAtx) {
-    value += ' ' + sequence;
-  }
 
   subexit();
   exit();

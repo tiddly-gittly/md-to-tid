@@ -14,7 +14,7 @@ import { list } from './list.js';
 import { listItem } from './list-item.js';
 import { paragraph } from './paragraph.js';
 import { root } from './root.js';
-import { strong } from './strong.js';
+import { bold } from './bold.js';
 import { text } from './text.js';
 import { thematicBreak } from './thematic-break.js';
 
@@ -39,7 +39,7 @@ export const handle = {
   listItem,
   paragraph,
   root,
-  strong,
+  strong: bold,
   text,
   thematicBreak
 }

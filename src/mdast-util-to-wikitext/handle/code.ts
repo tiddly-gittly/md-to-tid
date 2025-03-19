@@ -17,12 +17,18 @@ export function code(node: Code, _: Parents | undefined, state: State, info: Inf
   }
 
   const tracker = state.createTracker(info);
+  // 重复次数为代码原始内容中标记字符最长连续出现次数加 1 和 3 中的较大值。
+  // 例如，如果 marker 是 '`'，raw 是 被fence包裹的值，例如 a，
+  // 那么 longestStreak(raw, marker) 会返回 1，加 1 后是 2，
+  // 与 3 比较取较大值还是 3，所以 sequence 会是 '```'。
   const sequence = marker.repeat(Math.max(longestStreak(raw, marker) + 1, 3));
   const exit = state.enter('codeFenced');
+  // sequence=```
   let value = tracker.move(sequence);
 
   if (node.lang) {
     const subexit = state.enter(`codeFencedLang${suffix}`);
+    // sequence + lang + " "
     value += tracker.move(
       state.safe(node.lang, {
         before: value,
@@ -36,6 +42,8 @@ export function code(node: Code, _: Parents | undefined, state: State, info: Inf
 
   if (node.lang && node.meta) {
     const subexit = state.enter(`codeFencedMeta${suffix}`);
+    // value = sequence + lang + " " + " "
+    // value + node.meta + \n
     value += tracker.move(' ');
     value += tracker.move(
       state.safe(node.meta, {
@@ -59,7 +67,6 @@ export function code(node: Code, _: Parents | undefined, state: State, info: Inf
   return value;
 }
 
-/** @type {Map} */
 const map: Map = function map(line, _, blank) {
   return (blank ? '' : '    ') + line
 }

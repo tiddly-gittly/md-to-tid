@@ -6,8 +6,7 @@ export function hardBreak(_: Break, _1: Parents | undefined, state: State, info:
   let index = -1;
 
   while (++index < state.unsafe.length) {
-    // If we can’t put eols in this construct (setext headings, tables), use a
-    // space instead.
+    // 如果在当前结构（如 Setext 标题、表格）中不能使用换行符，则使用空格代替。
     if (state.unsafe[index].character === '\n' && patternInScope(state.stack, state.unsafe[index])) {
       return /[ \t]/.test(info.before) ? '' : ' ';
     }

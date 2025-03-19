@@ -14,5 +14,5 @@ export function italic(node: Emphasis, _: unknown, state: State, info: Info) {
 }
 
 function italicPeek(_: Emphasis, _1: unknown, state: State): string {
-  return state.options.italic ?? `''`;
+  return state.options.italic ?? `//`;
 }

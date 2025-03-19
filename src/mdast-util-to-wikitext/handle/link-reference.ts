@@ -4,6 +4,7 @@ import { Info, State } from '../types';
 linkReference.peek = linkReferencePeek;
 
 export function linkReference(node: LinkReference, _: Parents | undefined, state: State, info: Info): string {
+  // TODO 暂时不处理
   const type = node.referenceType;
   const exit = state.enter('linkReference');
   let subexit = state.enter('label');

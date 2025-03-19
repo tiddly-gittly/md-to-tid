@@ -8,8 +8,8 @@ import { Options, State } from '../types';
  * @param state - 包含配置选项的状态对象。
  * @returns 有效的规则重复次数。
  */
-export function checkRuleRepetition(state: State): Exclude<Options['ruleRepetition'], null | undefined> {
-  const repetition = state.options.ruleRepetition || 3;
+export function checkRuleRepetition(state: State): Exclude<Options['horizontalRuleRepetition'], null | undefined> {
+  const repetition = state.options.horizontalRuleRepetition || 3;
 
   if (repetition < 3) {
     throw new Error(

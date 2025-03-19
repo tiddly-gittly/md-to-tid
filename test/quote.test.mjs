@@ -346,7 +346,7 @@ describe('blockquote', () => {
 `);
   });
 
-  test('should support a strong in a block quote', () => {
+  test('should support a bold in a block quote', () => {
     expect(
       toString({
         type: 'blockquote',

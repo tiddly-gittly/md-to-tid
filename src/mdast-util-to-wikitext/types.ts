@@ -314,7 +314,7 @@ export interface ConstructNameMap {
    *     ^^^^^
    * ```
    */
-  strong: 'strong';
+  bold: 'bold';
   /**
    * Title using single quotes (occurs in definition, image, link).
    *
@@ -555,146 +555,108 @@ export type Map = (value: string, line: number, blank: boolean) => string;
  * Configuration (optional).
  */
 export interface Options {
-  italic?: '//' | '_' | undefined;
   /**
-   * Marker to use in certain cases where the primary bullet doesn’t work
-   * (default: `'-'` when `bullet` is `'*'`, `'*'` otherwise).
-   *
-   * Cannot be equal to `bullet`.
+   * 用于表示斜体的标记（可选），可以是 '//' 或 undefined。
    */
-  bulletOther?: '*' | '+' | '-' | null | undefined
+  italic?: '//' | undefined;
   /**
-   * Marker to use for bullets of items in ordered lists (default: `'.'`).
+   * 用于有序列表项的标记（默认值：`'#'`）。
+   */
+  bulletOrdered?: '#' | null | undefined;
+  /**
+   * 用于无序列表项的标记（默认值：`'*'`）。
+   */
+  bullet?: '*' | null | undefined;
+  /**
+   * 通过将文本设置为粗体或斜体来强调其重要性。
    *
-   * There is one case where the primary bullet for ordered items cannot be
-   * used:
+   * 用于表示强调的标记（默认值：``''``）。
+   */
+  emphasis?: '//' | `''` | null | undefined;
+  /**
+   * 要包含的扩展列表（可选）。
    *
-   * * when two ordered lists appear next to each other: `1. a\n2) b`; to
-   * solve
-   * that, `'.'` will be used when `bulletOrdered` is `')'`, and `'.'`
-   * otherwise
-   */;
-  bulletOrdered?: '.' | ')' | null | undefined
+   * 每个 `ToTidExtension` 是一个与这里的 `Options` 具有相同接口的对象。
+   */
+  extensions?: Array<Options> | null | undefined;
   /**
-   * Marker to use for bullets of items in unordered lists (default: `'*'`).
+   * 是否始终使用围栏代码块（默认值：`true`）。
    *
-   * There are three cases where the primary bullet cannot be used:
+   * 默认情况下，如果定义了语言、代码为空，或者代码以空行开头或结尾，则使用围栏代码块。
+   */
+  fences?: boolean | null | undefined;
+  /**
+   * 用于围栏代码块的标记（默认值：``'`'``）。
    *
-   * * when three or more list items are on their own, the last one is empty,
-   * and `bullet` is also a valid `rule`: `* - +`; this would turn into a
-   * thematic break if serialized with three primary bullets; `bulletOther`
-   * is used for the last item
-   * * when a thematic break is the first child of a list item and `bullet` is
-   * the same character as `rule`: `- ***`; this would turn into a single
-   * thematic break if serialized with primary bullets; `bulletOther` is used
-   * for the item
-   * * when two unordered lists appear next to each other: `* a\n- b`;
-   * `bulletOther` is used for such lists
-   */;
-  bullet?: '*' | '+' | '-' | null | undefined
-  /**
-   * Whether to add the same number of number signs (`#`) at the end of an ATX
-   * heading as the opening sequence (default: `false`).
-   */;
-  closeAtx?: boolean | null | undefined
-  /**
-   * Marker to use for emphasis (default: `'*'`).
-   */;
-  emphasis?: '*' | '_' | null | undefined
-  /**
-   * List of extensions to include (optional).
+   * ``'<'``用于标记引言区块，可包含css类别，<<<.myClass.another-class、以及末尾可以注释<<< cite
    *
-   * Each `ToMarkdownExtension` is an object with the same interface as
-   * `Options` here.
-   */;
-  extensions?: Array<Options> | null | undefined
+   * ``'$'``用于标记类型区块，$$$image/svg+xml、$$$.svg、$$$text/unknown
+   */
+  fence?: '`' | '<' | '$' | null | undefined;
   /**
-   * Whether to use fenced code always (default: `true`).
+   * 处理特定节点的函数（可选）。
    *
-   * The default is to use fenced code if there is a language defined, if the
-   * code is empty, or if it starts or ends in blank lines.
-   */;
-  fences?: boolean | null | undefined
+   * 每个键是节点类型，每个值是对应的处理函数。
+   */
+  handlers?: Partial<Handlers> | null | undefined;
   /**
-   * Marker to use for fenced code (default: ``'`'``).
-   */;
-  fence?: '`' | '~' | null | undefined
+   * 是否递增有序列表项的计数器（默认值：`true`）。
+   */
+  incrementListMarker?: boolean | null | undefined;
   /**
-   * Handle particular nodes (optional).
+   * 如何连接块（可选）。
+   */
+  join?: Array<Join> | null | undefined;
+  /**
+   * 如何缩进列表项的内容（默认值：`'one'`）。
    *
-   * Each key is a node type, each value its corresponding handler.
-   */;
-  handlers?: Partial<Handlers> | null | undefined
-  /**
-   * Whether to increment the counter of ordered lists items (default: `true`).
-   */;
-  incrementListMarker?: boolean | null | undefined
-  /**
-   * How to join blocks (optional).
-   */;
-  join?: Array<Join> | null | undefined
-  /**
-   * How to indent the content of list items (default: `'one'`).
+   * TW中列表项使用多个列表标记，不使用缩进。
    *
-   * Either with the size of the bullet plus one space (when `'one'`), a tab
-   * stop (`'tab'`), or depending on the item and its parent list (`'mixed'`,
-   * uses `'one'` if the item and list are tight and `'tab'` otherwise).
-   */;
-  listItemIndent?: 'mixed' | 'one' | 'tab' | null | undefined
+   * TODO 暂时不理解
+   *
+   * 可以是标记大小加一个空格（当为 `'one'` 时）、一个制表符（`'tab'`），或者根据列表项及其父列表而定（`'mixed'`，如果列表项和列表紧凑则使用 `'one'`，否则使用 `'tab'`）。
+   */
+  listItemIndent?: 'mixed' | 'one' | 'tab' | null | undefined;
   /**
-   * Marker to use for titles (default: `'"'`).
-   */;
+   * 用于标题的标记（默认值：`'"'`）。
+   * TODO 暂时不理解
+   */
   quote?: '"' | "'" | null | undefined;
   /**
-   * Whether to always use resource links (default: `false`).
+   * 是否始终使用资源链接（默认值：`false`）。
    *
-   * The default is to use autolinks (`<https://example.com>`) when possible
-   * and resource links (`[text](url)`) otherwise.
+   * 默认情况下，尽可能使用自动链接（`[ext[https://example.com]]`），否则使用资源链接（`[[text|url]]`）。
    */
   resourceLink?: boolean | null | undefined;
   /**
-   * Number of markers to use for thematic breaks (default: `3`).
+   * 水平分隔线使用的标记数量（默认值：`3`）。
    */
-  ruleRepetition?: number | null | undefined;
+  horizontalRuleRepetition?: number | null | undefined;
   /**
-   * Whether to add spaces between markers in thematic breaks (default:
-   * `false`).
+   * 用于水平分隔线的标记（默认值：`'-'`）。
    */
-  ruleSpaces?: boolean | null | undefined;
+  horizontalRule?: '-' | null | undefined;
   /**
-   * Marker to use for thematic breaks (default: `'*'`).
+   * 用于表示加粗的标记（默认值：`''`）。
    */
-  rule?: '*' | '-' | '_' | null | undefined;
+  bold?: `''` | null | undefined;
   /**
-   * Whether to use setext headings when possible (default: `false`).
+   * 是否不使用空行连接定义（默认值：`false`）。
    *
-   * The default is to always use ATX headings (`# heading`) instead of setext
-   * headings (`heading\n=======`).
-   * Setext headings cannot be used for empty headings or headings with a rank
-   * of three or more.
-   */
-  setext?: boolean | null | undefined;
-  /**
-   * Marker to use for strong (default: `'*'`).
-   */
-  strong?: '*' | '_' | null | undefined;
-  /**
-   * Whether to join definitions without a blank line (default: `false`).
-   *
-   * The default is to add blank lines between any flow (“block”) construct.
-   * Turning this option on is a shortcut for a join function like so:
+   * 默认情况下，在任何流（“块”）结构之间添加空行。
+   * 打开此选项相当于使用如下的连接函数：
    *
    * ```js
    * function joinTightDefinitions(left, right) {
-   * if (left.type === 'definition' && right.type === 'definition') {
-   * return 0
-   * }
+   *   if (left.type === 'definition' && right.type === 'definition') {
+   *     return 0;
+   *   }
    * }
    * ```
    */
   tightDefinitions?: boolean | null | undefined;
   /**
-   * Schemas that define when characters cannot occur (optional).
+   * 定义字符何时不能出现的模式（可选）。
    */
   unsafe?: Array<Unsafe> | null | undefined;
 }
@@ -715,25 +677,23 @@ export type PhrasingParents = Parents extends {
  */
 export interface SafeConfig extends SafeFields {
   /**
-   * Extra characters that *must* be encoded (as character references) instead
-   * of escaped (character escapes) (optional).
+   * 额外的字符，这些字符*必须*被编码为字符引用，而不是转义为字符转义（可选）。
    *
-   * Only ASCII punctuation will use character escapes, so you never need to
-   * pass non-ASCII-punctuation here.
+   * 只有 ASCII 标点符号会使用字符转义，因此您永远不需要在这里传递非 ASCII 标点符号。
    */
   encode?: Array<string> | null | undefined;
 }
 
 /**
- * Info on the characters that are around the current thing we are generating.
+ * 关于当前正在生成内容周围字符的信息。
  */
 export interface SafeFields {
   /**
-   * Characters after this (guaranteed to be one, can be more).
+   * 此内容之后的字符（保证至少有一个，可能更多）。
    */
   after: string;
   /**
-   * Characters before this (guaranteed to be one, can be more).
+   * 此内容之前的字符（保证至少有一个，可能更多）。
    */
   before: string;
 }
@@ -774,7 +734,7 @@ export interface State {
   /**
    * Info on whether to encode the surrounding of *attention*.
    *
-   * Whether attention (emphasis, strong, strikethrough) forms
+   * Whether attention (emphasis, bold, strikethrough) forms
    * depends on the characters inside and outside them.
    * The characters inside can be handled by *attention* itself.
    * However the outside characters are already handled.

@@ -1,14 +1,15 @@
 import { fromMarkdown } from 'mdast-util-from-markdown';
 
-import { type Options as IToMarkdownOptions, toTid } from './mdast-util-to-wikitext';
+import { toTid } from './mdast-util-to-wikitext';
+import { Options } from './mdast-util-to-wikitext/types';
 import { gfm } from 'micromark-extension-gfm';
 import { Root } from 'mdast';
 
-export type IOptions = Omit<IToMarkdownOptions, 'extensions'>;
+export type IOptions = Omit<Options, 'extensions'>;
 
 export function md2tid(markdownString: string): string {
   let tree: Root = fromMarkdown(markdownString, { extensions: [gfm()] });
-  return toTid(tree);
+  return toTid(tree, {});
 }
 
 export function toString(value: any, options: IOptions): string {
@@ -20,6 +21,5 @@ export function toString(value: any, options: IOptions): string {
     value = { type: 'root', children: [value] };
   }
 
-  return toTid(value);
+  return toTid(value, options);
 }
-// md2tid("## Hello, *World*!")

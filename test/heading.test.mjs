@@ -66,26 +66,6 @@ describe('title', () => {
     expect(toString({ type: 'heading', depth: 2, children: [] })).toEqual('!!\n');
   });
 
-  test('should serialize a heading with a closing sequence when `closeAtx` (empty)', () => {
-    expect(
-      // @ts-expect-error: `children` missing.
-      toString({ type: 'heading' }, { closeAtx: true }),
-    ).toEqual('! !\n');
-  });
-
-  test('should serialize a with a closing sequence when `closeAtx` (content)', () => {
-    expect(
-      toString(
-        {
-          type: 'heading',
-          depth: 3,
-          children: [{ type: 'text', value: 'a' }],
-        },
-        { closeAtx: true },
-      ),
-    ).toEqual('!!! a !!!\n');
-  });
-
   test('should not escape a `#` at the start of phrasing in a heading', () => {
     expect(toString({ type: 'heading', depth: 2, children: [{ type: 'text', value: '# a' }] })).toEqual('!! # a\n');
   });

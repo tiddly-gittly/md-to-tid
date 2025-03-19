@@ -1,20 +1,17 @@
-/**
- * @import {ConstructName, Unsafe} from 'mdast-util-to-markdown'
- */
-
 import { ConstructName, Unsafe } from './types';
 
 /**
- * List of constructs that occur in phrasing (paragraphs, headings), but cannot
- * contain things like attention (emphasis, strong), images, or links.
+ * List of types that occur in phrasing (paragraphs, headings), but cannot
+ * contain things like attention (italic, strong), images, or links.
  * So they sort of cancel each other out.
  * Note: could use a better name.
- *
- * @type {Array<ConstructName>}
  */
-const fullPhrasingSpans: Array<ConstructName> = ['autolink', 'destinationLiteral', 'destinationRaw', 'reference', 'titleQuote', 'titleApostrophe'];
+const fullPhrasingSpans: Array<ConstructName> = ['autolink', 'destinationLiteral', 'destinationRaw', 'reference'];
 
-/** @type {Array<Unsafe>} */
+/**
+ * Each item will be used by `patternCompile` function to be a RegExp before used.
+ * The inConstruct field will be use in patternInScope function to check if the stack have a type.
+ */
 export const unsafe: Array<Unsafe> = [
   { character: '\t', after: '[\\r\\n]', inConstruct: 'phrasing' },
   { character: '\t', before: '[\\r\\n]', inConstruct: 'phrasing' },
@@ -46,20 +43,18 @@ export const unsafe: Array<Unsafe> = [
   },
   // A quote can break out of a title.
   { character: '"', inConstruct: 'titleQuote' },
-  // A number sign could start an ATX heading if it starts a line.
-  { atBreak: true, character: '#' },
-  { character: '#', inConstruct: 'headingAtx', after: '(?:[\r\n]|$)' },
+  // A ! sign could start an ATX heading if it starts a line.
+  { atBreak: true, character: '!' },
+  { character: '!', inConstruct: 'headingAtx', after: '(?:[\r\n]|$)' },
   // Dollar sign and percentage are not used in markdown.
   // An ampersand could start a character reference.
   { character: '&', after: '[#A-Za-z]', inConstruct: 'phrasing' },
-  // An apostrophe can break out of a title.
-  { character: "'", inConstruct: 'titleApostrophe' },
   // A left paren could break out of a destination raw.
   { character: '(', inConstruct: 'destinationRaw' },
-  // A left paren followed by `]` could make something into a link or image.
+  // A left [ followed by `]` could make something into a link or image.
   {
     before: '\\]',
-    character: '(',
+    character: '[',
     inConstruct: 'phrasing',
     notInConstruct: fullPhrasingSpans,
   },
@@ -67,14 +62,18 @@ export const unsafe: Array<Unsafe> = [
   // raw.
   { atBreak: true, before: '\\d+', character: ')' },
   { character: ')', inConstruct: 'destinationRaw' },
-  // An asterisk can start thematic breaks, list items, emphasis, strong.
-  { atBreak: true, character: '*', after: '(?:[ \t\r\n*])' },
+  // An # can start list items, italic, strong.
+  { atBreak: true, character: '#' },
+  // An // can start list italic
+  { atBreak: true, character: '//' },
+  // An '' can start list strong.
+  { atBreak: true, character: `''` },
   { character: '*', inConstruct: 'phrasing', notInConstruct: fullPhrasingSpans },
   // A plus sign could start a list item.
-  { atBreak: true, character: '+', after: '(?:[ \t\r\n])' },
+  { atBreak: true, character: '+' },
   // A dash can start thematic breaks, list items, and setext heading
   // underlines.
-  { atBreak: true, character: '-', after: '(?:[ \t\r\n-])' },
+  { atBreak: true, character: '-' },
   // A dot could start a list item.
   { atBreak: true, before: '\\d+', character: '.', after: '(?:[ \t\r\n]|$)' },
   // Slash, colon, and semicolon are not used in markdown for constructs.
@@ -109,7 +108,7 @@ export const unsafe: Array<Unsafe> = [
   // A right bracket can exit labels.
   { character: ']', inConstruct: ['label', 'reference'] },
   // Caret is not used in markdown for constructs.
-  // An underscore can start emphasis, strong, or a thematic break.
+  // An underscore can start italic, strong, or a thematic break.
   { atBreak: true, character: '_' },
   { character: '_', inConstruct: 'phrasing', notInConstruct: fullPhrasingSpans },
   // A grave accent can start code (fenced or text), or it can break out of

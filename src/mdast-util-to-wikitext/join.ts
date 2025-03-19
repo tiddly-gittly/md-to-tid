@@ -1,5 +1,4 @@
 import { formatCodeAsIndented } from './util/format-code-as-indented.js';
-import { formatHeadingAsSetext } from './util/format-heading-as-setext.js';
 import { Join, State } from './types';
 import { Nodes, Parent } from 'mdast';
 
@@ -10,7 +9,7 @@ export const join: Array<Join> = [joinDefaults];
 
 /**
  * 默认的节点合并函数，用于判断两个相邻节点是否应该合并。
- * 
+ *
  * @param left - 左侧节点。
  * @param right - 右侧节点。
  * @param parent - 父节点。
@@ -33,10 +32,7 @@ function joinDefaults(left: Nodes, right: Nodes, parent: Parent, state: State): 
     if (
       left.type === 'paragraph' &&
       // 两个段落。
-      (left.type === right.type ||
-        right.type === 'definition' ||
-        // 段落后面跟着一个 Setext 标题。
-        (right.type === 'heading' && formatHeadingAsSetext(right, state)))
+      (left.type === right.type || right.type === 'definition')
     ) {
       return;
     }

@@ -24,6 +24,6 @@ describe('break', () => {
   });
 
   test('should serialize breaks in heading (setext)', () => {
-    expect(md2tid('a  \nb\n=\n')).resolves.toEqual('! a b\n');
+    expect(md2tid('a  \nb\n=\n')).toEqual('! a b\n');
   });
 });

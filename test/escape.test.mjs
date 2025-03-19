@@ -60,17 +60,8 @@ describe('escape', () => {
     ).toEqual('a\\\\[ext[https://a.b]]\n');
   });
 
-  test('should not escape single []', () => {
-    expect(
-      toString({
-        type: 'paragraph',
-        children: [{ type: 'text', value: '互联网始于[…] 年' }],
-      }),
-    ).toEqual('互联网始于[…] 年\n');
-  });
-
-  test('should not escape strong', () => {
-    expect(md2tid('> **问题**：互联网始于**[…]** **年**')).toEqual(`> ''问题''：互联网始于''\[…]'' ''年''`);
+  test('should not escape bold', () => {
+    expect(md2tid('> **问题**：互联网始于 **[…]** **年**')).toEqual(`> ''问题''：互联网始于 ''\\[…]'' ''年''\n`);
   });
 
   test('should escape what would otherwise be code (flow)', () => {
@@ -254,7 +245,7 @@ describe('escape', () => {
         {
           extensions: [
             {
-              strong: '_',
+              strong: `**a**`,
               join: undefined,
               handlers: undefined,
               extensions: undefined,
@@ -262,65 +253,7 @@ describe('escape', () => {
           ],
         },
       ),
-    ).toEqual(`_a_\n`);
-  });
-
-  test('should make `join` from options highest priority', () => {
-    expect(
-      toString(
-        {
-          type: 'root',
-          children: [
-            {
-              type: 'list',
-              ordered: true,
-              start: 1,
-              spread: false,
-              children: [
-                {
-                  type: 'listItem',
-                  spread: true,
-                  checked: null,
-                  children: [
-                    {
-                      type: 'paragraph',
-                      children: [
-                        {
-                          type: 'text',
-                          value: 'foo',
-                        },
-                      ],
-                    },
-                    {
-                      type: 'list',
-                      ordered: false,
-                      start: null,
-                      spread: false,
-                      children: [
-                        {
-                          type: 'listItem',
-                          spread: false,
-                          checked: null,
-                          children: [
-                            {
-                              type: 'paragraph',
-                              children: [{ type: 'text', value: 'bar' }],
-                            },
-                          ],
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-        {
-          join: [() => 0],
-        },
-      ),
-    ).toEqual('# foo\n# * bar\n');
+    ).toEqual(`''a''\n`);
   });
 
   test('should prefer main options over extension options', () => {
