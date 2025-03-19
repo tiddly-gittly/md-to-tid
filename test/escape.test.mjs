@@ -220,7 +220,7 @@ describe('escape', () => {
     expect(toString({ type: 'paragraph', children: [{ type: 'text', value: '1.2.3. asd' }] })).toEqual('1.2.3. asd\n');
   });
 
-  test.skip('should support options in extensions', () => {
+  test('should support options in extensions', () => {
     expect(
       toString(
         {
