@@ -1,4 +1,4 @@
-import { formatLinkAsAutolink } from '../util/format-link-as-autolink.js';
+import { formatLinkAsAutolink } from '../util/format-link-as-autolink';
 import { Link, Parents } from 'mdast';
 import { Exit, Info, State } from '../types';
 

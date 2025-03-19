@@ -1,4 +1,4 @@
-import { checkQuote } from '../util/check-quote.js';
+import { checkQuote } from '../util/check-quote';
 import { Definition, Parents } from 'mdast';
 import { Info, State } from '../types';
 

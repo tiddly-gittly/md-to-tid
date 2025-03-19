@@ -1,5 +1,5 @@
-import { checkBullet } from '../util/check-bullet.js';
-import { checkBulletOrdered } from '../util/check-bullet-ordered.js';
+import { checkBullet } from '../util/check-bullet';
+import { checkBulletOrdered } from '../util/check-bullet-ordered';
 import { List, Parents } from 'mdast';
 import { Info, State } from '../types';
 

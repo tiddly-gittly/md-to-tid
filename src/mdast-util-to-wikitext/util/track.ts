@@ -1,4 +1,4 @@
-import { Tracker, TrackFields } from '../types.js';
+import { Tracker, TrackFields } from '../types';
 
 /**
  * 跟踪输出中的位置信息。

@@ -1,4 +1,4 @@
-import { Map } from '../types.js';
+import { Map } from '../types';
 
 /**
  * 正则表达式，用于匹配换行符（支持不同操作系统的换行符格式）

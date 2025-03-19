@@ -1,4 +1,4 @@
-import { encodeCharacterReference } from '../util/encode-character-reference.js';
+import { encodeCharacterReference } from '../util/encode-character-reference';
 import { Heading, Parents } from 'mdast';
 import { Info, State } from '../types';
 

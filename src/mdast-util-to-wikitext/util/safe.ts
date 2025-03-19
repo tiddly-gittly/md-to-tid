@@ -1,5 +1,5 @@
-import { encodeCharacterReference } from './encode-character-reference.js';
-import { patternInScope } from './pattern-in-scope.js';
+import { encodeCharacterReference } from './encode-character-reference';
+import { patternInScope } from './pattern-in-scope';
 import { SafeConfig, State } from '../types';
 
 /**

@@ -1,4 +1,4 @@
-import { formatCodeAsIndented } from './util/format-code-as-indented.js';
+import { formatCodeAsIndented } from './util/format-code-as-indented';
 import { Join, State } from './types';
 import { Nodes, Parent } from 'mdast';
 

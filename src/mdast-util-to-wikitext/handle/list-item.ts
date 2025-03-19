@@ -1,5 +1,5 @@
-import { checkBullet } from '../util/check-bullet.js';
-import { checkListItemIndent } from '../util/check-list-item-indent.js';
+import { checkBullet } from '../util/check-bullet';
+import { checkListItemIndent } from '../util/check-list-item-indent';
 import { ListItem, Parents } from 'mdast';
 import { Info, Map, State } from '../types';
 import { checkBulletOrdered } from '../util/check-bullet-ordered';

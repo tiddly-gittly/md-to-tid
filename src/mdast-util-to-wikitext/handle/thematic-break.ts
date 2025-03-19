@@ -1,5 +1,5 @@
-import { checkRuleRepetition } from '../util/check-rule-repetition.js';
-import { checkRule } from '../util/check-rule.js';
+import { checkRuleRepetition } from '../util/check-rule-repetition';
+import { checkRule } from '../util/check-rule';
 import { Parents, ThematicBreak } from 'mdast';
 import { State } from '../types';
 

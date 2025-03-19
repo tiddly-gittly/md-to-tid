@@ -1,4 +1,4 @@
-import { FlowChildren, FlowParents, State, TrackFields } from '../types.js';
+import { FlowChildren, FlowParents, State, TrackFields } from '../types';
 
 
 /**

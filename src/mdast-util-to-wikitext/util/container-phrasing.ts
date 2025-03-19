@@ -1,6 +1,6 @@
-import { Info, PhrasingParents, State } from '../types.js';
+import { Info, PhrasingParents, State } from '../types';
 
-import { encodeCharacterReference } from './encode-character-reference.js';
+import { encodeCharacterReference } from './encode-character-reference';
 
 
 /**

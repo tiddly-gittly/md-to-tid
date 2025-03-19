@@ -1,6 +1,6 @@
 import { longestStreak } from 'longest-streak';
-import { formatCodeAsIndented } from '../util/format-code-as-indented.js';
-import { checkFence } from '../util/check-fence.js';
+import { formatCodeAsIndented } from '../util/format-code-as-indented';
+import { checkFence } from '../util/check-fence';
 import { Code, Parents } from 'mdast';
 import { Info, Map, State } from '../types';
 

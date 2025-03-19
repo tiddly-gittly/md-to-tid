@@ -1,4 +1,4 @@
-import { checkBold } from '../util/check-bold.js';
+import { checkBold } from '../util/check-bold';
 import { Parents, Strong } from 'mdast';
 import { Info, State } from '../types';
 
