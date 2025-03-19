@@ -10,8 +10,6 @@
     "test": "npm run build:js && cross-env NODE_OPTIONS=--experimental-vm-modules jest --config=jest.config.json",
     "build:types": "tsc --emitDeclarationOnly",
     "build:js": "rollup -c",
-    "build:demo": "rollup -c rollup.config.demo.js && cp demo/index.html public-dist/index.html",
-    "dev:demo": "mkdir -p public-dist/ && cp demo/index.html public-dist/index.html && rollup -c rollup.config.demo.development.js --watch",
     "prepublishOnly": "npm run clean && npm run build",
     "clean": "rimraf dist public-dist",
     "installType": "typesync"
