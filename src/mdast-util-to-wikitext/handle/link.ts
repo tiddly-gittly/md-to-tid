@@ -4,6 +4,8 @@ import { Exit, Info, State } from '../types';
 
 link.peek = linkPeek;
 
+// Link: html 的 <a>
+// [alpha](https://example.com "bravo")
 export function link(node: Link, _: Parents | undefined, state: State, info: Info): string {
   // [[Tiddler Title]]
   // [[Displayed Link Title|Tiddler Title]]

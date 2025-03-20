@@ -2,6 +2,7 @@ import { checkQuote } from '../util/check-quote';
 import { Definition, Parents } from 'mdast';
 import { Info, State } from '../types';
 
+// Definition: md变量定义，如: [Alpha]: https://example.com
 export function definition(node: Definition, _: Parents | undefined, state: State, info: Info): string {
   const quote = checkQuote(state);
   const suffix = quote === '"' ? 'Quote' : 'Apostrophe';

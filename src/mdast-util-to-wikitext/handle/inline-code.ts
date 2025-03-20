@@ -1,7 +1,6 @@
 import { InlineCode, Parents } from 'mdast';
 import { State } from '../types';
 
-// 为 inlineCode 函数添加 peek 方法，指向 inlineCodePeek 函数
 inlineCode.peek = inlineCodePeek;
 
 export function inlineCode(node: InlineCode, _: Parents | undefined, state: State): string {

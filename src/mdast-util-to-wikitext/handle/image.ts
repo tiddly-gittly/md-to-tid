@@ -3,6 +3,8 @@ import { Info, State } from '../types';
 
 image.peek = imagePeek;
 
+// Image: html 的 <img>
+// [alpha](https://example.com/favicon.ico "bravo")
 export function image(node: Image, _: Parents | undefined, state: State, info: Info): string {
   // [img[https://tiddlywiki.com/favicon.ico]]
   // [img[An explanatory tooltip|Motovun Jack.jpg]]

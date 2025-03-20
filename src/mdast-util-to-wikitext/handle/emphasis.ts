@@ -4,6 +4,7 @@ import { Emphasis, Parents } from 'mdast';
 
 emphasis.peek = emphasisPeek;
 
+// Emphasis: *alpha* _bravo_ 对应 html 中的 <em>
 export function emphasis(node: Emphasis, _: Parents | undefined, state: State, info: Info): string {
   const marker = checkEmphasis(state);
   const exit = state.enter('emphasis');

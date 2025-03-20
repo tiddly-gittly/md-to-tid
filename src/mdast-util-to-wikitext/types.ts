@@ -608,16 +608,6 @@ export interface Options {
    */
   join?: Array<Join> | null | undefined;
   /**
-   * 如何缩进列表项的内容（默认值：`'one'`）。
-   *
-   * TW中列表项使用多个列表标记，不使用缩进。
-   *
-   * TODO 暂时不理解
-   *
-   * 可以是标记大小加一个空格（当为 `'one'` 时）、一个制表符（`'tab'`），或者根据列表项及其父列表而定（`'mixed'`，如果列表项和列表紧凑则使用 `'one'`，否则使用 `'tab'`）。
-   */
-  listItemIndent?: 'mixed' | 'one' | 'tab' | null | undefined;
-  /**
    * 用于标题的标记（默认值：`'"'`）。
    * TODO 暂时不理解
    */

@@ -2,6 +2,7 @@ import { patternInScope } from '../util/pattern-in-scope';
 import { Break, Parents } from 'mdast';
 import { Info, State } from '../types';
 
+// Break: (2个空格) or ··，一行的换行，它不像 \n，这个换行还是在之前的 Paragraph 内的
 export function hardBreak(_: Break, _1: Parents | undefined, state: State, info: Info): string {
   let index = -1;
 
