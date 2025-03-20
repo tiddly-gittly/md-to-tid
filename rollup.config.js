@@ -17,6 +17,7 @@ export default {
     babel({
       exclude: 'node_modules/**',
       extensions: ['.js', '.ts'],
+      babelHelpers: 'bundled',
     }),
     json(),
   ],

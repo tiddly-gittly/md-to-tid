@@ -8,8 +8,10 @@ export default {
   input: 'demo/app.tsx',
   output: {
     file: 'public-dist/bundle.js',
-    format: 'iife',
+    format: 'es',
+    inlineDynamicImports: true
   },
+  context: 'window',
   plugins: [
     nodeResolve({ extensions: ['.ts', '.tsx', '.js', '.jsx', '.mjs', '.mts'], browser: true }),
     commonjs(),
@@ -17,6 +19,7 @@ export default {
     json(),
     replace({
       'process.env.NODE_ENV': JSON.stringify('production'),
+      preventAssignment: true
     }),
   ],
 };

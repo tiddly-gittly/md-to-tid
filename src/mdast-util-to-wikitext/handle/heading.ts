@@ -16,7 +16,7 @@ export function heading(node: Heading, _: Parents | undefined, state: State, inf
   tracker.move(sequence + ' ');
 
   let value = state.containerPhrasing(node, {
-    before: `${marker} `,
+    before: marker,
     after: '\n',
     ...tracker.current(),
   });
