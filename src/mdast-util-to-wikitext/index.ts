@@ -24,6 +24,7 @@ import {
   State,
   TrackFields,
 } from './types';
+import { gfmTableToTid } from './util/gfm-table';
 
 /**
  * Turn an mdast syntax tree into markdown.
@@ -58,6 +59,12 @@ export function toTid(tree: Nodes, options: Options | null | undefined): string 
   };
 
   configure(state, settings);
+
+  // 注册表格处理函数
+  configure(state, {
+    handlers: { ...gfmTableToTid(settings).handlers },
+    unsafe: [...gfmTableToTid(settings).gfmUnsafe],
+  });
 
   if (state.options.tightDefinitions) {
     state.join.push(joinDefinition);
