@@ -283,6 +283,7 @@ export function gfmTableToTid(options: Options | null | undefined) {
           const size = longestCellByColumn[columnIndex] - (sizes[columnIndex] || 0);
           const code = alignments[columnIndex];
 
+          // TODO 处理对其方式，这个地方的TW对其先不处理。
           if (code === ALIGN_LOWER_RIGHT) {
             before = ' '.repeat(size);
           } else if (code === ALIGN_LOWER_CENTER) {
@@ -303,14 +304,14 @@ export function gfmTableToTid(options: Options | null | undefined) {
           line.push('|');
         }
 
-        // if (
-        //   // 如果进行对齐，并且单元格不为空，则要添加开头的空格
-        //   settings.padding !== false &&
-        //   !(settings.alignDelimiters === false && cell === '') &&
-        //   (settings.delimiterStart || columnIndex)
-        // ) {
-        //   line.push(' ');
-        // }
+        if (
+          // 如果不进行对齐且单元格为空，则不添加开头空格：会有一个结尾空格。
+          settings.padding !== false &&
+          !(settings.alignDelimiters === false && cell === '') &&
+          (settings.delimiterStart || columnIndex)
+        ) {
+          line.push(' ');
+        }
 
         if (settings.alignDelimiters !== false) {
           line.push(before);
