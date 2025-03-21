@@ -1,57 +1,89 @@
-import type { Link } from 'mdast';
-import type { Context, Exit, Parent } from '../types';
-
-import { formatLinkAsExtLink } from '../util/format-link-as-external-link';
-import { containerPhrasing } from '../util/container-phrasing';
-import { safe } from '../util/safe';
+import { formatLinkAsAutolink } from '../util/format-link-as-autolink';
+import { Link, Parents } from 'mdast';
+import { Exit, Info, State } from '../types';
 
 link.peek = linkPeek;
 
-export function link(node: Link, parent: Parent | null | undefined, context: Context) {
+// Link: html 的 <a>
+// [alpha](https://example.com "bravo")
+export function link(node: Link, _: Parents | undefined, state: State, info: Info): string {
+  // [[Tiddler Title]]
+  // [[Displayed Link Title|Tiddler Title]]
+  // 驼峰式链接: HelloThere
+  // 自动链接：[ext[Title|https://tiddlywiki.com/]]
+  // [[TW5|https://tiddlywiki.com/]]
+
+  // const quote = checkQuote(state);
+  // const suffix = quote === '"' ? 'Quote' : 'Apostrophe';
+
+  const tracker = state.createTracker(info);
   let exit: Exit;
   let subexit: Exit;
-  let value: string = '';
 
-  if (formatLinkAsExtLink(node, context)) {
+  // 若是自动链接`[ext[https://example.com]]`
+  if (formatLinkAsAutolink(node, state)) {
     // Hide the fact that we’re in phrasing, because escapes don’t work.
-    const stack = context.stack;
-    context.stack = [];
-    exit = context.enter('autolink');
-    value = '[ext[' + containerPhrasing(node, context, { before: '[ext[', after: ']]' }) + ']]';
+    const stack = state.stack;
+    state.stack = [];
+    exit = state.enter('autolink');
+    // [ext[
+    let value = tracker.move('[ext[');
+    // [ext[ + node
+    // TODO 这里不知道是需要node 还是 node.url，暂时选择url吧
+    value += tracker.move(node.url);
+    // [ext[ + node + ]]
+    value += tracker.move(']]');
     exit();
-    context.stack = stack;
+    state.stack = stack;
     return value;
   }
 
-  exit = context.enter('link');
-  subexit = context.enter('label');
-  const childValue = containerPhrasing(node, context, { before: '[[', after: ']]' });
-  const separateLine = childValue ? '|' : '';
+  exit = state.enter('link');
+  subexit = state.enter('label');
+  // [[
+  let value = tracker.move('[[');
+  // linkText = tel:123
+  let linkText = tracker.move(
+    state.containerPhrasing(node, {
+      before: value,
+      after: ']]',
+      ...tracker.current(),
+    }),
+  );
+  // [[ linkText
+  value += linkText;
+  const separateLine = linkText ? '|' : '';
   subexit();
 
+  // @image.ts
   if (
-    // If there’s no url but there is a title…
+    // 如果没有 url 但有标题...
     (!node.url && node.title) ||
-    // If there are control characters or whitespace.
+    // 如果 url 中包含控制字符或空白字符。
     /[\0- \u007F]/.test(node.url)
   ) {
-    subexit = context.enter('destinationLiteral');
-    value = `[[${childValue}${separateLine}${safe(context, node.url, { before: '[[', after: ']]' })}]]`;
+    subexit = state.enter('destinationLiteral');
+    // [[ linkText |
+    value += tracker.move(separateLine);
+    // [[ linkText | url
+    value += tracker.move(state.safe(node.url, { before: '[[', after: ']]', ...tracker.current() }));
   } else {
-    // No whitespace, raw is prettier.
-    subexit = context.enter('destinationRaw');
-    value = `[[${childValue}${separateLine}${safe(context, node.url, {
-      before: '[[',
-      after: node.title ? ' ' : ']]',
-    })}]]`;
+    // 没有空白字符，原始格式更美观。
+    subexit = state.enter('destinationRaw');
+    // [[ linkText |
+    value += tracker.move(separateLine);
+    // [[ linkText | url
+    value += tracker.move(state.safe(node.url, { before: '[[', after: node.title ? ' ' : ']]', ...tracker.current() }));
   }
 
   subexit();
+  // [[ linkText | url ]]
+  value += tracker.move(']]');
 
   exit();
   return value;
 }
 
-function linkPeek(node: Link, parent: Parent | null | undefined, context: Context) {
-  return formatLinkAsExtLink(node, context) ? '[ext[' : '[[';
+function linkPeek(node: Link, _: Parents | undefined, state: State): string {
+  return formatLinkAsAutolink(node, state) ? '[ext[' : '[[';
 }

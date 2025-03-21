@@ -1,11 +1,10 @@
-import type { Paragraph } from 'mdast';
-import type { Context, Parent, SafeOptions } from '../types';
-import { containerPhrasing } from '../util/container-phrasing';
+import { Paragraph, Parents } from 'mdast';
+import { Info, State } from '../types';
 
-export function paragraph(node: Paragraph, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
-  const exit = context.enter('paragraph');
-  const subexit = context.enter('phrasing');
-  const value = containerPhrasing(node, context, { before: '\n', after: '\n' });
+export function paragraph(node: Paragraph, _: Parents | undefined, state: State, info: Info): string {
+  const exit = state.enter('paragraph');
+  const subexit = state.enter('phrasing');
+  const value = state.containerPhrasing(node, info);
   subexit();
   exit();
   return value;

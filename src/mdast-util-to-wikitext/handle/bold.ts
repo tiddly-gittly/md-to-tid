@@ -1,26 +1,36 @@
-import type { Strong } from 'mdast';
-import type { Context, Parent, SafeOptions } from '../types';
-
-import { checkStrong } from '../util/check-strong';
-import { containerPhrasing } from '../util/container-phrasing';
+import { checkBold } from '../util/check-bold';
+import { Parents, Strong } from 'mdast';
+import { Info, State } from '../types';
 
 bold.peek = boldPeek;
+// 在 TW 中，我们使用术语 "bold" 而不是 "strong" ，因为大多数用户已经习惯了。
+// ... 呈现过程将我们的 "粗体文本" 转换为 STRONG HTML 元素。
+export function bold(node: Strong, _: Parents | undefined, state: State, info: Info): string {
+  const marker = checkBold(state);
+  const exit = state.enter('bold');
+  const tracker = state.createTracker(info);
+  const before = tracker.move(marker);
 
-export function bold(node: Strong, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
-  const marker = checkStrong(context);
-  const exit = context.enter('strong');
-  const value = containerPhrasing(node, context, {
-    before: marker,
-    after: marker,
-  });
+  let between = tracker.move(
+    state.containerPhrasing(node, {
+      after: marker,
+      before,
+      ...tracker.current(),
+    }),
+  );
+
+  const after = tracker.move(marker);
+
   exit();
-  return marker + value + marker;
+  return before + between + after;
 }
 
 /**
- * @type {Handle}
  * @param {Strong} _
+ * @param {Parents | undefined} _1
+ * @param {State} state
+ * @returns {string}
  */
-function boldPeek(_: Strong, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
-  return context.options.strong || `''`;
+function boldPeek(_: Strong, _1: Parents | undefined, state: State): string {
+  return state.options.bold || `''`;
 }

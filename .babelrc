@@ -3,7 +3,9 @@
     [
       "@babel/env",
       {
-        "targets": "> 30%, not dead"
+        "targets": {
+          "node": "current"
+        }
       }
     ],
     "@babel/typescript",
@@ -11,8 +13,16 @@
   ],
   "plugins": [
     "macros",
-    "lodash",
-    ["styled-components-px2rem", { "rootValue": 100, "unitPrecision": 5, "minPixelValue": 0, "multiplier": 1, "transformRuntime": false }],
+    [
+      "styled-components-px2rem",
+      {
+        "rootValue": 100,
+        "unitPrecision": 5,
+        "minPixelValue": 0,
+        "multiplier": 1,
+        "transformRuntime": false
+      }
+    ],
     "styled-components"
   ]
 }

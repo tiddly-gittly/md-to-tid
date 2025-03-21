@@ -1,6 +1,6 @@
 import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
-import base from './rollup.config.demo';
+import base from './rollup.config.demo.js';
 
 export default {
   ...base,

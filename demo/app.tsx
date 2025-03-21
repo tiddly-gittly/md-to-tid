@@ -1,18 +1,15 @@
+import ReactMarkdown from 'react-markdown';
 import React, { useCallback, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
+import { useDebouncedCallback } from 'beautiful-react-hooks';
+
 import styled from 'styled-components';
-import { Button, ButtonGroup, Card, Intent, Tab, Tabs, TextArea } from '@blueprintjs/core';
-import { ErrorSchema, IChangeEvent, withTheme } from '@rjsf/core';
-import { Theme as RJSFUITheme } from '@rjsf/fluent-ui';
+import { Button, ButtonGroup, Intent, Tab, Tabs, TextArea, Card } from '@blueprintjs/core';
 import { useLocalStorage } from 'beautiful-react-hooks';
 import useQueryString from 'use-query-string';
-import { useTemplateGeneration } from './useTemplateGeneration';
-import { IOptions } from '../src';
-import { templates } from './data';
-import { GenerationResult, ResultDisplayMode } from './result';
-import GlobalStyle from './globalStyle';
 
-const Form = withTheme(RJSFUITheme);
+import { templates } from './data';
+import { IOptions, md2tid } from '../src';
 
 const Container = styled.div`
   display: flex;
@@ -36,27 +33,14 @@ const TemplateInputContainer = styled(Card)`
 
   min-height: 100%;
   margin-right: 10px;
+
   & textarea {
     display: flex;
-    max-height: 80vh;
+    max-height: calc(90%);
     flex: 3;
   }
 `;
-const ConfigurationContainer = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: row;
-  margin-top: 10px;
-  & textarea {
-    display: flex;
-    flex: 1 !important;
-    margin-left: 10px;
-  }
-`;
-const ConfigJSONSchemaForm = styled(Form)`
-  display: flex;
-  flex: 3;
-`;
+
 const ErrorMessageContainer = styled.div`
   display: flex;
   justify-content: center;
@@ -67,12 +51,99 @@ const ResultDisplayModeSelectContainer = styled.div`
   bottom: 10px;
   right: 10px;
   opacity: 0.5;
+
   &:active,
   &:hover,
   &:focus {
     opacity: 1;
   }
 `;
+
+const ResultContainer = styled(Card)`
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  max-height: calc(90%);
+  overflow: scroll;
+
+  padding: 40px;
+  font-size: 64px;
+`;
+const CopyButton = styled(Button)``;
+
+function useTrigger() {
+  const [a, f] = useState(false);
+  return [
+    useCallback(() => {
+      f(!a);
+    }, [a]),
+    a,
+  ] as const;
+}
+
+export function useTemplateGeneration(configFormData: IOptions | undefined, fileName = 'input.md') {
+  const [template, templateSetter] = useState('');
+  const [result, resultSetter] = useState<string>('');
+  const [templateData, templateDataSetter] = useState<string>('');
+  const [errorMessage, errorMessageSetter] = useState('');
+  const [rerender, rerenderHookTrigger] = useTrigger();
+  const parseAndGenerateFromTemplate = useDebouncedCallback(
+    (templateStringToParse: string) => {
+      let newErrorMessage = '';
+      try {
+        const templateData = md2tid(templateStringToParse);
+        if (configFormData === undefined) {
+          throw new Error('模板参数不正确');
+        }
+        resultSetter(templateData.toString());
+      } catch (e) {
+        newErrorMessage += (e as Error).message;
+      }
+      // newErrorMessage += reporter(vFile);
+      errorMessageSetter(newErrorMessage);
+    },
+    [configFormData],
+    500,
+  );
+  useEffect(() => {
+    parseAndGenerateFromTemplate(template);
+  }, [template, rerenderHookTrigger]);
+
+  return [rerender, template, templateSetter, result, errorMessage, templateData] as const;
+}
+
+export enum ResultDisplayMode {
+  paragraph,
+  card,
+}
+
+export function GenerationResult(props: { result: string; resultDisplayMode: ResultDisplayMode; template: string }): JSX.Element {
+  switch (props.resultDisplayMode) {
+    case ResultDisplayMode.card: {
+      return (
+        <ResultContainer>
+          <pre>{props.result}</pre>
+        </ResultContainer>
+      );
+    }
+    case ResultDisplayMode.paragraph: {
+      return (
+        <ResultContainer as="article">
+          <CopyButton
+            size="large"
+            onClick={() => {
+              navigator.clipboard.writeText(props.result);
+            }}>
+            复制
+          </CopyButton>
+          <pre>{props.result}</pre>
+        </ResultContainer>
+      );
+    }
+  }
+}
 
 function updateQuery(path: string) {
   window.history.pushState(null, document.title, path);
@@ -86,11 +157,8 @@ function App(): JSX.Element {
   const [templateTab, templateTabSetter] = useState<keyof typeof templates>('空白');
   const [resultDisplayMode, resultDisplayModeSetter] = useState<ResultDisplayMode>(ResultDisplayMode.paragraph);
   const [空白templateContent, 空白templateContentSetter] = useLocalStorage<string>('空白templateContent', templates['空白']);
-  let configFormData: IOptions | undefined;
-  try {
-    configFormData = JSON.parse(configString) as IOptions;
-  } catch {}
-  const [rerender, template, templateSetter, result, configSchema, errorMessage, templateData] = useTemplateGeneration(configFormData, `${templateTab}.md`);
+  let configFormData: IOptions | undefined = JSON.parse(configString) as IOptions;
+  const [rerender, template, templateSetter, result, errorMessage, templateData] = useTemplateGeneration(configFormData, `${templateTab}.md`);
   useEffect(() => {
     templates['空白'] = 空白templateContent;
     const tabFromQueryString = queryString[0].tab as keyof typeof templates | undefined;
@@ -102,10 +170,8 @@ function App(): JSX.Element {
     }
     const configStringFromQueryString = queryString[0].conf as string | undefined;
     if (configStringFromQueryString) {
-      try {
-        JSON.parse(configStringFromQueryString);
-        configStringSetter(configStringFromQueryString);
-      } catch {}
+      JSON.parse(configStringFromQueryString);
+      configStringSetter(configStringFromQueryString);
     }
     const resultDisplayModeFromQueryString = queryString[0].mode;
     if (resultDisplayModeFromQueryString) {
@@ -139,10 +205,6 @@ function App(): JSX.Element {
           templateTabSetter(nextTabName);
           templateSetter(templates[nextTabName]);
           queryString[1]({ tab: nextTabName });
-          // when opening readme, auto set display mode to markdown
-          if (nextTabName.toLowerCase() === 'readme') {
-            resultDisplayModeSetter(ResultDisplayMode.markdown);
-          }
         }}
         selectedTabId={templateTab}>
         {Object.keys(templates).map((templateName) => (
@@ -150,7 +212,7 @@ function App(): JSX.Element {
         ))}
       </Tabs>
       <TextArea
-        large={true}
+        size="large"
         intent={Intent.PRIMARY}
         fill={true}
         onChange={(event) => {
@@ -161,32 +223,6 @@ function App(): JSX.Element {
         }}
         value={template}
       />
-      <ConfigurationContainer>
-        {configSchema !== undefined && (
-          <ConfigJSONSchemaForm
-            formData={configFormData}
-            schema={configSchema}
-            onChange={(submitEvent: IChangeEvent, es?: ErrorSchema) => {
-              const nextConfigString = JSON.stringify(submitEvent.formData);
-              updateConfigString(nextConfigString);
-            }}
-            onSubmit={() => rerender()}
-          />
-        )}
-        <TextArea
-          large={true}
-          intent={Intent.PRIMARY}
-          fill={true}
-          onChange={(event) => {
-            try {
-              // prevent invalid input
-              const nextConfigString = event.target.value;
-              updateConfigString(nextConfigString);
-            } catch {}
-          }}
-          value={configString}
-        />
-      </ConfigurationContainer>
       <ErrorMessageContainer>{errorMessage}</ErrorMessageContainer>
     </TemplateInputContainer>
   );
@@ -194,20 +230,14 @@ function App(): JSX.Element {
   return (
     <Container>
       <ContentContainer as="main">
-        {resultDisplayMode !== ResultDisplayMode.share && inputGroup}
+        {inputGroup}
         <ResultDisplayModeSelectContainer>
           <ButtonGroup>
             <Button icon="eye-on" onClick={() => updateResultDisplayMode(ResultDisplayMode.paragraph)}>
               编辑模式
             </Button>
-            <Button icon="share" onClick={() => updateResultDisplayMode(ResultDisplayMode.share)}>
-              分享模式
-            </Button>
             <Button icon="database" onClick={() => updateResultDisplayMode(ResultDisplayMode.card)}>
               元信息模式
-            </Button>
-            <Button icon="database" onClick={() => updateResultDisplayMode(ResultDisplayMode.markdown)}>
-              MD
             </Button>
           </ButtonGroup>
         </ResultDisplayModeSelectContainer>
@@ -218,10 +248,4 @@ function App(): JSX.Element {
 }
 
 const domContainer = document.querySelector('#app');
-ReactDOM.render(
-  <>
-    <GlobalStyle />
-    <App />
-  </>,
-  domContainer,
-);
+ReactDOM.render(<App />, domContainer);

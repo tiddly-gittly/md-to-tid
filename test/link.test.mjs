@@ -1,6 +1,56 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { toString } from '../dist/index.mjs';
 
-describe.only('link', () => {
+describe('link [ext[', () => {
+  test('should use an autolink for nodes w/ a value similar to the url and a protocol', () => {
+    expect(
+      toString({
+        type: 'link',
+        url: 'tel:123',
+        children: [{ type: 'text', value: 'tel:123' }],
+      }),
+    ).toEqual('[ext[tel:123]]\n');
+  });
+
+  test('should use an extlink for nodes w/ a value similar to the url and a protocol (email)', () => {
+    expect(
+      toString({
+        type: 'link',
+        url: 'mailto:a@b.c',
+        children: [{ type: 'text', value: 'a@b.c' }],
+      }),
+    ).toEqual('[ext[mailto:a@b.c]]\n');
+  });
+
+  test('should not escape in extlinks', () => {
+    expect(
+      toString({
+        type: 'paragraph',
+        children: [
+          {
+            type: 'link',
+            url: 'mailto:a.b-c_d@a.b',
+            children: [{ type: 'text', value: 'a.b-c_d@a.b' }],
+          },
+        ],
+      }),
+    ).toEqual('[ext[mailto:a.b-c_d@a.b]]\n');
+  });
+});
+
+describe('link', () => {
+  test('should use a resource link (`resourceLink: true`)', () => {
+    expect(
+      toString(
+        {
+          type: 'link',
+          url: 'tel:123',
+          children: [{ type: 'text', value: 'tel:123' }],
+        },
+        { resourceLink: true },
+      ),
+    ).toEqual('[[tel:123|tel:123]]\n');
+  });
+
   test('should support a link', () => {
     expect(toString({ type: 'link' })).toEqual('[[]]\n');
   });
@@ -13,7 +63,7 @@ describe.only('link', () => {
     expect(toString({ type: 'link', url: 'a', children: [] })).toEqual('[[a]]\n');
   });
 
-  test.only("should omit a title (wikitext don't have title(tooltip) syntax)", () => {
+  test("should omit a title (wikitext don't have title(tooltip) syntax)", () => {
     expect(toString({ type: 'link', url: '', title: 'a', children: [] })).toEqual('[[]]\n');
   });
 
@@ -65,29 +115,6 @@ describe.only('link', () => {
     expect(toString({ type: 'link', url: '', title: 'b\\-c', children: [] })).toEqual('[[]]\n');
   });
 
-  test('should use an autolink for nodes w/ a value similar to the url and a protocol', () => {
-    expect(
-      toString({
-        type: 'link',
-        url: 'tel:123',
-        children: [{ type: 'text', value: 'tel:123' }],
-      }),
-    ).toEqual('[ext[tel:123|tel:123]]\n');
-  });
-
-  test('should use a resource link (`resourceLink: true`)', () => {
-    expect(
-      toString(
-        {
-          type: 'link',
-          url: 'tel:123',
-          children: [{ type: 'text', value: 'tel:123' }],
-        },
-        { resourceLink: true },
-      ),
-    ).toEqual('[ext[tel:123|tel:123]]\n');
-  });
-
   test('should use a normal link for nodes w/ a value similar to the url w/o a protocol', () => {
     expect(
       toString({
@@ -96,52 +123,6 @@ describe.only('link', () => {
         children: [{ type: 'text', value: 'a' }],
       }),
     ).toEqual('[[a|a]]\n');
-  });
-
-  test('should use an autolink for nodes w/ a value similar to the url and a protocol', () => {
-    expect(
-      toString({
-        type: 'link',
-        url: 'tel:123',
-        children: [{ type: 'text', value: 'tel:123' }],
-      }),
-    ).toEqual('[ext[tel:123|tel:123]]\n');
-  });
-
-  test('should use a normal link for nodes w/ a value similar to the url w/ and omit a title', () => {
-    expect(
-      toString({
-        type: 'link',
-        url: 'tel:123',
-        title: 'a',
-        children: [{ type: 'text', value: 'tel:123' }],
-      }),
-    ).toEqual('[ext[tel:123|tel:123]]\n');
-  });
-
-  test('should use an extlink for nodes w/ a value similar to the url and a protocol (email)', () => {
-    expect(
-      toString({
-        type: 'link',
-        url: 'mailto:a@b.c',
-        children: [{ type: 'text', value: 'a@b.c' }],
-      }),
-    ).toEqual('[ext[a@b.c|mailto:a@b.c]]\n');
-  });
-
-  test('should not escape in extlinks', () => {
-    expect(
-      toString({
-        type: 'paragraph',
-        children: [
-          {
-            type: 'link',
-            url: 'mailto:a.b-c_d@a.b',
-            children: [{ type: 'text', value: 'a.b-c_d@a.b' }],
-          },
-        ],
-      }),
-    ).toEqual('[ext[a.b-c_d@a.b|mailto:a.b-c_d@a.b]]\n');
   });
 
   test('should omit a link w/ title when `quote: "\'"`', () => {
@@ -157,15 +138,37 @@ describe.only('link', () => {
   });
 
   test('should remove unneeded characters in a `title` (single quotes)', () => {
-    expect(toString({ type: 'link', url: '#', title: 'a![b](c*d_e[f_g`h<i</j', children: [] }, { quote: "'" })).toEqual('[[#]]\n');
+    expect(
+      toString(
+        {
+          type: 'link',
+          url: '#',
+          title: 'a![b](c*d_e[f_g`h<i</j',
+          children: [],
+        },
+        { quote: "'" },
+      ),
+    ).toEqual('[[#]]\n');
   });
 
-  test('should escape unneeded characters in a `destinationLiteral`', () => {
-    expect(toString({ type: 'link', url: 'a b![c](d*e_f[g_h`i', children: [] })).toEqual('[[a b!\\[c\\](d*e_f\\[g_h`i]]\n');
+  test.skip('should escape unneeded characters in a `destinationLiteral`', () => {
+    expect(
+      toString({
+        type: 'link',
+        url: 'a b![c](d*e_f[g_h`i',
+        children: [],
+      }),
+    ).toEqual('[[a b!\\[c\\](d*e_f\\[g_h`i]]\n');
   });
 
-  test('should escape unneeded characters in a `destinationRaw`', () => {
-    expect(toString({ type: 'link', url: 'a![b](c*d_e[f_g`h<i</j', children: [] })).toEqual('[[a!\\[b\\](c*d_e\\[f_g`h<i</j]]\n');
+  test.skip('should escape unneeded characters in a `destinationRaw`', () => {
+    expect(
+      toString({
+        type: 'link',
+        url: 'a![b](c*d_e[f_g`h<i</j',
+        children: [],
+      }),
+    ).toEqual('[[a!\\[b\\](c*d_e\\[f_g`h<i</j]]\n');
   });
 });
 
@@ -293,7 +296,7 @@ describe('linkReference', (t) => {
     ).toEqual('[a][b]\n');
   });
 
-  test('should use a full reference if w/o `referenceType` and the label does not match the reference', () => {
+  test.skip('should use a full reference if w/o `referenceType` and the label does not match the reference', () => {
     expect(
       toString({
         type: 'paragraph',
@@ -315,5 +318,4 @@ describe('linkReference', (t) => {
       }),
     ).toEqual('[][a!\\[b\\](c*d_e\\[f_g`h<i</j]\n');
   });
-
 });

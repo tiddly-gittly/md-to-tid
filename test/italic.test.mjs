@@ -1,4 +1,4 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { toString } from '../dist/index.mjs';
 
 describe('italic', () => {
   test('should support an empty emphasis (italic)', () => {

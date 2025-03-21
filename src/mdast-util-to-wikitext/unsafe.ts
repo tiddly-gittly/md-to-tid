@@ -1,4 +1,4 @@
-import type { Conflict } from './types';
+import { ConstructName, Unsafe } from './types';
 
 /**
  * List of types that occur in phrasing (paragraphs, headings), but cannot
@@ -6,69 +6,69 @@ import type { Conflict } from './types';
  * So they sort of cancel each other out.
  * Note: could use a better name.
  */
-const fullPhrasingSpans = ['autolink', 'destinationLiteral', 'destinationRaw', 'reference'];
+const fullPhrasingSpans: Array<ConstructName> = ['autolink', 'destinationLiteral', 'destinationRaw', 'reference'];
 
 /**
  * Each item will be used by `patternCompile` function to be a RegExp before used.
- * The conflict field will be use in patternInScope function to check if the stack have a type.
+ * The inConstruct field will be use in patternInScope function to check if the stack have a type.
  */
-export const conflict: Conflict[] = [
-  { character: '\t', after: '[\\r\\n]', conflict: 'phrasing' },
-  { character: '\t', before: '[\\r\\n]', conflict: 'phrasing' },
+export const unsafe: Array<Unsafe> = [
+  { character: '\t', after: '[\\r\\n]', inConstruct: 'phrasing' },
+  { character: '\t', before: '[\\r\\n]', inConstruct: 'phrasing' },
   {
     character: '\t',
-    conflict: ['codeFencedLangGraveAccent', 'codeFencedLangTilde'],
+    inConstruct: ['codeFencedLangGraveAccent', 'codeFencedLangTilde'],
   },
   {
     character: '\r',
-    conflict: ['codeFencedLangGraveAccent', 'codeFencedLangTilde', 'codeFencedMetaGraveAccent', 'codeFencedMetaTilde', 'destinationLiteral', 'headingAtx'],
+    inConstruct: ['codeFencedLangGraveAccent', 'codeFencedLangTilde', 'codeFencedMetaGraveAccent', 'codeFencedMetaTilde', 'destinationLiteral', 'headingAtx'],
   },
   {
     character: '\n',
-    conflict: ['codeFencedLangGraveAccent', 'codeFencedLangTilde', 'codeFencedMetaGraveAccent', 'codeFencedMetaTilde', 'destinationLiteral', 'headingAtx'],
+    inConstruct: ['codeFencedLangGraveAccent', 'codeFencedLangTilde', 'codeFencedMetaGraveAccent', 'codeFencedMetaTilde', 'destinationLiteral', 'headingAtx'],
   },
-  { character: ' ', after: '[\\r\\n]', conflict: 'phrasing' },
-  { character: ' ', before: '[\\r\\n]', conflict: 'phrasing' },
+  { character: ' ', after: '[\\r\\n]', inConstruct: 'phrasing' },
+  { character: ' ', before: '[\\r\\n]', inConstruct: 'phrasing' },
   {
     character: ' ',
-    conflict: ['codeFencedLangGraveAccent', 'codeFencedLangTilde'],
+    inConstruct: ['codeFencedLangGraveAccent', 'codeFencedLangTilde'],
   },
   // An exclamation mark can start an image, if it is followed by a link or
   // a link reference.
   {
     character: '!',
     after: '\\[',
-    conflict: 'phrasing',
-    notConflict: fullPhrasingSpans,
+    inConstruct: 'phrasing',
+    notInConstruct: fullPhrasingSpans,
   },
   // A quote can break out of a title.
-  { character: '"', conflict: 'titleQuote' },
+  { character: '"', inConstruct: 'titleQuote' },
   // A ! sign could start an ATX heading if it starts a line.
   { atBreak: true, character: '!' },
-  { character: '!', conflict: 'headingAtx', after: '(?:[\r\n]|$)' },
+  { character: '!', inConstruct: 'headingAtx', after: '(?:[\r\n]|$)' },
   // Dollar sign and percentage are not used in markdown.
   // An ampersand could start a character reference.
-  { character: '&', after: '[#A-Za-z]', conflict: 'phrasing' },
+  { character: '&', after: '[#A-Za-z]', inConstruct: 'phrasing' },
   // A left paren could break out of a destination raw.
-  { character: '(', conflict: 'destinationRaw' },
+  { character: '(', inConstruct: 'destinationRaw' },
   // A left [ followed by `]` could make something into a link or image.
   {
     before: '\\]',
     character: '[',
-    conflict: 'phrasing',
-    notConflict: fullPhrasingSpans,
+    inConstruct: 'phrasing',
+    notInConstruct: fullPhrasingSpans,
   },
   // A right paren could start a list item or break out of a destination
   // raw.
   { atBreak: true, before: '\\d+', character: ')' },
-  { character: ')', conflict: 'destinationRaw' },
+  { character: ')', inConstruct: 'destinationRaw' },
   // An # can start list items, italic, strong.
   { atBreak: true, character: '#' },
   // An // can start list italic
   { atBreak: true, character: '//' },
   // An '' can start list strong.
   { atBreak: true, character: `''` },
-  { character: '*', conflict: 'phrasing', notConflict: fullPhrasingSpans },
+  { character: '*', inConstruct: 'phrasing', notInConstruct: fullPhrasingSpans },
   // A plus sign could start a list item.
   { atBreak: true, character: '+' },
   // A dash can start thematic breaks, list items, and setext heading
@@ -86,39 +86,39 @@ export const conflict: Conflict[] = [
   {
     character: '<',
     after: '[!/?A-Za-z]',
-    conflict: 'phrasing',
-    notConflict: fullPhrasingSpans,
+    inConstruct: 'phrasing',
+    notInConstruct: fullPhrasingSpans,
   },
-  { character: '<', conflict: 'destinationLiteral' },
+  { character: '<', inConstruct: 'destinationLiteral' },
   // An equals to can start setext heading underlines.
   { atBreak: true, character: '=' },
   // A greater than can start block quotes and it can break out of a
   // destination literal.
   { atBreak: true, character: '>' },
-  { character: '>', conflict: 'destinationLiteral' },
+  { character: '>', inConstruct: 'destinationLiteral' },
   // Question mark and at sign are not used in markdown for constructs.
   // A left bracket can start definitions, references, labels,
   { atBreak: true, character: '[' },
-  { character: '[', conflict: 'phrasing', notConflict: fullPhrasingSpans },
-  { character: '[', conflict: ['label', 'reference'] },
+  { character: '[', inConstruct: 'phrasing', notInConstruct: fullPhrasingSpans },
+  { character: '[', inConstruct: ['label', 'reference'] },
   // A backslash can start an escape (when followed by punctuation) or a
   // hard break (when followed by an eol).
   // Note: typical escapes are handled in `safe`!
-  { character: '\\', after: '[\\r\\n]', conflict: 'phrasing' },
+  { character: '\\', after: '[\\r\\n]', inConstruct: 'phrasing' },
   // A right bracket can exit labels.
-  { character: ']', conflict: ['label', 'reference'] },
+  { character: ']', inConstruct: ['label', 'reference'] },
   // Caret is not used in markdown for constructs.
   // An underscore can start italic, strong, or a thematic break.
   { atBreak: true, character: '_' },
-  { character: '_', conflict: 'phrasing', notConflict: fullPhrasingSpans },
+  { character: '_', inConstruct: 'phrasing', notInConstruct: fullPhrasingSpans },
   // A grave accent can start code (fenced or text), or it can break out of
   // a grave accent code fence.
   { atBreak: true, character: '`' },
   {
     character: '`',
-    conflict: ['codeFencedLangGraveAccent', 'codeFencedMetaGraveAccent'],
+    inConstruct: ['codeFencedLangGraveAccent', 'codeFencedMetaGraveAccent'],
   },
-  { character: '`', conflict: 'phrasing', notConflict: fullPhrasingSpans },
+  { character: '`', inConstruct: 'phrasing', notInConstruct: fullPhrasingSpans },
   // Left brace, vertical bar, right brace are not used in markdown for
   // constructs.
   // A tilde can start code (fenced).

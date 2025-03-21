@@ -1,4 +1,4 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { toString } from '../dist/index.mjs';
 
 describe('html', () => {
   test('should support a void html', () => {

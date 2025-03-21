@@ -1,40 +1,46 @@
-import type { ListItem } from 'mdast';
-import type { Handle } from '../types';
-
 import { checkBullet } from '../util/check-bullet';
-import { checkListItemIndent } from '../util/check-list-item-indent';
-import { containerFlow } from '../util/container-flow';
-import { indentLines, Map } from '../util/indent-lines';
+import { ListItem, Parents } from 'mdast';
+import { Info, Map, State } from '../types';
+import { checkBulletOrdered } from '../util/check-bullet-ordered';
 
-export const listItem: Handle = function listItem(node: ListItem, parent, context) {
-  const listItemIndent = checkListItemIndent(context);
-  let bullet = context.bulletCurrent || checkBullet(context);
+export function listItem(node: ListItem, parent: Parents | undefined, state: State, info: Info): string {
+  let bullet = state.bulletCurrent || checkBullet(state);
 
-  // Add the marker value for ordered lists.
+  // 为有序列表添加标记值
+  // 检查父节点是否存在，且父节点类型为 'list'，并且该列表是有序列表
   if (parent && parent.type === 'list' && parent.ordered) {
-    bullet =
-      context.options.incrementListMarker === false
-        ? bullet
-        : (typeof parent.start === 'number' && parent.start > -1 ? parent.start : 1) + parent.children.indexOf(node) + bullet;
+    bullet = checkBulletOrdered(state);
   }
 
   let size = bullet.length + 1;
 
-  if (listItemIndent === 'tab' || (listItemIndent === 'mixed' && ((parent && parent.type === 'list' && parent.spread) || node.spread))) {
+  // 满足父列表为展开状态或当前列表项为展开状态，则将缩进大小（size）向上取整到最接近的 4 的倍数。
+  if (((parent && parent.type === 'list' && parent.spread) || node.spread)) {
+    // Math.ceil会返回大于或等于该数字的最小整数
     size = Math.ceil(size / 4) * 4;
   }
 
-  const exit = context.enter('listItem');
+  const tracker = state.createTracker(info);
+  // 假设 `bullet` 是 `#`，`size` 是 4.
+  // 那么 `bullet + ' '.repeat(size - bullet.length)` 会生成 `#   `。
+  tracker.move(bullet.repeat(size - bullet.length));
+  tracker.shift(size);
+  const exit = state.enter('listItem');
   const map: Map = function map(line, index, blank) {
-    // in tw, there is no indent for list item
-    if (line.startsWith(bullet)) {
-      return (blank ? '' : bullet) + line;
+    if (index) {
+      if (line.startsWith("#") || line.startsWith("*")) {
+        let old_bullet = line.split(" ")[0]
+        let old_line = line.split(" ").slice(1).join(" ")
+        return (blank ? '' : bullet.repeat(size - bullet.length) + old_bullet + ' ') + old_line;
+      } else {
+        return (blank ? '' : bullet.repeat(size - bullet.length) + ' ') + line;
+      }
     }
 
-    return (blank ? bullet : bullet + ' ') + line;
+    return (blank ? bullet : bullet.repeat(size - bullet.length) + ' ') + line;
   };
-  const value = indentLines(containerFlow(node, context), map);
+  const value = state.indentLines(state.containerFlow(node, tracker.current()), map);
   exit();
 
   return value;
-};
+}

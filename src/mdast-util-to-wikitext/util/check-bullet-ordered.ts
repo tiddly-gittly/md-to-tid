@@ -1,7 +1,23 @@
-import type { Context, Options } from '../types';
+import { Options, State } from '../types';
 
-export function checkBulletOrdered(context: Context): Exclude<Options['bulletOrdered'], undefined> {
-  const marker = context.options.bulletOrdered || '#';
+/**
+ * 检查有序列表项的标记字符是否有效。
+ *
+ * 如果提供的标记字符不是 有序列表`#`，则抛出错误。
+ *
+ * @param state - 包含配置选项的状态对象。
+ * @returns 有效的有序列表项标记字符。
+ */
+export function checkBulletOrdered(state: State): Exclude<Options['bulletOrdered'], null | undefined> {
+  const marker = state.options.bulletOrdered || '#';
 
-  return marker;
+  if (marker !== '#') {
+    throw new Error(
+      'Cannot serialize items with `' +
+      marker +
+      '` for `options.bulletOrdered`, expected `.`'
+    )
+  }
+
+  return marker
 }

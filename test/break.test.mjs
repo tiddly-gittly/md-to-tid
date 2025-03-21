@@ -1,21 +1,15 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { md2tid, toString } from '../dist/index.mjs';
 
 describe('break', () => {
   test('should support a break', () => {
-    expect(
-      toString({type: 'break'}),
-    ).toEqual('\\\n');
+    expect(toString({ type: 'break' })).toEqual('\\\n');
   });
 
   test('should serialize breaks in heading (atx) as a space', () => {
     const tidResult = toString({
       type: 'heading',
       depth: 3,
-      children: [
-        {type: 'text', value: 'a'},
-        {type: 'break'},
-        {type: 'text', value: 'b'}
-      ]
+      children: [{ type: 'text', value: 'a' }, { type: 'break' }, { type: 'text', value: 'b' }],
     });
     expect(tidResult).toEqual('!!! a b\n');
   });
@@ -24,16 +18,12 @@ describe('break', () => {
     const tidResult = toString({
       type: 'heading',
       depth: 3,
-      children: [
-        {type: 'text', value: 'a '},
-        {type: 'break'},
-        {type: 'text', value: 'b'}
-      ]
+      children: [{ type: 'text', value: 'a ' }, { type: 'break' }, { type: 'text', value: 'b' }],
     });
     expect(tidResult).toEqual(`!!! a b\n`);
   });
 
-  test('should serialize breaks in heading (setext)', async () => {
-    await expect(md2tid('a  \nb\n=\n')).resolves.toEqual('! a b\n');
+  test('should serialize breaks in heading (setext)', () => {
+    expect(md2tid('a  \nb\n=\n')).toEqual('! a b\n');
   });
 });

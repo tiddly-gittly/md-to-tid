@@ -2,7 +2,7 @@ import { blockquote } from './blockquote';
 import { hardBreak } from './break';
 import { code } from './code';
 import { definition } from './definition';
-import { italic } from './italic';
+import { emphasis } from './emphasis';
 import { heading } from './heading';
 import { html } from './html';
 import { image } from './image';
@@ -16,14 +16,17 @@ import { paragraph } from './paragraph';
 import { root } from './root';
 import { bold } from './bold';
 import { text } from './text';
-import { separateLine } from './separate-line';
+import { thematicBreak } from './thematic-break';
 
+/**
+ * Default (CommonMark) handlers.
+ */
 export const handle = {
   blockquote,
   break: hardBreak,
   code,
   definition,
-  emphasis: italic,
+  emphasis,
   hardBreak,
   heading,
   html,
@@ -38,5 +41,5 @@ export const handle = {
   root,
   strong: bold,
   text,
-  thematicBreak: separateLine,
-};
+  thematicBreak
+}

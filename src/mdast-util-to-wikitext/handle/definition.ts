@@ -1,13 +1,23 @@
-import type { Definition } from 'mdast';
-import type { Context } from '../types';
+import { checkQuote } from '../util/check-quote';
+import { Definition, Parents } from 'mdast';
+import { Info, State } from '../types';
 
-import { association } from '../util/association';
-import { safe } from '../util/safe';
-
-export function definition(node: Definition, _: unknown, context: Context) {
-  const exit = context.enter('definition');
-  let subexit = context.enter('label');
-  let value = '[' + safe(context, association(node), { before: '[', after: ']' }) + ']: ';
+// Definition: md变量定义，如: [Alpha]: https://example.com
+export function definition(node: Definition, _: Parents | undefined, state: State, info: Info): string {
+  const quote = checkQuote(state);
+  const suffix = quote === '"' ? 'Quote' : 'Apostrophe';
+  const exit = state.enter('definition');
+  let subexit = state.enter('label');
+  const tracker = state.createTracker(info);
+  let value = tracker.move('[');
+  value += tracker.move(
+    state.safe(state.associationId(node), {
+      before: value,
+      after: ']',
+      ...tracker.current(),
+    }),
+  );
+  value += tracker.move(']: ');
 
   subexit();
 
@@ -17,15 +27,37 @@ export function definition(node: Definition, _: unknown, context: Context) {
     // If there are control characters or whitespace.
     /[\0- \u007F]/.test(node.url)
   ) {
-    subexit = context.enter('destinationLiteral');
-    value += '<' + safe(context, node.url, { before: '<', after: '>' }) + '>';
+    subexit = state.enter('destinationLiteral');
+    value += tracker.move('<');
+    value += tracker.move(state.safe(node.url, { before: value, after: '>', ...tracker.current() }));
+    value += tracker.move('>');
   } else {
     // No whitespace, raw is prettier.
-    subexit = context.enter('destinationRaw');
-    value += safe(context, node.url, { before: ' ', after: ' ' });
+    subexit = state.enter('destinationRaw');
+    value += tracker.move(
+      state.safe(node.url, {
+        before: value,
+        after: node.title ? ' ' : '\n',
+        ...tracker.current(),
+      }),
+    );
   }
 
   subexit();
+
+  if (node.title) {
+    subexit = state.enter(`title${suffix}`);
+    value += tracker.move(' ' + quote);
+    value += tracker.move(
+      state.safe(node.title, {
+        before: value,
+        after: quote,
+        ...tracker.current(),
+      }),
+    );
+    value += tracker.move(quote);
+    subexit();
+  }
 
   exit();
 

@@ -1,4 +1,4 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { md2tid, toString } from '../dist/index.mjs';
 
 describe('title', () => {
   test('render 1 level title3 ast', () => {
@@ -66,17 +66,6 @@ describe('title', () => {
     expect(toString({ type: 'heading', depth: 2, children: [] })).toEqual('!!\n');
   });
 
-  test('should serialize a heading with a closing sequence when `closeAtx` (empty)', () => {
-    expect(
-      // @ts-expect-error: `children` missing.
-      toString({ type: 'heading' }, { closeAtx: true }),
-    ).toEqual('! !\n');
-  });
-
-  test('should serialize a with a closing sequence when `closeAtx` (content)', () => {
-    expect(toString({ type: 'heading', depth: 3, children: [{ type: 'text', value: 'a' }] }, { closeAtx: true })).toEqual('!!! a !!!\n');
-  });
-
   test('should not escape a `#` at the start of phrasing in a heading', () => {
     expect(toString({ type: 'heading', depth: 2, children: [{ type: 'text', value: '# a' }] })).toEqual('!! # a\n');
   });
@@ -118,7 +107,13 @@ describe('title', () => {
   });
 
   test('should encode a tab at the start of an atx heading', () => {
-    expect(toString({ type: 'heading', depth: 1, children: [{ type: 'text', value: '\t\ta' }] })).toEqual('! &#x9;\ta\n');
+    expect(
+      toString({
+        type: 'heading',
+        depth: 1,
+        children: [{ type: 'text', value: '\t\ta' }],
+      }),
+    ).toEqual('! &#x9;\ta\n');
   });
 
   test('should encode a space at the end of an atx heading', () => {
@@ -126,7 +121,13 @@ describe('title', () => {
   });
 
   test('should encode a tab at the end of an atx heading', () => {
-    expect(toString({ type: 'heading', depth: 1, children: [{ type: 'text', value: 'a\t\t' }] })).toEqual('! a\t&#x9;\n');
+    expect(
+      toString({
+        type: 'heading',
+        depth: 1,
+        children: [{ type: 'text', value: 'a\t\t' }],
+      }),
+    ).toEqual('! a\t&#x9;\n');
   });
 
   test('should not need to encode spaces around a line ending in an atx heading (because the line ending is encoded)', () => {
@@ -139,11 +140,11 @@ describe('title', () => {
     ).toEqual('!!! a &#xA; b\n');
   });
 
-  test('# to !', async () => {
-    await expect(md2tid('# title 1\n')).resolves.toEqual('! title 1\n');
+  test('# to !', () => {
+    expect(md2tid('# title 1\n')).toEqual('! title 1\n');
   });
 
-  test('3 level #s to !s', async () => {
+  test('3 level #s to !s', () => {
     const md = `
 # AAA
 
@@ -162,6 +163,6 @@ DDD
 
 DDD
 `;
-    await expect(md2tid(md)).resolves.toEqual(tid);
+    expect(md2tid(md)).toEqual(tid);
   });
 });

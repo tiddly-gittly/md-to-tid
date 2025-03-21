@@ -1,38 +1,54 @@
-import type { LinkReference } from 'mdast';
-import type { Context, Exit, Parent, SafeOptions } from '../types';
-
-import { association } from '../util/association';
-import { containerPhrasing } from '../util/container-phrasing';
-import { safe } from '../util/safe';
+import { LinkReference, Parents } from 'mdast';
+import { Info, State } from '../types';
 
 linkReference.peek = linkReferencePeek;
 
-export function linkReference(node: LinkReference, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
+// LinkReference: 链接引用变量的节点，结合 Definition 使用
+// 如 [alpha][Bravo]
+// TODO 暂时不处理
+export function linkReference(node: LinkReference, _: Parents | undefined, state: State, info: Info): string {
   const type = node.referenceType;
-  const exit = context.enter('linkReference');
-  let subexit = context.enter('label');
-  const text = containerPhrasing(node, context, { before: '[', after: ']' });
-  let value = '[' + text + ']';
+  const exit = state.enter('linkReference');
+  let subexit = state.enter('label');
+  const tracker = state.createTracker(info);
+  let value = tracker.move('[');
+  const text = state.containerPhrasing(node, {
+    before: value,
+    after: ']',
+    ...tracker.current(),
+  });
+  value += tracker.move(text + '][');
 
   subexit();
   // Hide the fact that we’re in phrasing, because escapes don’t work.
-  const stack = context.stack;
-  context.stack = [];
-  subexit = context.enter('reference');
-  const reference = safe(context, association(node), { before: '[', after: ']' });
+  const stack = state.stack;
+  state.stack = [];
+  subexit = state.enter('reference');
+  // Note: for proper tracking, we should reset the output positions when we end
+  // up making a `shortcut` reference, because then there is no brace output.
+  // Practically, in that case, there is no content, so it doesn’t matter that
+  // we’ve tracked one too many characters.
+  const reference = state.safe(state.associationId(node), {
+    before: value,
+    after: ']',
+    ...tracker.current(),
+  });
   subexit();
-  context.stack = stack;
+  state.stack = stack;
   exit();
 
   if (type === 'full' || !text || text !== reference) {
-    value += '[' + reference + ']';
-  } else if (type !== 'shortcut') {
-    value += '[]';
+    value += tracker.move(reference + ']');
+  } else if (type === 'shortcut') {
+    // Remove the unwanted `[`.
+    value = value.slice(0, -1);
+  } else {
+    value += tracker.move(']');
   }
 
   return value;
 }
 
-function linkReferencePeek(node: LinkReference, parent: Parent | null | undefined, context: Context, safeOptions: SafeOptions) {
+function linkReferencePeek(): string {
   return '[';
 }

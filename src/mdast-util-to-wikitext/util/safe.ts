@@ -1,30 +1,44 @@
-import type { Context, SafeOptions } from '../types';
-
-import { patternCompile } from './pattern-compile';
+import { encodeCharacterReference } from './encode-character-reference';
 import { patternInScope } from './pattern-in-scope';
+import { SafeConfig, State } from '../types';
 
 /**
- * Escape and remove some characters from a string, based on information in the Context['conflict']
- * @param context 
- * @param input 
- * @param config 
- * @returns 
+ * 使字符串安全地嵌入到 Markdown 结构中。
+ *
+ * 在 Markdown 中，几乎所有标点符号在某些情况下都可能产生特殊效果。
+ * 它们是否会产生特殊效果很大程度上取决于它们出现的位置和上下文。
+ *
+ * 为了解决这个问题，`mdast-util-to-markdown` 会跟踪以下信息：
+ *
+ * * 某些内容前后的字符；
+ * * 当前所处的 “结构”。
+ *
+ * 此函数会使用这些信息来转义或编码特殊字符。
+ *
+ * @param {State} state
+ *   关于当前状态的信息。
+ * @param {string | null | undefined} input
+ *   要处理成安全格式的原始值。
+ * @param {SafeConfig} config
+ *   配置信息。
+ * @returns {string}
+ *   序列化后的、可安全嵌入的 Markdown 字符串。
  */
-export function safe(context: Context, input: string | null | undefined, config: SafeOptions & { encode?: Array<string> }): string {
+export function safe(state: State, input: string | null | undefined, config: SafeConfig): string {
   const value = (config.before || '') + (input || '') + (config.after || '');
   const positions: number[] = [];
   const result: string[] = [];
   const infos: Record<number, { before: boolean; after: boolean }> = {};
   let index = -1;
 
-  while (++index < context.conflict.length) {
-    const pattern = context.conflict[index];
+  while (++index < state.unsafe.length) {
+    const pattern = state.unsafe[index];
 
-    if (!patternInScope(context.stack, pattern)) {
+    if (!patternInScope(state.stack, pattern)) {
       continue;
     }
 
-    const expression = patternCompile(pattern);
+    const expression = state.compilePattern(pattern);
     let match: RegExpExecArray | null;
 
     while ((match = expression.exec(value))) {
@@ -56,14 +70,13 @@ export function safe(context: Context, input: string | null | undefined, config:
   while (++index < positions.length) {
     const position = positions[index];
 
-    // Character before or after matched:
+    // 匹配到的字符在前后部分：
     if (position < start || position >= end) {
       continue;
     }
 
-    // If this character is supposed to be escaped because it has a condition on
-    // the next character, and the next character is definitly being escaped,
-    // then skip this escape.
+    // 如果这个字符因为下一个字符的条件需要转义，并且下一个字符肯定会被转义，
+    // 那么跳过这个转义。
     if (
       (position + 1 < end && positions[index + 1] === position + 1 && infos[position].after && !infos[position + 1].before && !infos[position + 1].after) ||
       (positions[index - 1] === position - 1 && infos[position].before && !infos[position - 1].before && !infos[position - 1].after)
@@ -72,20 +85,18 @@ export function safe(context: Context, input: string | null | undefined, config:
     }
 
     if (start !== position) {
-      // If we have to use a character reference, an ampersand would be more
-      // correct, but as backslashes only care about punctuation, either will
-      // do the trick
+      // 如果我们必须使用字符引用，一个 & 符号会更合适，但由于反斜杠只处理标点符号，两者都可以达到目的
       result.push(escapeBackslashes(value.slice(start, position), '\\'));
     }
 
     start = position;
 
     if (/[!-/:-@[-`{-~]/.test(value.charAt(position)) && (!config.encode || !config.encode.includes(value.charAt(position)))) {
-      // Character escape.
+      // 字符转义。
       result.push('\\');
     } else {
-      // Character reference.
-      result.push('&#x' + value.charCodeAt(position).toString(16).toUpperCase() + ';');
+      // 字符引用。
+      result.push(encodeCharacterReference(value.charCodeAt(position)));
       start++;
     }
   }
@@ -111,8 +122,8 @@ function numerical(a: number, b: number): number {
  */
 function escapeBackslashes(value: string, after: string): string {
   const expression = /\\(?=[!-/:-@[-`{-~])/g;
-  const positions: Array<number> = [];
-  const results: Array<string> = [];
+  const positions: number[] = [];
+  const results: string[] = [];
   const whole = value + after;
   let index = -1;
   let start = 0;

@@ -65,3 +65,5 @@ public-dist/
 # testing and dev temp folders
 settings-dev/
 .dccache
+.vscode/launch.json
+.idea

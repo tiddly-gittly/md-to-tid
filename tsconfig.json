@@ -1,6 +1,6 @@
 {
   "exclude": ["dist", "public-dist"],
-  "include": ["src", "demo", "test/index.test.mjs"],
+  "include": ["src", "demo"],
   "ts-node": {
     "files": true,
     "compilerOptions": {

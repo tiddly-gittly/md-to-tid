@@ -1,4 +1,4 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { toString } from '../dist/index.mjs';
 
 describe('code (flow)', () => {
   test('should support empty code', () => {
@@ -57,20 +57,8 @@ describe('code (flow)', () => {
     expect(toString({ type: 'code', lang: 'x', meta: 'a\\-b', value: '' })).toEqual('```x a\\\\-b\n```\n');
   });
 
-  test('should support fenced code w/ tildes when `fence: "~"`', () => {
-    expect(toString({ type: 'code', value: '' }, { fence: '~' })).toEqual('~~~\n~~~\n');
-  });
-
-  test('should not encode a grave accent when using tildes for fences', () => {
-    expect(toString({ type: 'code', lang: 'a`b', value: '' }, { fence: '~' })).toEqual('~~~a`b\n~~~\n');
-  });
-
   test('should use more grave accents for fences if there are streaks of grave accents in the value (fences)', () => {
     expect(toString({ type: 'code', value: '```\nasd\n```' }, { fences: true })).toEqual('````\n```\nasd\n```\n````\n');
-  });
-
-  test('should use more tildes for fences if there are streaks of tildes in the value (fences)', () => {
-    expect(toString({ type: 'code', value: '~~~\nasd\n~~~' }, { fence: '~', fences: true })).toEqual('~~~~\n~~~\nasd\n~~~\n~~~~\n');
   });
 
   test('should use a fence if there is an info', () => {

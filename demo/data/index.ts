@@ -30,6 +30,6 @@ module.exports = results` as Record<string, string>;
  * 在下面的代码里注册模板，方便在生成器里使用
  */
 export const templates = {
-  空白: '',
   ...importedFiles,
+  空白: '',
 };

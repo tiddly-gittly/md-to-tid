@@ -1,4 +1,4 @@
-import { toString, md2tid } from '../dist/index.mjs';
+import { toString } from '../dist/index.mjs';
 
 describe('paragraph', () => {
   test('should support an empty paragraph', () => {
@@ -26,10 +26,20 @@ describe('paragraph', () => {
   });
 
   test('should encode spaces around line endings in paragraphs', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: 'a  \n  b' }] })).toEqual('a &#x20;\n&#x20; b\n');
+    expect(
+      toString({
+        type: 'paragraph',
+        children: [{ type: 'text', value: 'a  \n  b' }],
+      }),
+    ).toEqual('a &#x20;\n&#x20; b\n');
   });
 
   test('should encode spaces around line endings in paragraphs', () => {
-    expect(toString({ type: 'paragraph', children: [{ type: 'text', value: 'a\t\t\n\t\tb' }] })).toEqual('a\t&#x9;\n&#x9;\tb\n');
+    expect(
+      toString({
+        type: 'paragraph',
+        children: [{ type: 'text', value: 'a\t\t\n\t\tb' }],
+      }),
+    ).toEqual('a\t&#x9;\n&#x9;\tb\n');
   });
 });
