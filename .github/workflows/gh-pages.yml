@@ -7,19 +7,19 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2-beta
+      - uses: actions/checkout@v4.1.2
+      - uses: actions/setup-node@v4.3.0
         with:
-          node-version: '16'
+          node-version: '20'
 
       - name: Cache dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v4.2.2
         with:
           path: |
             **/node_modules
-          key: ${{ runner.os }}-${{ hashFiles('**/package-lock.json') }}
+          key: ${{ runner.os }}-${{ hashFiles('**/package.json') }}
       - name: Install Dependency
         run: npm install
       - name: Build
