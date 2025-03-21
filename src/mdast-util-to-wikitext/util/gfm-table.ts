@@ -6,7 +6,7 @@ const ALIGN_LOWER_RIGHT: number = 114;
 const ALIGN_LOWER_CENTER: number = 99;
 const ALIGN_LOWER_LEFT: number = 108;
 
-const ALIGN_UPPER_RRIGHT: number = 82;
+const ALIGN_UPPER_RIGHT: number = 82;
 const ALIGN_UPPER_CENTER: number = 67;
 const ALIGN_UPPER_LEFT: number = 76;
 
@@ -21,7 +21,7 @@ function defaultStringLength(value: string): number {
 }
 
 /**
- * 将GFM表格转换为TiddlyWiki表格的配置函数。
+ * GFM表格注册函数
  *
  * @param {Options | null | undefined} options - 转换选项，可为空。
  * @returns {Object} - 包含不安全字符和处理函数的配置对象。
@@ -29,14 +29,12 @@ function defaultStringLength(value: string): number {
 export function gfmTableToTid(options: Options | null | undefined) {
   // 如果未提供选项，则使用空对象
   const settings = options || {};
-  // 获取表格单元格的填充设置，默认为true
-  const padding = settings.tableCellPadding || true;
   // 获取表格分隔符对齐设置，默认为true
   const alignDelimiters = settings.tablePipeAlign || true;
   // 获取字符串长度计算函数，默认为defaultStringLength
   const stringLength = settings.stringLength || defaultStringLength;
   // 根据填充设置确定单元格周围的字符
-  const around = padding ? ' ' : '|';
+  const around = '|';
 
   // 定义不安全字符及其适用的构造
   const gfmUnsafe: Array<Unsafe> = [
@@ -126,7 +124,6 @@ export function gfmTableToTid(options: Options | null | undefined) {
     return tiddlywikiTable(matrix, {
       align,
       alignDelimiters,
-      padding,
       stringLength,
     });
   }
@@ -138,7 +135,6 @@ export function gfmTableToTid(options: Options | null | undefined) {
    * @param {Object} options - 转换选项。
    * @param {Array<string | null | undefined> | null | undefined} [options.align] - 列对齐方式。
    * @param {boolean} [options.alignDelimiters] - 是否对齐分隔符。
-   * @param {boolean} [options.padding] - 是否使用填充。
    * @param {(value: string) => number} [options.stringLength] - 字符串长度计算函数。
    * @param {boolean | null | undefined | true} [options.delimiterStart] - 是否在每行开头添加分隔符。
    * @param {boolean | null | undefined | true} [options.delimiterEnd] - 是否在每行结尾添加分隔符。
@@ -149,7 +145,6 @@ export function gfmTableToTid(options: Options | null | undefined) {
     options: {
       align?: (string | null | undefined)[] | null | undefined;
       alignDelimiters?: boolean;
-      padding?: boolean;
       stringLength?: (value: string) => number;
       delimiterStart?: boolean | null | undefined;
       delimiterEnd?: boolean | null | undefined;
@@ -175,7 +170,7 @@ export function gfmTableToTid(options: Options | null | undefined) {
     // 当前处理的行索引
     let rowIndex = -1;
 
-    // 遍历矩阵，计算单元格大小和最长单元格
+    // 遍历矩阵，计算单元格大小和最长单元格，得到单元格文本矩阵、单元格文本长度矩阵
     // 如果我们不进行对齐定界符，这个循环是多余的，但是如果我们进行对齐，否则在对齐时我们会做多余的工作，所以为了优化对齐过程。
     while (++rowIndex < matrix.length) {
       const row: Array<string> = [];
@@ -205,6 +200,7 @@ export function gfmTableToTid(options: Options | null | undefined) {
       sizeMatrix[rowIndex] = sizes;
     }
 
+    // column是列，row是行
     // 确定每列的对齐方式
     let columnIndex = -1;
 
@@ -220,49 +216,8 @@ export function gfmTableToTid(options: Options | null | undefined) {
       }
     }
 
-    // 生成对齐行，Tiddlywiki不需要对其行
-    // columnIndex = -1;
-    // const row: Array<string> = [];
-    // const sizes: Array<number> = [];
-    //
-    // while (++columnIndex < mostCellsPerRow) {
-    //   const code = alignments[columnIndex];
-    //   let before = '';
-    //   let after = '';
-    //
-    //   if (code === 99 /* `c` */) {
-    //     before = ':';
-    //     after = ':';
-    //   } else if (code === 108 /* `l` */) {
-    //     before = ':';
-    //   } else if (code === 114 /* `r` */) {
-    //     after = ':';
-    //   }
-    //
-    //   // 每个对齐单元格至少要有一个破折号
-    //   let size = !settings.alignDelimiters ? 1 : Math.max(1, longestCellByColumn[columnIndex] - before.length - after.length);
-    //
-    //   const cell = before + '-'.repeat(size) + after;
-    //
-    //   if (settings.alignDelimiters) {
-    //     size = before.length + size + after.length;
-    //
-    //     if (size > longestCellByColumn[columnIndex]) {
-    //       longestCellByColumn[columnIndex] = size;
-    //     }
-    //
-    //     sizes[columnIndex] = size;
-    //   }
-    //
-    //   row[columnIndex] = cell;
-    // }
-    //
-    // // 插入对齐行
-    // cellMatrix.splice(1, 0, row);
-    // sizeMatrix.splice(1, 0, sizes);
-
     rowIndex = -1;
-    // 存储每行的字符串, column是列，row是行
+    // 存储每行的字符串
     const lines: Array<string> = [];
 
     while (++rowIndex < cellMatrix.length) {
@@ -280,17 +235,22 @@ export function gfmTableToTid(options: Options | null | undefined) {
         let after = '';
 
         if (settings.alignDelimiters) {
-          const size = longestCellByColumn[columnIndex] - (sizes[columnIndex] || 0);
-          const code = alignments[columnIndex];
-
-          // TODO 处理对其方式，这个地方的TW对其先不处理。
+          // 一列（columnIndex列）中最长的单元格长度 减去 一行中（columnIndex列）单元格长度
+          // A列最长3，A列当前行单元格长度1，size结果即为 2。
+          let size = longestCellByColumn[columnIndex] - (sizes[columnIndex] || 0);
+          // 对齐方式
+          let code = alignments[columnIndex];
+          // 对于TiddlyWiki需要增加 2 个空白字符用来标记对其方式。
+          size += 2;
           if (code === ALIGN_LOWER_RIGHT) {
             before = ' '.repeat(size);
           } else if (code === ALIGN_LOWER_CENTER) {
             if (size % 2) {
+              // 奇数情况
               before = ' '.repeat(size / 2 + 0.5);
               after = ' '.repeat(size / 2 - 0.5);
             } else {
+              // 偶数情况
               before = ' '.repeat(size / 2);
               after = before;
             }
@@ -304,16 +264,7 @@ export function gfmTableToTid(options: Options | null | undefined) {
           line.push('|');
         }
 
-        if (
-          // 如果不进行对齐且单元格为空，则不添加开头空格：会有一个结尾空格。
-          settings.padding !== false &&
-          !(settings.alignDelimiters === false && cell === '') &&
-          (settings.delimiterStart || columnIndex)
-        ) {
-          line.push(' ');
-        }
-
-        if (settings.alignDelimiters !== false) {
+        if (settings.alignDelimiters) {
           line.push(before);
         }
 
@@ -321,10 +272,6 @@ export function gfmTableToTid(options: Options | null | undefined) {
 
         if (settings.alignDelimiters) {
           line.push(after);
-        }
-
-        if (settings.padding) {
-          line.push(' ');
         }
 
         if (settings.delimiterEnd || columnIndex !== mostCellsPerRow - 1) {
@@ -351,7 +298,7 @@ export function gfmTableToTid(options: Options | null | undefined) {
       ? ALIGN_LOWER_CENTER /* `c` */
       : code === ALIGN_UPPER_LEFT /* `L` */ || code === ALIGN_LOWER_LEFT /* `l` */
       ? ALIGN_LOWER_LEFT /* `l` */
-      : code === ALIGN_UPPER_RRIGHT /* `R` */ || code === ALIGN_LOWER_RIGHT /* `r` */
+      : code === ALIGN_UPPER_RIGHT /* `R` */ || code === ALIGN_LOWER_RIGHT /* `r` */
       ? ALIGN_LOWER_RIGHT /* `r` */
       : 0;
   }
