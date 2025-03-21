@@ -559,21 +559,17 @@ export type Map = (value: string, line: number, blank: boolean) => string;
  */
 export interface Options {
   /**
-   * Whether to add a space of padding between delimiters and cells (default:`true`)
-   */
-  tableCellPadding?: boolean | null | undefined
-  /**
    * Whether to align the delimiters (default: `true`).
-   */;
-  tablePipeAlign?: boolean | null | undefined
+   */
+  tablePipeAlign?: boolean | null | undefined;
   /**
    * Function to detect the length of table cell content, used when aligning
    * the delimiters between cells (optional).
-   */;
-  stringLength?: ((value: string) => number) | null | undefined
+   */
+  stringLength?: ((value: string) => number) | null | undefined;
   /**
    * 用于表示斜体的标记（可选），可以是 '//' 或 undefined。
-   */;
+   */
   italic?: '//' | undefined;
   /**
    * 用于有序列表项的标记（默认值：`'#'`）。
