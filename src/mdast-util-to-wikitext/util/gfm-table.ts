@@ -2,6 +2,14 @@ import { InlineCode, type Parents, Table, TableCell, TableRow } from 'mdast';
 import { Info, Options, State, Unsafe } from '../types';
 import { handle } from '../handle';
 
+const ALIGN_LOWER_RIGHT: number = 114;
+const ALIGN_LOWER_CENTER: number = 99;
+const ALIGN_LOWER_LEFT: number = 108;
+
+const ALIGN_UPPER_RRIGHT: number = 82;
+const ALIGN_UPPER_CENTER: number = 67;
+const ALIGN_UPPER_LEFT: number = 76;
+
 /**
  * @param {string} value
  *   Cell value.
@@ -212,53 +220,55 @@ export function gfmTableToTid(options: Options | null | undefined) {
       }
     }
 
-    // 生成对齐行
-    columnIndex = -1;
-    const row: Array<string> = [];
-    const sizes: Array<number> = [];
-
-    while (++columnIndex < mostCellsPerRow) {
-      const code = alignments[columnIndex];
-      let before = '';
-      let after = '';
-
-      if (code === 99 /* `c` */) {
-        before = ':';
-        after = ':';
-      } else if (code === 108 /* `l` */) {
-        before = ':';
-      } else if (code === 114 /* `r` */) {
-        after = ':';
-      }
-
-      // 每个对齐单元格至少要有一个破折号
-      let size = !settings.alignDelimiters ? 1 : Math.max(1, longestCellByColumn[columnIndex] - before.length - after.length);
-
-      const cell = before + '-'.repeat(size) + after;
-
-      if (settings.alignDelimiters) {
-        size = before.length + size + after.length;
-
-        if (size > longestCellByColumn[columnIndex]) {
-          longestCellByColumn[columnIndex] = size;
-        }
-
-        sizes[columnIndex] = size;
-      }
-
-      row[columnIndex] = cell;
-    }
-
-    // 插入对齐行
-    cellMatrix.splice(1, 0, row);
-    sizeMatrix.splice(1, 0, sizes);
+    // 生成对齐行，Tiddlywiki不需要对其行
+    // columnIndex = -1;
+    // const row: Array<string> = [];
+    // const sizes: Array<number> = [];
+    //
+    // while (++columnIndex < mostCellsPerRow) {
+    //   const code = alignments[columnIndex];
+    //   let before = '';
+    //   let after = '';
+    //
+    //   if (code === 99 /* `c` */) {
+    //     before = ':';
+    //     after = ':';
+    //   } else if (code === 108 /* `l` */) {
+    //     before = ':';
+    //   } else if (code === 114 /* `r` */) {
+    //     after = ':';
+    //   }
+    //
+    //   // 每个对齐单元格至少要有一个破折号
+    //   let size = !settings.alignDelimiters ? 1 : Math.max(1, longestCellByColumn[columnIndex] - before.length - after.length);
+    //
+    //   const cell = before + '-'.repeat(size) + after;
+    //
+    //   if (settings.alignDelimiters) {
+    //     size = before.length + size + after.length;
+    //
+    //     if (size > longestCellByColumn[columnIndex]) {
+    //       longestCellByColumn[columnIndex] = size;
+    //     }
+    //
+    //     sizes[columnIndex] = size;
+    //   }
+    //
+    //   row[columnIndex] = cell;
+    // }
+    //
+    // // 插入对齐行
+    // cellMatrix.splice(1, 0, row);
+    // sizeMatrix.splice(1, 0, sizes);
 
     rowIndex = -1;
-    // 存储每行的字符串
+    // 存储每行的字符串, column是列，row是行
     const lines: Array<string> = [];
 
     while (++rowIndex < cellMatrix.length) {
+      // 表格每一行的字符串数组  ['a', 'b', 'c', 'd'];
       const row = cellMatrix[rowIndex];
+      // 表格每一行的字符串大小数组 [1, 1, 1, 1];
       const sizes = sizeMatrix[rowIndex];
       columnIndex = -1;
       // 存储当前行的单元格字符串
@@ -273,9 +283,9 @@ export function gfmTableToTid(options: Options | null | undefined) {
           const size = longestCellByColumn[columnIndex] - (sizes[columnIndex] || 0);
           const code = alignments[columnIndex];
 
-          if (code === 114 /* `r` */) {
+          if (code === ALIGN_LOWER_RIGHT) {
             before = ' '.repeat(size);
-          } else if (code === 99 /* `c` */) {
+          } else if (code === ALIGN_LOWER_CENTER) {
             if (size % 2) {
               before = ' '.repeat(size / 2 + 0.5);
               after = ' '.repeat(size / 2 - 0.5);
@@ -284,6 +294,7 @@ export function gfmTableToTid(options: Options | null | undefined) {
               after = before;
             }
           } else {
+            // 若无其他情况，默认为左对齐
             after = ' '.repeat(size);
           }
         }
@@ -292,15 +303,14 @@ export function gfmTableToTid(options: Options | null | undefined) {
           line.push('|');
         }
 
-        if (
-          settings.padding !== false &&
-          // Don’t add the opening space if we’re not aligning and the cell is
-          // empty: there will be a closing space.
-          !(settings.alignDelimiters === false && cell === '') &&
-          (settings.delimiterStart || columnIndex)
-        ) {
-          line.push(' ');
-        }
+        // if (
+        //   // 如果进行对齐，并且单元格不为空，则要添加开头的空格
+        //   settings.padding !== false &&
+        //   !(settings.alignDelimiters === false && cell === '') &&
+        //   (settings.delimiterStart || columnIndex)
+        // ) {
+        //   line.push(' ');
+        // }
 
         if (settings.alignDelimiters !== false) {
           line.push(before);
@@ -336,12 +346,12 @@ export function gfmTableToTid(options: Options | null | undefined) {
   function toAlignment(value: string | null | undefined): number {
     const code = typeof value === 'string' ? value.codePointAt(0) : 0;
 
-    return code === 67 /* `C` */ || code === 99 /* `c` */
-      ? 99 /* `c` */
-      : code === 76 /* `L` */ || code === 108 /* `l` */
-      ? 108 /* `l` */
-      : code === 82 /* `R` */ || code === 114 /* `r` */
-      ? 114 /* `r` */
+    return code === ALIGN_UPPER_CENTER /* `C` */ || code === ALIGN_LOWER_CENTER /* `c` */
+      ? ALIGN_LOWER_CENTER /* `c` */
+      : code === ALIGN_UPPER_LEFT /* `L` */ || code === ALIGN_LOWER_LEFT /* `l` */
+      ? ALIGN_LOWER_LEFT /* `l` */
+      : code === ALIGN_UPPER_RRIGHT /* `R` */ || code === ALIGN_LOWER_RIGHT /* `r` */
+      ? ALIGN_LOWER_RIGHT /* `r` */
       : 0;
   }
 
@@ -363,7 +373,7 @@ export function gfmTableToTid(options: Options | null | undefined) {
    * @param {Info} info - 转换信息。
    * @returns {Array<Array<string>>} - 转换后的数据矩阵。
    */
-  function handleTableAsData(node: Table, state: State, info: Info) {
+  function handleTableAsData(node: Table, state: State, info: Info): Array<Array<string>> {
     const children = node.children;
     let index = -1;
     const result: Array<Array<string>> = [];
@@ -386,7 +396,7 @@ export function gfmTableToTid(options: Options | null | undefined) {
    * @param {Info} info - 转换信息。
    * @returns {Array<string>} - 转换后的数据数组。
    */
-  function handleTableRowAsData(node: TableRow, state: State, info: Info) {
+  function handleTableRowAsData(node: TableRow, state: State, info: Info): Array<string> {
     const children = node.children;
     let index = -1;
     const result: Array<string> = [];
@@ -412,7 +422,7 @@ export function gfmTableToTid(options: Options | null | undefined) {
    * @param {State} state - 转换状态。
    * @returns {string} - 处理后的内联代码字符串。
    */
-  function inlineCodeWithTable(node: InlineCode, parent: Parents | undefined, state: State) {
+  function inlineCodeWithTable(node: InlineCode, parent: Parents | undefined, state: State): string {
     let value = handle.inlineCode(node, parent, state);
 
     if (state.stack.includes('tableCell')) {
