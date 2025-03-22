@@ -1,10 +1,9 @@
-import ReactMarkdown from 'react-markdown';
 import React, { useCallback, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 import { useDebouncedCallback } from 'beautiful-react-hooks';
 
 import styled from 'styled-components';
-import { Button, ButtonGroup, Intent, Tab, Tabs, TextArea, Card } from '@blueprintjs/core';
+import { Button, ButtonGroup, Intent, Tab, Tabs, TextArea, Card, Elevation } from '@blueprintjs/core';
 import { useLocalStorage } from 'beautiful-react-hooks';
 import useQueryString from 'use-query-string';
 
@@ -21,6 +20,7 @@ const ContentContainer = styled.div`
   display: flex;
   flex: 1;
   margin-top: 10px;
+  max-height: 1350px;
   flex-direction: column;
   @media (min-width: 700px) {
     flex-direction: row;
@@ -31,12 +31,12 @@ const TemplateInputContainer = styled(Card)`
   flex: 1;
   flex-direction: column;
 
-  min-height: 100%;
+  min-height: 300px;
   margin-right: 10px;
 
   & textarea {
     display: flex;
-    max-height: calc(90%);
+    max-height: calc(95%);
     flex: 3;
   }
 `;
@@ -69,7 +69,7 @@ const ResultContainer = styled(Card)`
   overflow: scroll;
 
   padding: 40px;
-  font-size: 64px;
+  font-size: 32px;
 `;
 const CopyButton = styled(Button)``;
 
@@ -123,14 +123,14 @@ export function GenerationResult(props: { result: string; resultDisplayMode: Res
   switch (props.resultDisplayMode) {
     case ResultDisplayMode.card: {
       return (
-        <ResultContainer>
+        <ResultContainer elevation={Elevation.TWO}>
           <pre>{props.result}</pre>
         </ResultContainer>
       );
     }
     case ResultDisplayMode.paragraph: {
       return (
-        <ResultContainer as="article">
+        <ResultContainer elevation={Elevation.TWO}>
           <CopyButton
             size="large"
             onClick={() => {
