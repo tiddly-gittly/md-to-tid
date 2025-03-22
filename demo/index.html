@@ -3,6 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <title>MD to Tid Wikitext</title>
+    <link href="https://cdn.jsdelivr.net/npm/normalize.css@8.0.1/normalize.min.css" rel="stylesheet" />
+
+    <!-- include blueprint-icons.css for icon font support -->
+    <link href="https://cdn.jsdelivr.net/npm/@blueprintjs/core@5.17.6/lib/css/blueprint.min.css" rel="stylesheet" />
   </head>
 
   <body style="height: 100vh; min-height: 100vh">
@@ -10,11 +14,6 @@
 
     <!-- Load our app -->
     <script type="module" src="./bundle.js" async></script>
-
-    <!-- Style dependencies -->
-    <link href="https://unpkg.com/normalize.css@^7.0.0" rel="stylesheet" />
-    <!-- Blueprint stylesheets -->
-    <link href="https://unpkg.com/@blueprintjs/core@^4.3.0/lib/css/blueprint.css" rel="stylesheet" />
 
     <!-- 网上抄的 REM 自适应，居然没人包成 npm 包，太复古了 -->
     <script>
