@@ -13,7 +13,6 @@ import { track } from './util/track';
 import { Nodes, Parents } from 'mdast';
 import {
   ConstructName,
-  Enter,
   Exit,
   FlowChildren,
   FlowParents,
@@ -25,6 +24,7 @@ import {
   TrackFields,
 } from './types';
 import { gfmTableToTid } from './util/gfm-table';
+import { gfmFootnoteToTid } from './util/gfm-footnote';
 
 /**
  * Turn an mdast syntax tree into markdown.
@@ -64,6 +64,12 @@ export function toTid(tree: Nodes, options: Options | null | undefined): string 
   configure(state, {
     handlers: { ...gfmTableToTid(settings).handlers },
     unsafe: [...gfmTableToTid(settings).gfmUnsafe],
+  });
+
+  // 注册脚注处理函数
+  configure(state, {
+    handlers: { ...gfmFootnoteToTid(settings).handlers },
+    unsafe: [...gfmFootnoteToTid(settings).gfmUnsafe],
   });
 
   if (state.options.tightDefinitions) {
