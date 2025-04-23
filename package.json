@@ -38,11 +38,16 @@
   "dependencies": {
     "@types/mdast": "^4.0.4",
     "@types/unist": "^3.0.3",
+    "escape-string-regexp": "^5.0.0",
     "longest-streak": "^3.1.0",
     "mdast-util-from-markdown": "^2.0.2",
+    "mdast-util-frontmatter": "^2.0.1",
+    "mdast-util-gfm-footnote": "^2.1.0",
     "mdast-util-gfm-table": "^2.0.0",
     "mdast-util-phrasing": "^4.1.0",
     "mdast-util-to-string": "^4.0.0",
+    "micromark-extension-frontmatter": "^2.0.0",
+    "micromark-extension-gfm-footnote": "^2.1.0",
     "micromark-extension-gfm-table": "^2.1.1",
     "micromark-util-decode-string": "^2.0.1",
     "zwitch": "^2.0.4"

@@ -3,7 +3,8 @@ import type { State } from '../types';
 
 /**
  * 检查是否应将代码节点格式化为缩进代码。
- * 
+ * tiddlywiki无缩进代码块定义。
+ *
  * @param node - 要格式化的代码节点。
  * @param context - 转换的当前状态。
  * @returns 如果应将代码格式化为缩进代码，则返回 true；否则返回 false。

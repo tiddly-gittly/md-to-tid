@@ -6,7 +6,7 @@ describe('code (flow)', () => {
   });
 
   test('should support code w/ a value (indent)', () => {
-    expect(toString({ type: 'code', value: 'a' })).toEqual('    a\n');
+    expect(toString({ type: 'code', value: 'a' })).toEqual('```\na\n```\n');
   });
 
   test('should support code w/ a value (fences)', () => {
@@ -86,7 +86,7 @@ describe('code (flow)', () => {
   });
 
   test('should use an indent if the value is indented', () => {
-    expect(toString({ type: 'code', value: '  a\n\n b' })).toEqual('      a\n\n     b\n');
+    expect(toString({ type: 'code', value: '  a\n\n b' })).toEqual('```\n  a\n\n b\n```\n');
   });
 });
 

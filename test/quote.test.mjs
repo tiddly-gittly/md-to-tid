@@ -70,7 +70,7 @@ describe('blockquote', () => {
         type: 'blockquote',
         children: [{ type: 'code', value: 'a\nb\n\nc' }],
       }),
-    ).toEqual('>     a\n>     b\n>\n>     c\n');
+    ).toEqual('> ```\n> a\n> b\n>\n> c\n> ```\n');
   });
 
   test('should support code (flow, fenced) in a block quote', () => {

@@ -52,6 +52,8 @@ export type CompilePattern = (info: Unsafe) => RegExp;
  * ```
  */
 export interface ConstructNameMap {
+  footnoteDefinition: 'footnoteDefinition';
+  footnoteReference: 'footnoteReference';
   table: 'table';
   tableRow: 'tableRow';
   tableCell: 'tableCell';
@@ -558,6 +560,7 @@ export type Map = (value: string, line: number, blank: boolean) => string;
  * Configuration (optional).
  */
 export interface Options {
+  firstLineBlank?: boolean | null | undefined;
   /**
    * Whether to align the delimiters (default: `true`).
    */

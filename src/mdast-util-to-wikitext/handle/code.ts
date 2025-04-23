@@ -1,20 +1,23 @@
 import { longestStreak } from 'longest-streak';
-import { formatCodeAsIndented } from '../util/format-code-as-indented';
 import { checkFence } from '../util/check-fence';
 import { Code, Parents } from 'mdast';
-import { Info, Map, State } from '../types';
+import { Info, State } from '../types';
 
 export function code(node: Code, _: Parents | undefined, state: State, info: Info): string {
   const marker = checkFence(state);
   const raw = node.value || '';
   const suffix = marker === '`' ? 'GraveAccent' : 'Tilde';
 
-  if (formatCodeAsIndented(node, state)) {
-    const exit = state.enter('codeIndented');
-    const value = state.indentLines(raw, map);
-    exit();
-    return value;
-  }
+  // tiddlywiki无缩进代码块定义。
+  // if (formatCodeAsIndented(node, state)) {
+  //   const exit = state.enter('codeIndented');
+  //   const value = state.indentLines(raw, map);
+  //   exit();
+  //   return value;
+  // }
+  // const map: Map = function map(line, _, blank) {
+  //   return (blank ? '' : '    ') + line
+  // }
 
   const tracker = state.createTracker(info);
   // 重复次数为代码原始内容中标记字符最长连续出现次数加 1 和 3 中的较大值。
@@ -65,8 +68,4 @@ export function code(node: Code, _: Parents | undefined, state: State, info: Inf
   value += tracker.move(sequence);
   exit();
   return value;
-}
-
-const map: Map = function map(line, _, blank) {
-  return (blank ? '' : '    ') + line
 }
