@@ -66,9 +66,9 @@ export function gfmFootnoteToTid(options: Options) {
 }
 
 function mapExceptFirst(value: string, line: number, blank: boolean) {
-  return line === 0 ? line.toString() : mapAll(value, line, blank);
+  return line === 0 ? value : mapAll(value, line, blank);
 }
 
-function mapAll(value: string, line: number, blank: boolean) {
-  return (blank ? '' : '    ') + line;
+function mapAll(value: string | number, line: number, blank: boolean) {
+  return (blank ? '' : '    ') + value;
 }
