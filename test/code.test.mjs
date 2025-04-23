@@ -5,6 +5,10 @@ describe('code (flow)', () => {
     expect(toString({ type: 'code' })).toEqual('```\n```\n');
   });
 
+  test('should support code w/ a value (indent)', () => {
+    expect(toString({ type: 'code', value: 'a' })).toEqual('```\na\n```\n');
+  });
+
   test('should support code w/ a value (fences)', () => {
     expect(toString({ type: 'code', value: 'a' }, { fences: true })).toEqual('```\na\n```\n');
   });
@@ -79,6 +83,10 @@ describe('code (flow)', () => {
 
   test('should use a fence if there last line is blank (filled)', () => {
     expect(toString({ type: 'code', value: 'a\n ' })).toEqual('```\na\n \n```\n');
+  });
+
+  test('should use an indent if the value is indented', () => {
+    expect(toString({ type: 'code', value: '  a\n\n b' })).toEqual('```\n  a\n\n b\n```\n');
   });
 });
 

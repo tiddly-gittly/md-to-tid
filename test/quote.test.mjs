@@ -64,13 +64,13 @@ describe('blockquote', () => {
     ).toEqual('> a\\\n> b\n');
   });
 
-  test.skip('should support code (flow, indented) in a block quote', () => {
+  test('should support code (flow, indented) in a block quote', () => {
     expect(
       toString({
         type: 'blockquote',
         children: [{ type: 'code', value: 'a\nb\n\nc' }],
       }),
-    ).toEqual('>     a\n>     b\n>\n>     c\n');
+    ).toEqual('> ```\n> a\n> b\n>\n> c\n> ```\n');
   });
 
   test('should support code (flow, fenced) in a block quote', () => {

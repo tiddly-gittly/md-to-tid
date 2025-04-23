@@ -12,7 +12,7 @@ let tab = `
 | L | L | R | C |
 `;
 
-let foot = `
+let footnote = `
 In the Solar System, Mercury[^mercury] and Venus[^venus] have very small tilts.
 
 [^mercury]:
@@ -22,6 +22,20 @@ In the Solar System, Mercury[^mercury] and Venus[^venus] have very small tilts.
 [^venus]:
     **Venus** is the second planet from
     the Sun.
-`
+`;
 
-console.log(md2tid(foot));
+let tomlFrontMatter = `+++
+title = "New Website"
++++
+
+# Other markdown
+`;
+
+let yamlFrontMatter = `---
+foo: bar
+---
+
+# Other markdown
+`;
+
+console.log(md2tid(tomlFrontMatter));
