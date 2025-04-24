@@ -38,4 +38,4 @@ foo: bar
 # Other markdown
 `;
 
-console.log(md2tid(tomlFrontMatter));
+console.log(md2tid(footnote));

@@ -26,6 +26,7 @@ import {
 import { gfmTableToTid } from './util/gfm-table';
 import { gfmFootnoteToTid } from './util/gfm-footnote';
 import { frontMatterToTid } from './util/frontmatter';
+import { visit } from 'unist-util-visit';
 
 /**
  * Turn an mdast syntax tree into markdown.
@@ -57,6 +58,7 @@ export function toTid(tree: Nodes, options: Options | null | undefined): string 
     safe: safeBound,
     stack: [],
     unsafe: [...unsafe],
+    useMemo: new Map(),
   };
 
   configure(state, settings);
@@ -87,6 +89,18 @@ export function toTid(tree: Nodes, options: Options | null | undefined): string 
     invalid,
     unknown,
     handlers: state.handlers,
+  });
+
+  const footnoteDefinitionDict: Map<string, string> = new Map();
+  visit(tree, 'footnoteDefinition', function (node, index, parent) {
+    let fd_text = state
+      .containerFlow(node, {
+        now: { line: 1, column: 1 },
+        lineShift: 0,
+      })
+      .replaceAll('\n', ' ');
+    footnoteDefinitionDict.set(association(node), fd_text);
+    state.useMemo.set('footnoteDefinition', footnoteDefinitionDict);
   });
 
   let result = state.handle(tree, undefined, state, {

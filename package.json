@@ -50,6 +50,7 @@
     "micromark-extension-gfm-footnote": "^2.1.0",
     "micromark-extension-gfm-table": "^2.1.1",
     "micromark-util-decode-string": "^2.0.1",
+    "unist-util-visit": "^5.0.0",
     "zwitch": "^2.0.4"
   },
   "devDependencies": {
