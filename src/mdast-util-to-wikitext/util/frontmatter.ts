@@ -23,7 +23,7 @@ export function frontMatterToTid(options: Options) {
     // Typing this is the responsibility of the end user.
     handlers[matter.type] = handler(matter);
 
-    const open = fence(matter, 'open');
+    const open = fence(matter, 'open') + matter.type;
 
     gfmUnsafe.push({
       atBreak: true,
@@ -44,7 +44,7 @@ export function frontMatterToTid(options: Options) {
  *   Handler.
  */
 function handler(matter: Matter): (node: Literal) => string {
-  const open = fence(matter, 'open');
+  const open = fence(matter, 'open') + matter.type;
   const close = fence(matter, 'close');
 
   return handle;
@@ -91,5 +91,5 @@ function fence(matter: Matter, prop: 'close' | 'open'): string {
  *   Thing to use for the opening or closing.
  */
 function pick(schema: Info | string, prop: 'close' | 'open'): string {
-  return typeof schema === 'string' ? schema : schema[prop];
+  return typeof schema === 'string' ? '`' : schema[prop];
 }
