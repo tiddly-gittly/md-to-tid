@@ -4,9 +4,28 @@ Transform markdown to tiddlywiki5 wikitext syntax. Using unifiedjs.
 
 ## Basic features
 
-- `-` to `*`
-- `1.` to `#`
-- `#` to `!`
+- blockquote
+- bold
+- break
+- code
+- definition
+- emphasis
+- heading
+- html
+- image
+- image-reference
+- inline-code
+- italic
+- link
+- link-reference
+- list
+- list-item
+- paragraph
+- text
+- thematic-break
+- front-matter
+- table
+- footnote
 
 ## Usage
 

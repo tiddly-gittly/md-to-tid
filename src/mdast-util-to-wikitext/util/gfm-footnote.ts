@@ -29,7 +29,7 @@ export function gfmFootnoteToTid(options: Options) {
 }
 
 function footnoteReferencePeek() {
-  return '[';
+  return '<<fnote "';
 }
 
 function footnoteReference(node: FootnoteReference, _: Parents | undefined, state: State, info: Info) {
