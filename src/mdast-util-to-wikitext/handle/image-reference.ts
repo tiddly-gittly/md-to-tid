@@ -45,7 +45,7 @@ export function imageReference(node: ImageReference, _: Parents | undefined, sta
 
   if (type === 'full' || !alt || alt !== reference) {
     value += tracker.move(reference + ']]');
-  } else if (type === 'shortcut') {
+  } else if (type === 'shortcut' && alt !== '') {
     // Remove the unwanted `|`.
     value = value.slice(0, -1);
     value += tracker.move(']]');
