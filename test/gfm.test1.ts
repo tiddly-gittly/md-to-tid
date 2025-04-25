@@ -53,4 +53,12 @@ let reference = `
 [label2]: https://example.com
 `;
 
-console.log(md2tid(reference));
+let obsidian_internal_link_and_embeds = `
+[[Link]]
+[[Link|AltText]]
+
+![[Embeds]]
+![[Embeds|AltText]]
+`;
+
+console.log(md2tid(obsidian_internal_link_and_embeds));
