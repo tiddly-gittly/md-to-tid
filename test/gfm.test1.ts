@@ -1,5 +1,4 @@
 import { md2tid } from '../src';
-import { linkReference } from '../src/mdast-util-to-wikitext/handle/link-reference';
 
 let tab = `
 # 这是一个表格
@@ -40,10 +39,18 @@ foo: bar
 `;
 
 let reference = `
+[][]
+![][]
+[alt1][]
+![alt2][]
+
+[][label1]
+![][label2]
 [alt1][label1]
 ![alt2][label2]
 
 [label1]: https://en.wikipedia.org/wiki/Hobbit#Lifestyle "Hobbit lifestyles"
 [label2]: https://example.com
-`
+`;
+
 console.log(md2tid(reference));

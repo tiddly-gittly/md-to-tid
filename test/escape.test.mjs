@@ -144,7 +144,7 @@ describe('escape', () => {
           },
         ],
       }),
-    ).toEqual('\\![a][b]\n');
+    ).toEqual('\\![ext[a|b]]\n');
   });
 
   test('should escape what would otherwise be an image (reference)', () => {

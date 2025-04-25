@@ -255,7 +255,7 @@ describe('blockquote', () => {
           },
         ],
       }),
-    ).toEqual('> a\n> ![b\n> c][d\n> e]\n> g\n');
+    ).toEqual('> a\n> [img[b\n> c|d\n> e]]\n> g\n');
   });
 
   test('should support a link (resource) in a block quote', () => {
@@ -302,7 +302,7 @@ describe('blockquote', () => {
           },
         ],
       }),
-    ).toEqual('> a\n> [b\n> c][d\n> e]\n> g\n');
+    ).toEqual('> a\n> [ext[b\n> c|d\n> e]]\n> g\n');
   });
 
   test('should support a list in a block quote', () => {

@@ -174,19 +174,19 @@ describe('link', () => {
 
 describe('linkReference', (t) => {
   test('should support a link reference (nonsensical)', () => {
-    expect(toString({ type: 'linkReference' })).toEqual('[][]\n');
+    expect(toString({ type: 'linkReference' })).toEqual('[ext[]]\n');
   });
 
   test('should support `children`', () => {
-    expect(toString({ type: 'linkReference', children: [{ type: 'text', value: 'a' }] })).toEqual('[a][]\n');
+    expect(toString({ type: 'linkReference', children: [{ type: 'text', value: 'a' }] })).toEqual('[ext[a|]]\n');
   });
 
   test('should support an `identifier` (nonsensical)', () => {
-    expect(toString({ type: 'linkReference', identifier: 'a' })).toEqual('[][a]\n');
+    expect(toString({ type: 'linkReference', identifier: 'a' })).toEqual('[ext[a]]\n');
   });
 
   test('should support a `label` (nonsensical)', () => {
-    expect(toString({ type: 'linkReference', label: 'a' })).toEqual('[][a]\n');
+    expect(toString({ type: 'linkReference', label: 'a' })).toEqual('[ext[a]]\n');
   });
 
   test('should support `referenceType: "shortcut"`', () => {
@@ -197,7 +197,7 @@ describe('linkReference', (t) => {
         label: 'A',
         referenceType: 'shortcut',
       }),
-    ).toEqual('[A]\n');
+    ).toEqual('[ext[A]]\n');
   });
 
   test('should support `referenceType: "collapsed"`', () => {
@@ -209,7 +209,7 @@ describe('linkReference', (t) => {
         identifier: 'a',
         referenceType: 'collapsed',
       }),
-    ).toEqual('[A][]\n');
+    ).toEqual('[ext[A|]]\n');
   });
 
   test('should support `referenceType: "full"` (default)', () => {
@@ -221,7 +221,7 @@ describe('linkReference', (t) => {
         identifier: 'a',
         referenceType: 'full',
       }),
-    ).toEqual('[A][A]\n');
+    ).toEqual('[ext[A|A]]\n');
   });
 
   test('should prefer label over identifier', () => {
@@ -233,7 +233,7 @@ describe('linkReference', (t) => {
         identifier: '&amp;',
         referenceType: 'full',
       }),
-    ).toEqual('[&][&]\n');
+    ).toEqual('[ext[&|&]]\n');
   });
 
   test('should decode `identifier` if w/o `label`', () => {
@@ -244,7 +244,7 @@ describe('linkReference', (t) => {
         identifier: '&amp;',
         referenceType: 'full',
       }),
-    ).toEqual('[&][&]\n');
+    ).toEqual('[ext[&|&]]\n');
   });
 
   test('should support incorrect character references', () => {
@@ -260,7 +260,7 @@ describe('linkReference', (t) => {
           },
         ],
       }),
-    ).toEqual('[\\&a;][&b;]\n');
+    ).toEqual('[ext[\\&a;|&b;]]\n');
   });
 
   test('should unescape `identifier` if w/o `label`', () => {
@@ -271,7 +271,7 @@ describe('linkReference', (t) => {
         identifier: '\\+',
         referenceType: 'full',
       }),
-    ).toEqual('[+][+]\n');
+    ).toEqual('[ext[+|+]]\n');
   });
 
   test('should use a collapsed reference if w/o `referenceType` and the label matches the reference', () => {
@@ -282,7 +282,7 @@ describe('linkReference', (t) => {
         label: 'a',
         identifier: 'a',
       }),
-    ).toEqual('[a][]\n');
+    ).toEqual('[ext[a|]]\n');
   });
 
   test('should use a full reference if w/o `referenceType` and the label does not match the reference', () => {
@@ -293,7 +293,7 @@ describe('linkReference', (t) => {
         label: 'b',
         identifier: 'b',
       }),
-    ).toEqual('[a][b]\n');
+    ).toEqual('[ext[a|b]]\n');
   });
 
   test.skip('should use a full reference if w/o `referenceType` and the label does not match the reference', () => {
@@ -316,6 +316,6 @@ describe('linkReference', (t) => {
         referenceType: 'full',
         children: [],
       }),
-    ).toEqual('[][a!\\[b\\](c*d_e\\[f_g`h<i</j]\n');
+    ).toEqual('[ext[a!\\[b\\](c*d_e\\[f_g`h<i</j]]\n');
   });
 });

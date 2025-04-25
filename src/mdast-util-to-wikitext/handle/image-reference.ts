@@ -18,7 +18,11 @@ export function imageReference(node: ImageReference, _: Parents | undefined, sta
     after: ']',
     ...tracker.current(),
   });
-  value += tracker.move(alt + '|');
+
+  // 如果alt为空，则直接使用url
+  if (alt !== '') {
+    value += tracker.move(alt + '|');
+  }
 
   subexit();
   // Hide the fact that we’re in phrasing, because escapes don’t work.
@@ -30,7 +34,7 @@ export function imageReference(node: ImageReference, _: Parents | undefined, sta
   // Practically, in that case, there is no content, so it doesn’t matter that
   // we’ve tracked one too many characters.
 
-  const reference = state.safe(state.memo.get('definition')?.get(state.associationId(node)), {
+  const reference = state.safe(state.memo.get('definition')?.get(state.associationId(node)) || state.associationId(node), {
     before: value,
     after: ']]',
     ...tracker.current(),
@@ -44,6 +48,7 @@ export function imageReference(node: ImageReference, _: Parents | undefined, sta
   } else if (type === 'shortcut') {
     // Remove the unwanted `|`.
     value = value.slice(0, -1);
+    value += tracker.move(']]');
   } else {
     value += tracker.move(']]');
   }

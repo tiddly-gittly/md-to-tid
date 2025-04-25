@@ -13,12 +13,16 @@ export function linkReference(node: LinkReference, _: Parents | undefined, state
   let subexit = state.enter('label');
   const tracker = state.createTracker(info);
   let value = tracker.move('[ext[');
-  const text = state.containerPhrasing(node, {
+  const alt = state.containerPhrasing(node, {
     before: value,
     after: '|',
     ...tracker.current(),
   });
-  value += tracker.move(text + '|');
+
+  // 如果alt为空，则直接使用url
+  if (alt !== '') {
+    value += tracker.move(alt + '|');
+  }
 
   subexit();
   // Hide the fact that we’re in phrasing, because escapes don’t work.
@@ -29,7 +33,7 @@ export function linkReference(node: LinkReference, _: Parents | undefined, state
   // up making a `shortcut` reference, because then there is no brace output.
   // Practically, in that case, there is no content, so it doesn’t matter that
   // we’ve tracked one too many characters.
-  const reference = state.safe(state.memo.get('definition')?.get(state.associationId(node)), {
+  const reference = state.safe(state.memo.get('definition')?.get(state.associationId(node)) || state.associationId(node), {
     before: value,
     after: ']]',
     ...tracker.current(),
@@ -38,11 +42,12 @@ export function linkReference(node: LinkReference, _: Parents | undefined, state
   state.stack = stack;
   exit();
 
-  if (type === 'full' || !text || text !== reference) {
+  if (type === 'full' || !alt || alt !== reference) {
     value += tracker.move(reference + ']]');
-  } else if (type === 'shortcut') {
+  } else if (type === 'shortcut' && alt !== '') {
     // Remove the unwanted `|`.
     value = value.slice(0, -1);
+    value += tracker.move(']]');
   } else {
     value += tracker.move(']]');
   }
