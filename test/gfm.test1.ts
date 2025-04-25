@@ -56,9 +56,11 @@ let reference = `
 let obsidian_internal_link_and_embeds = `
 [[Link]]
 [[Link|AltText]]
+[[Link|AltText|AltText1|...]]
 
 ![[Embeds]]
 ![[Embeds|AltText]]
+![[Embeds|AltText|AltText1|...|200x400]]
 `;
 
 console.log(md2tid(obsidian_internal_link_and_embeds));
