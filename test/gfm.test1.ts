@@ -63,4 +63,9 @@ let obsidian_internal_link_and_embeds = `
 ![[Embeds|AltText|AltText1|...|200x400]]
 `;
 
+// 用不到的其它语法
+// ![[内部链接#^b15695]]
+// ![[Document.pdf#page=3]]
+// ![[Document.pdf#height=400]]
+
 console.log(md2tid(obsidian_internal_link_and_embeds));
