@@ -58,9 +58,10 @@ export function toTid(tree: Nodes, options: Options | null | undefined): string 
     safe: safeBound,
     stack: [],
     unsafe: [...unsafe],
-    useMemo: new Map(),
+    memo: new Map(),
   };
 
+  // 初始配置
   configure(state, settings);
 
   // 注册表格处理函数
@@ -91,7 +92,9 @@ export function toTid(tree: Nodes, options: Options | null | undefined): string 
     handlers: state.handlers,
   });
 
+  // 预先记忆定义用于后面脚注、链接、图片的引用
   const footnoteDefinitionDict: Map<string, string> = new Map();
+  const definitionDict: Map<string, string> = new Map();
   visit(tree, 'footnoteDefinition', function (node, index, parent) {
     let fd_text = state
       .containerFlow(node, {
@@ -100,7 +103,11 @@ export function toTid(tree: Nodes, options: Options | null | undefined): string 
       })
       .replaceAll('\n', ' ');
     footnoteDefinitionDict.set(association(node), fd_text);
-    state.useMemo.set('footnoteDefinition', footnoteDefinitionDict);
+    state.memo.set('footnoteDefinition', footnoteDefinitionDict);
+  });
+  visit(tree, 'definition', function (node, index, parent) {
+    definitionDict.set(association(node), node.url);
+    state.memo.set('definition', definitionDict);
   });
 
   let result = state.handle(tree, undefined, state, {

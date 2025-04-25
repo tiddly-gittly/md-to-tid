@@ -814,7 +814,7 @@ export interface State {
   /**
    * 记忆全局变量
    */
-  useMemo: Map<string, Map<string, string>>;
+  memo: Map<string, Map<string, string>>;
 }
 
 /**

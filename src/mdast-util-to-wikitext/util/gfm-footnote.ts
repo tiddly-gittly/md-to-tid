@@ -37,7 +37,7 @@ function footnoteReference(node: FootnoteReference, _: Parents | undefined, stat
   let value = tracker.move('<<fnote "');
   const exit = state.enter('footnoteReference');
   const subexit = state.enter('reference');
-  value += tracker.move(state.useMemo.get('footnoteDefinition')?.get(state.associationId(node)));
+  value += tracker.move(state.memo.get('footnoteDefinition')?.get(state.associationId(node)));
   subexit();
   exit();
   value += tracker.move('">>');
