@@ -179,7 +179,7 @@ describe('escape', () => {
         type: 'paragraph',
         children: [{ type: 'text', value: '[[a.jpg]]' }],
       }),
-    ).toEqual('\\[\\[a.jpg]]\n');
+    ).toEqual('[[a.jpg]]\n');
   });
 
   test('should not escape what would otherwise not be a link (resource)', () => {
