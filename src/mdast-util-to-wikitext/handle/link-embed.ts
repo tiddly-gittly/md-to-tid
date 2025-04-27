@@ -23,7 +23,7 @@ export function linkEmbed(node: Text, state: State, info: Info) {
       // [[Link|AltText|AltText1|...]]
       const verticalBarIndex = match.indexOf('|');
       let linkText = match.substring(0, verticalBarIndex);
-      const altText = match.substring(verticalBarIndex + 1);
+      const altText = match.substring(verticalBarIndex + 1).replaceAll("|","_");
       if (verticalBarIndex === -1) {
         transformerRegexpInternalLink.push(item);
       } else {
