@@ -38,4 +38,34 @@ foo: bar
 # Other markdown
 `;
 
-console.log(md2tid(tomlFrontMatter));
+let reference = `
+[][]
+![][]
+[alt1][]
+![alt2][]
+
+[][label1]
+![][label2]
+[alt1][label1]
+![alt2][label2]
+
+[label1]: https://en.wikipedia.org/wiki/Hobbit#Lifestyle "Hobbit lifestyles"
+[label2]: https://example.com
+`;
+
+let obsidian_internal_link_and_embeds = `
+[[Link]]
+[[Link|AltText]]
+[[Link|AltText|AltText1|...]]
+
+![[Embeds]]
+![[Embeds|AltText]]
+![[Embeds|AltText|AltText1|...|200x400]]
+`;
+
+// 用不到的其它语法
+// ![[内部链接#^b15695]]
+// ![[Document.pdf#page=3]]
+// ![[Document.pdf#height=400]]
+
+console.log(md2tid(obsidian_internal_link_and_embeds));

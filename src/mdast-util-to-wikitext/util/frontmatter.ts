@@ -1,7 +1,7 @@
-import { Info, Matter, Options, toMatters } from 'micromark-extension-frontmatter';
+import {Matter, Options, toMatters} from 'micromark-extension-frontmatter';
 import escapeStringRegexp from 'escape-string-regexp';
-import { Literal } from 'mdast';
-import { Options as ToMarkdownExtension } from '../types';
+import {Literal} from 'mdast';
+import {Options as ToMarkdownExtension} from '../types';
 
 /**
  * Create an extension for `mdast-util-to-markdown`.
@@ -23,7 +23,7 @@ export function frontMatterToTid(options: Options) {
     // Typing this is the responsibility of the end user.
     handlers[matter.type] = handler(matter);
 
-    const open = fence(matter, 'open');
+    const open = '`'.repeat(3) + matter.type;
 
     gfmUnsafe.push({
       atBreak: true,
@@ -44,8 +44,8 @@ export function frontMatterToTid(options: Options) {
  *   Handler.
  */
 function handler(matter: Matter): (node: Literal) => string {
-  const open = fence(matter, 'open');
-  const close = fence(matter, 'close');
+  const open = '`'.repeat(3) + matter.type;
+  const close = '`'.repeat(3);
 
   return handle;
 
@@ -60,36 +60,4 @@ function handler(matter: Matter): (node: Literal) => string {
   function handle(node: Literal): string {
     return open + (node.value ? '\n' + node.value : '') + '\n' + close;
   }
-}
-
-/**
- * Get an `open` or `close` fence.
- *
- * @param {Matter} matter
- *   Structure.
- * @param {'close' | 'open'} prop
- *   Field to get.
- * @returns {string}
- *   Fence.
- */
-function fence(matter: Matter, prop: 'close' | 'open'): string {
-  return matter.marker
-    ? pick(matter.marker, prop).repeat(3)
-    : // @ts-expect-error: They’re mutually exclusive.
-      pick(matter.fence, prop);
-}
-
-/**
- * Take `open` or `close` fields when schema is an info object, or use the
- * given value when it is a string.
- *
- * @param {Info | string} schema
- *   Info object or value.
- * @param {'close' | 'open'} prop
- *   Field to get.
- * @returns {string}
- *   Thing to use for the opening or closing.
- */
-function pick(schema: Info | string, prop: 'close' | 'open'): string {
-  return typeof schema === 'string' ? schema : schema[prop];
 }

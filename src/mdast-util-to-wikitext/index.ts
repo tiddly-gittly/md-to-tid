@@ -26,6 +26,7 @@ import {
 import { gfmTableToTid } from './util/gfm-table';
 import { gfmFootnoteToTid } from './util/gfm-footnote';
 import { frontMatterToTid } from './util/frontmatter';
+import { visit } from 'unist-util-visit';
 
 /**
  * Turn an mdast syntax tree into markdown.
@@ -57,8 +58,10 @@ export function toTid(tree: Nodes, options: Options | null | undefined): string 
     safe: safeBound,
     stack: [],
     unsafe: [...unsafe],
+    memo: new Map(),
   };
 
+  // 初始配置
   configure(state, settings);
 
   // 注册表格处理函数
@@ -87,6 +90,24 @@ export function toTid(tree: Nodes, options: Options | null | undefined): string 
     invalid,
     unknown,
     handlers: state.handlers,
+  });
+
+  // 预先记忆定义用于后面脚注、链接、图片的引用
+  const footnoteDefinitionDict: Map<string, string> = new Map();
+  const definitionDict: Map<string, string> = new Map();
+  visit(tree, 'footnoteDefinition', function (node, index, parent) {
+    let fd_text = state
+      .containerFlow(node, {
+        now: { line: 1, column: 1 },
+        lineShift: 0,
+      })
+      .replaceAll('\n', ' ');
+    footnoteDefinitionDict.set(association(node), fd_text);
+    state.memo.set('footnoteDefinition', footnoteDefinitionDict);
+  });
+  visit(tree, 'definition', function (node, index, parent) {
+    definitionDict.set(association(node), node.url);
+    state.memo.set('definition', definitionDict);
   });
 
   let result = state.handle(tree, undefined, state, {

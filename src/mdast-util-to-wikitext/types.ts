@@ -495,7 +495,7 @@ export type Handle = (
  * @returns
  *   Padded value.
  */
-export type IndentLines = (value: string, map: Map) => string;
+export type IndentLines = (value: string, map: IndentLineMap) => string;
 
 /**
  * Info on the surrounding of the node that is serialized.
@@ -554,13 +554,12 @@ export type Join = (left: FlowChildren, right: FlowChildren, parent: FlowParents
  * @returns
  *   Padded line.
  */
-export type Map = (value: string, line: number, blank: boolean) => string;
+export type IndentLineMap = (value: string, line: number, blank: boolean) => string;
 
 /**
  * Configuration (optional).
  */
 export interface Options {
-  firstLineBlank?: boolean | null | undefined;
   /**
    * Whether to align the delimiters (default: `true`).
    */
@@ -812,6 +811,10 @@ export interface State {
    * Applied unsafe patterns.
    */
   unsafe: Array<Unsafe>;
+  /**
+   * 记忆全局变量
+   */
+  memo: Map<string, Map<string, string>>;
 }
 
 /**

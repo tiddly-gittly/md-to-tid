@@ -1,6 +1,6 @@
 import { checkBullet } from '../util/check-bullet';
 import { ListItem, Parents } from 'mdast';
-import { Info, Map, State } from '../types';
+import { Info, IndentLineMap, State } from '../types';
 import { checkBulletOrdered } from '../util/check-bullet-ordered';
 
 export function listItem(node: ListItem, parent: Parents | undefined, state: State, info: Info): string {
@@ -26,7 +26,7 @@ export function listItem(node: ListItem, parent: Parents | undefined, state: Sta
   tracker.move(bullet.repeat(size - bullet.length));
   tracker.shift(size);
   const exit = state.enter('listItem');
-  const map: Map = function map(line, index, blank) {
+  const map: IndentLineMap = function map(line, index, blank) {
     if (index) {
       if (line.startsWith("#") || line.startsWith("*")) {
         let old_bullet = line.split(" ")[0]

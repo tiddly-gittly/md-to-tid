@@ -1,4 +1,4 @@
-import { Map } from '../types';
+import { IndentLineMap } from '../types';
 
 /**
  * 正则表达式，用于匹配换行符（支持不同操作系统的换行符格式）
@@ -9,10 +9,10 @@ const eol = /\r?\n|\r/g;
  * 对输入的字符串按行进行处理，并根据提供的映射函数进行转换。
  *
  * @param {string} value - 要处理的原始字符串。
- * @param {Map} map - 用于处理每一行的映射函数。
+ * @param {IndentLineMap} map - 用于处理每一行的映射函数。
  * @returns {string} - 处理后的字符串。
  */
-export function indentLines(value: string, map: Map): string {
+export function indentLines(value: string, map: IndentLineMap): string {
   // 用于存储处理后的每一行和换行符
   const result: string[] = [];
   // 记录当前处理的起始位置
