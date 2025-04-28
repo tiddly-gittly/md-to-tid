@@ -1,6 +1,6 @@
 {
   "name": "md-to-tid",
-  "version": "0.1.1",
+  "version": "1.0.0",
   "description": "Transform markdown to tiddlywiki5 wikitext syntax.",
   "main": "dist/index.mjs",
   "type": "module",
